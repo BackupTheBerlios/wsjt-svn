@@ -7,8 +7,10 @@
 #include <sys/time.h>
 #include "fivehz.h"
 
-#if 0
+#if 1
 #define ALSA_LOG
+#endif
+#if 0
 #define ALSA_LOG_BUFFERS
 #endif
 #if 0
@@ -85,7 +87,12 @@ static int ao_alsa_open(alsa_driver_t *this_gen, int32_t *input_rate, snd_pcm_st
   err = snd_output_stdio_attach(&jcd_out, stdout, 0);
   
   this->num_channels = 2;
-  pcm_device="default";
+  if (direction == SND_PCM_STREAM_PLAYBACK) {
+    pcm_device="plug:front";
+  } else {
+    pcm_device="default";
+  }
+
 #ifdef ALSA_LOG
   printf("audio_alsa_out: Audio Device name = %s\n",pcm_device);
   printf("audio_alsa_out: Number of channels = %d\n",this->num_channels);
