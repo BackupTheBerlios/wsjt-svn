@@ -12,7 +12,7 @@ subroutine wsjtgen
   parameter (NMSGMAX=28)             !Max characters per message
   parameter (NSPD=25)                !Samples per dit
   parameter (NDPC=3)                 !Dits per character
-  parameter (NWMAX=60*11025)         !Max length of waveform
+  parameter (NWMAX=661500)         !Max length of waveform = 60*11025
   parameter (NTONES=4)               !Number of FSK tones
 
   integer   itone(84)
