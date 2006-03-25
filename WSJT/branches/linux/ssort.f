@@ -19,12 +19,11 @@ c            = -1  means sort x in decreasing order (ignoring y)
 c            = -2  means sort x in decreasing order and carry y along.
 
       integer kflag, n
-      real x(*), y(*)
+      real x(n), y(n)
       real r, t, tt, tty, ty
       integer i, ij, j, k, kk, l, m, nn
       integer il(21), iu(21)
 
-      print*,'ssort entered'
       nn = n
       if (nn .lt. 1) then
          print*,'ssort: The number of sort elements is not positive.'
