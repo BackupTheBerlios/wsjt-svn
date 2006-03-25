@@ -24,6 +24,7 @@ c            = -2  means sort x in decreasing order and carry y along.
       integer i, ij, j, k, kk, l, m, nn
       integer il(21), iu(21)
 
+      print*,'ssort entered'
       nn = n
       if (nn .lt. 1) then
          print*,'ssort: The number of sort elements is not positive.'
@@ -172,6 +173,7 @@ c
 c     select a central element of the array and save it in location t
 c
       ij = i + int((j-i)*r)
+      print*,'ssort:ij=',ij
       t = x(ij)
       ty = y(ij)
 c
