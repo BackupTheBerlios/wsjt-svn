@@ -172,7 +172,6 @@ c
 c     select a central element of the array and save it in location t
 c
       ij = i + int((j-i)*r)
-      print*,'ssort:ij=',ij
       t = x(ij)
       ty = y(ij)
 c
