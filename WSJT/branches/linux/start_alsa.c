@@ -4,6 +4,8 @@
 #include <alsa/asoundlib.h>
 #include <inttypes.h>
 #include <time.h>
+#include <sys/time.h>
+#include "fivehz.h"
 
 #if 0
 #define ALSA_LOG
@@ -22,7 +24,7 @@ typedef struct alsa_driver_s {
 	int		 open_mode;
 	int		 has_pause_resume;
 	int		 is_paused;
-	int32_t		 output_sample_rate, input_sample_rate;
+	uint32_t		 output_sample_rate, input_sample_rate;
 	double		 sample_rate_factor;
 	uint32_t	 num_channels;
 	uint32_t	 bits_per_sample;
@@ -75,7 +77,7 @@ static int ao_alsa_open(alsa_driver_t *this_gen, int32_t *input_rate, snd_pcm_st
   int                   err, dir;
   int                 open_mode=1; /* NONBLOCK */
   /* int                   open_mode=0;  BLOCK */
-  int32_t            rate=*input_rate;
+  uint32_t            rate=*input_rate;
   this->input_sample_rate=*input_rate;
 
   snd_pcm_hw_params_alloca(&params);
@@ -114,8 +116,8 @@ static int ao_alsa_open(alsa_driver_t *this_gen, int32_t *input_rate, snd_pcm_st
    */
   err = snd_pcm_hw_params_any(this->audio_fd, params);
   if (err < 0) {
-    printf ("audio_alsa_out: broken configuration for this PCM: no configurations available: %s\n"),
-	     snd_strerror(err);
+    printf ("audio_alsa_out: broken configuration for this PCM: no configurations available: %s\n",
+	     snd_strerror(err));
     goto close;
   }
   /* set interleaved access */
@@ -378,7 +380,7 @@ int playback_callback(alsa_driver_t *alsa_driver_playback) {
 	result = snd_pcm_writen(this->audio_fd, alsa_playback_buffers, this->period_size);
 	this->tx_offset += this->period_size;
 	if (result != this->period_size) {
-		printf("Playback write failed. Expected %d samples, sent only %d\n", this->period_size, result);
+		printf("Playback write failed. Expected %lu samples, sent only %d\n", this->period_size, result);
 #ifdef ALSA_PLAYBACK_LOG
 		snd_pcm_status_t *pcm_stat;
 		snd_pcm_status_alloca(&pcm_stat);
@@ -387,6 +389,7 @@ int playback_callback(alsa_driver_t *alsa_driver_playback) {
 #endif
 	}
   	fivehztx_();                             //Call fortran routine
+	return result;
 }
 
 int capture_callback(alsa_driver_t *alsa_driver_capture) {
@@ -431,6 +434,7 @@ int capture_callback(alsa_driver_t *alsa_driver_capture) {
         snd_pcm_status_dump(pcm_stat, jcd_out);
 #endif
 	fivehz_();                             //Call fortran routine
+	return result;
 }
 
 int playback_xrun(alsa_driver_t *alsa_driver_playback) {
@@ -441,6 +445,7 @@ int playback_xrun(alsa_driver_t *alsa_driver_playback) {
 	snd_pcm_status(this->audio_fd, pcm_stat);
         snd_pcm_status_dump(pcm_stat, jcd_out);
 	snd_pcm_prepare(this->audio_fd);
+	return 0;
 }
 
 int capture_xrun(alsa_driver_t *alsa_driver_capture) {
@@ -450,6 +455,7 @@ int capture_xrun(alsa_driver_t *alsa_driver_capture) {
 	printf("capture xrun\n");
 	snd_pcm_status(this->audio_fd, pcm_stat);
         snd_pcm_status_dump(pcm_stat, jcd_out);
+	return 0;
 }
 
 void ao_alsa_loop(void *iarg) {
@@ -506,7 +512,7 @@ void ao_alsa_loop(void *iarg) {
 	return;
 }
 
-extern void decode1_(int *iarg);
+void decode1_(void *iarg);
 
 int start_threads_(int *ndevin, int *ndevout, short y1[], short y2[],
 	int *nbuflen, int *iwrite, short iwave[],
@@ -517,7 +523,7 @@ int start_threads_(int *ndevin, int *ndevout, short y1[], short y2[],
 {
   pthread_t thread1,thread2;
   int iret1,iret2;
-  int iarg1 = 1,iarg2 = 2;
+  int iarg1 = 1;
   //int32_t rate=11025;
   int32_t rate=*nfsample;
   alsa_driver_capture.app_buffer_y1 = y1;
@@ -537,7 +543,7 @@ int start_threads_(int *ndevin, int *ndevout, short y1[], short y2[],
   alsa_driver_playback.transmitting = Transmitting;
   alsa_driver_playback.ndsec = ndsec;
   //  printf("start_threads: creating thread for decode1\n");
-  iret1 = pthread_create(&thread1,NULL,decode1_,&iarg1);
+  iret1 = pthread_create(&thread1,NULL,(void*)&decode1_,&iarg1);
 /* Open audio card. */
   printf("Using ALSA sound.\n");
   ao_alsa_open(&alsa_driver_playback, &rate, SND_PCM_STREAM_PLAYBACK);
@@ -546,9 +552,10 @@ int start_threads_(int *ndevin, int *ndevout, short y1[], short y2[],
 /*
  * Start audio io thread
  */
-  iret2 = pthread_create(&thread2, NULL, ao_alsa_loop, NULL);
+  iret2 = pthread_create(&thread2, NULL, (void *)&ao_alsa_loop, NULL);
   snd_pcm_prepare(alsa_driver_capture.audio_fd);
   snd_pcm_start(alsa_driver_capture.audio_fd);
   snd_pcm_prepare(alsa_driver_playback.audio_fd);
   //snd_pcm_start(alsa_driver_playback.audio_fd);
+  return 0;
 }

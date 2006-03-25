@@ -10,7 +10,7 @@ CFLAGS += ${DEFS}
 CPPFLAGS += ${DEFS}
 
 # WSJT specific Fortran flags
-FFLAGS += -Wall -fbounds-check -fno-second-underscore
+FFLAGS += -Wall -fbounds-check -fno-second-underscore -ffixed-line-length-none
 #FFLAGS += -cpp -fno-second-underscore
 # The default rules
 .c.o:
@@ -19,8 +19,8 @@ FFLAGS += -Wall -fbounds-check -fno-second-underscore
 .f.o:
 	${G95} ${CPPFLAGS} ${FFLAGS} -c -o ${<:.f=.o} $<
 
-.f90.o:
-	${G95} ${CPPFLAGS} ${FFLAGS} -c -o ${<:.f90=.o} $<
+.F90.o:
+	${G95} ${CPPFLAGS} ${FFLAGS} -c -o ${<:.F90=.o} $<
 
 OS=@OS@
 G95=@G95@
@@ -44,7 +44,7 @@ OBJS1 = JT65code.o nchar.o grid2deg.o packmsg.o packtext.o \
 
 F2PYONLY = ftn_init ftn_quit audio_init spec getfile azdist0 astro0
 
-SRCS2F90 = abc441.f90 astro0.f90 audio_init.f90 azdist0.f90 \
+SRCS2F90 = abc441.f90 astro0.F90 audio_init.f90 azdist0.f90 \
 	blanker.f90 decode1.f90 decode2.f90 decode3.f90 ftn_init.f90 \
 	ftn_quit.f90 get_fname.f90 getfile.f90 horizspec.f90 hscroll.f90 \
 	i1tor4.f90 pix2d.f90 pix2d65.f90 rfile.f90 savedata.f90 spec.f90 \
@@ -101,7 +101,7 @@ wsjt6:	Audio.so #wsjt.spec
 # 
 #
 Audio.so: $(OBJS2C) $(OBJS3C) $(OBJS2F77) $(SRCS2F90) $(AUDIOSRCS)
-	 ${F2PY} -c --quiet --opt="-O -cpp -D${CFLAGS} \
+	 ${F2PY} -c --quiet --opt="-O -D${CFLAGS} \
 	-fno-second-underscore"	$(OBJS2C) $(OBJS2F77) -m Audio \
 	--f77exec=${G95} --f90exec=${G95} ${CPPFLAGS} ${LDFLAGS} \
 	only: $(F2PYONLY) \

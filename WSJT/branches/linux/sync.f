@@ -9,6 +9,8 @@ C  before decimation by NSPD.
       real y3(npts)
       real y4(npts)
       real zf(NSPD)
+      real tmp1
+      real tmp2
       complex csum
       integer nsum(NSPD)
       real z(65538)                            !Ready for FSK110
@@ -64,7 +66,9 @@ C  Find phase of signal at 441 Hz.
          pha=j*twopi/NSPD
          csum=csum+zf(j)*cmplx(cos(pha),-sin(pha))
       enddo
-      pha=-atan2(imag(csum),real(csum))
+      tmp1=imag(csum)
+      tmp2=real(csum)
+      pha=-atan2(tmp1,tmp2)
       jpk=nint(NSPD*pha/twopi)
       if(jpk.lt.1) jpk=jpk+NSPD
 
