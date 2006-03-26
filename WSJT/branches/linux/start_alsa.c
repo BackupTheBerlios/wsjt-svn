@@ -493,7 +493,7 @@ void ao_alsa_loop(void *iarg) {
 	while(1) {
 		if (poll (pfd, nfds, 100000) < 0) {
 			printf("poll failed\n");
-			return;
+			continue;
 		}
 		snd_pcm_poll_descriptors_revents(alsa_driver_playback.audio_fd, &pfd[0], playback_nfds, &playback_revents);
 		snd_pcm_poll_descriptors_revents(alsa_driver_capture.audio_fd, &pfd[capture_index], capture_nfds, &capture_revents);
