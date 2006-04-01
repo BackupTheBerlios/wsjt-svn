@@ -491,7 +491,7 @@ void ao_alsa_loop(void *iarg) {
 	capture_index = nfds;
 	nfds += capture_nfds;
 	while(1) {
-		if (poll (pfd, nfds, 100000) < 0) {
+		if (poll (pfd, nfds, 200000) < 0) {
 			printf("poll failed\n");
 			continue;
 		}
