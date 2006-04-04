@@ -48,7 +48,6 @@ C            read(23,'A80',END=20) line    !FIXME: Segfault happened here.
 C Probably due to line only being 80 chars long, and the read not
 C limiting the read.
 C 1002       format(A80)
-            print*,line
             if(line(1:2).eq.'//') go to 10
             i1=index(line,',')
             if(i1.lt.4) go to 10
