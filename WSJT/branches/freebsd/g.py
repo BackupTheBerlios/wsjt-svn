@@ -10,14 +10,22 @@ showspecjt=0
 #------------------------------------------------------ ftnstr
 def ftnstr(x):
     y=""
-    for i in range(len(x)):
-        y=y+x[i]
+    xs=x.tostring()
+    for i in range(len(xs)):
+        y=y+xs[i]
     return y
 
 #------------------------------------------------------ filetime
 def filetime(t):
-    i=t.rfind(".")
+#    i=t.rfind(".")
+    i=rfnd(t,".")
     t=t[:i][-6:]
     t=t[0:2]+":"+t[2:4]+":"+t[4:6]
     return t
 
+#------------------------------------------------------ rfnd
+#Temporary workaround to replace t.rfind(c)
+def rfnd(t,c):
+    for i in range(len(t)-1,0,-1):
+        if t[i:i+1]==c: return i
+    return -1

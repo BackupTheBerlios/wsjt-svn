@@ -1,4 +1,4 @@
-# ----------------------------------------------------------- WSJT
+#------------------------------------------------------------------- WSJT
 from Tkinter import *
 from tkFileDialog import *
 import Pmw
@@ -11,23 +11,32 @@ import dircache
 import Image,ImageTk  #, ImageDraw
 from palettes import colormapblue, colormapgray0, colormapHot, \
      colormapAFMHot, colormapgray1, colormapLinrad, Colormap2Palette
+from types import *
+import array
 
 root = Tk()
-Version="5.9.2 r" + "$Rev$"[6:-1]
+Version="5.9.4 r" + "$Rev$"[6:-1]
 print "******************************************************************"
 print "WSJT Version " + Version + ", by K1JT"
 print "Revision date: " + \
       "$Date$"[7:-1]
 print "Run date:   " + time.asctime(time.gmtime()) + " UTC"
-try:
-    root.option_readfile('wsjtrc')
-except:
-    pass
-root_geom=""
 
 #See if we are running in Windows
 g.Win32=0
-if sys.platform=="win32": g.Win32=1
+if sys.platform=="win32":
+    g.Win32=1
+    try:
+        root.option_readfile('wsjtrc.win')
+    except:
+        pass
+else:
+    try:
+        root.option_readfile('wsjtrc')
+    except:
+        pass
+root_geom=""
+
 
 #------------------------------------------------------ Global variables
 appdir=os.getcwd()
@@ -45,10 +54,6 @@ lauto=0
 cmap0="Linrad"
 fileopened=""
 font1='Helvetica'
-font2='Helvetica'
-#font1=('MS', 'Sans', 'Serif')
-#font2=('MS', 'Sans', 'Serif')
-font3='Courier'
 hiscall=""
 hisgrid=""
 isec0=-99
@@ -81,6 +86,7 @@ setseq=IntVar()
 ShOK=IntVar()
 slabel="Sync   "
 textheight=7
+txsnrdb=99.
 TxFirst=IntVar()
 green=zeros(500,'f')
 im=Image.new('P',(500,120))
@@ -92,10 +98,18 @@ g.freeze_decode=0
 g.mode=""
 g.ndevin=IntVar()
 g.ndevout=IntVar()
-
+g.focus=0
 #------------------------------------------------------ showspecjt
-def showspecjt():
-    g.showspecjt=1
+def showspecjt(event=NONE):
+    if g.showspecjt>0:
+        if g.focus>=1:
+            root.focus_set()
+            g.focus=0
+        else:
+            g.focus=2
+    else:
+        g.showspecjt=1
+        g.focus=2
 
 #------------------------------------------------------ restart
 def restart():
@@ -106,6 +120,14 @@ def restart():
 def restart2():
     Audio.gcom2.shok=ShOK.get()
     Audio.gcom2.nrestart=1
+
+#------------------------------------------------------ toggle_freeze
+def toggle_freeze(event=NONE):
+    nfreeze.set(1-nfreeze.get())
+
+#------------------------------------------------------ toggle_zap
+def toggle_zap(event=NONE):
+    nzap.set(1-nzap.get())
 
 #------------------------------------------------------ btx (1-6)
 def btx1(event=NONE):
@@ -479,7 +501,7 @@ def ModeFSK441(event=NONE):
         mode.set("FSK441")
         cleartext()
         Audio.gcom1.trperiod=30
-        lab2.configure(text='FileID            T      Width   dB  Rpt      DF')
+        lab2.configure(text='FileID            T      Width    dB  Rpt       DF')
         lab1.configure(text='Time (s)',bg="green")
         lab4.configure(fg='black')
         lab5.configure(fg='black')
@@ -503,12 +525,13 @@ def ModeFSK441(event=NONE):
         inctol()
         ntx.set(1)
         GenStdMsgs()
+        erase()
 
 #------------------------------------------------------ ModeJT65
 def ModeJT65():
     global slabel,isync,isync65,textheight,itol
     cleartext()
-    lab2.configure(text='FileID      Sync    dB        DT       DF    W')
+    lab2.configure(text='FileID      Sync      dB        DT       DF    W')
     lab4.configure(fg='gray85')
     lab5.configure(fg='gray85')
     Audio.gcom1.trperiod=60
@@ -531,6 +554,7 @@ def ModeJT65():
     inctol()
     ntx.set(1)
     GenStdMsgs()
+    erase()
 #    graph2.pack_forget()
 
 #------------------------------------------------------ ModeJT65A
@@ -561,15 +585,17 @@ def ModeJT6M(event=NONE):
         if lauto: toggleauto()
         cleartext()
         ModeFSK441()
-        lab2.configure(text='FileID            T      Width     dB       DF')
+        lab2.configure(text='FileID            T      Width      dB        DF')
         mode.set("JT6M")
         isync=isync6m
         lsync.configure(text=slabel+str(isync))
         shmsg.configure(state=DISABLED)
+        cbfreeze.configure(state=NORMAL)
         itol=5
         inctol()
         ntx.set(1)
         GenStdMsgs()
+        erase()
         
 
 #------------------------------------------------------ ModeCW
@@ -580,7 +606,7 @@ def ModeCW(event=NONE):
         mode.set("CW")
         Audio.gcom1.trperiod=ncwtrperiod
         iframe4b.pack_forget()
-        text.configure(height=1)
+        text.configure(height=9)
         bclravg.configure(state=DISABLED)
         binclude.configure(state=DISABLED)
         bexclude.configure(state=DISABLED)
@@ -590,6 +616,7 @@ def ModeCW(event=NONE):
         report.configure(state=NORMAL)
         ntx.set(1)
         GenStdMsgs()
+        erase()
 
 #------------------------------------------------------ ModeEcho
 def ModeEcho(event=NONE):
@@ -620,13 +647,16 @@ on 50 MHz; JT65, an extremely sensitive mode for troposcatter
 and EME; CW at 15 WPM with messages structured for EME; and
 an EME Echo mode for measuring your own echoes from the moon.
 
-WSJT is Copyright (c) 2001-2005 by Joseph H. Taylor, Jr., K1JT, 
-and is licensed under the GNU General Public License (GPL).
+WSJT is Copyright (c) 2001-2006 by Joseph H. Taylor, Jr., K1JT, 
+with contributions from additional authors.  It is Open Source 
+software, licensed under the GNU General Public License (GPL).
+Source code and programming information may be found at 
+http://developer.berlios.de/projects/wsjt/.
 """
-    Label(about,text=t,font=(font1,9),justify=LEFT).pack(padx=20)
+    Label(about,text=t,justify=LEFT).pack(padx=20)
     t="Revision date: " + \
       "$Date$"[7:-1]
-    Label(about,text=t,font=(font1,9)).pack(padx=20)
+    Label(about,text=t,justify=LEFT).pack(padx=20)
     about.focus_set()
 
 #------------------------------------------------------ shortcuts
@@ -651,14 +681,16 @@ Shift-F8	Set JT65B mode
 CTRL-F8		Set JT65C mode
 Shift-CTRL-F8	Set CW mode
 F9		Set EME Echo mode
+F10             Toggle focus between WSJT screens
 Alt-1 to Alt-6  Tx1 to Tx6
 Alt-A           Toggle Auto On/Off
 Alt-D           Decode
 Alt-E           Erase
-Alt-G		Generate Standard Messages
+Alt-F           Toggle Freeze
+Alt-G	    Generate Standard Messages
 Alt-I           Include
-Alt-L		Lookup
-CTRL-L		Lookup, then Generate Standard Messages
+Alt-L	    Lookup
+CTRL-L	    Lookup, then Generate Standard Messages
 Alt-M           Monitor
 Alt-O           Tx Stop
 Alt-P           Play
@@ -666,8 +698,10 @@ Alt-Q           Log QSO
 Alt-S           Stop Monitoring or Decoding
 Alt-V           Save Last
 Alt-X           Exclude
+Alt-Z           Toggle Zap
+Right/Left Arrow    Increase/decrease Freeze DF
 """
-    Label(scwid,text=t,font=(font2,9),justify=LEFT).pack(padx=20)
+    Label(scwid,text=t,justify=LEFT).pack(padx=20)
     scwid.focus_set()
 
 #------------------------------------------------------ mouse_commands
@@ -679,20 +713,20 @@ def mouse_commands(event=NONE):
 Click on          Action
 --------------------------------------------------------
 Waterfall        FSK441/JT6M: click to decode ping
-                 JT65: Click to set DF for Freeze
+                      JT65: Click to set DF for Freeze
                        Double-click to Freeze and Decode
 
 Main screen,     FSK441/JT6M: click to decode ping
 graphics area    JT65: Click to set DF for Freeze
-                       Double-click to Freeze and Decode
+                           Double-click to Freeze and Decode
 
 Main screen,     Double-click puts callsign in Tx messages
-text area        Right-double-click also sets Auto ON
+text area           Right-double-click also sets Auto ON
 
 Sync, Clip,      Left/Right click to increase/decrease
 Tol, ...
 """
-    Label(scwid,text=t,font=(font2,9),justify=LEFT).pack(padx=20)
+    Label(scwid,text=t,justify=LEFT).pack(padx=20)
     scwid.focus_set()
 
 #------------------------------------------------------ what2send
@@ -729,8 +763,38 @@ know this, so it is conventional to send 73 to signify that you are done.
 (Sending grid locators is conventional in JT65, but numerical signal
 reports may be substituted.)
 """
-    Label(screenf5,text=t,font=(font1,10),justify=LEFT).pack(padx=20)
+    Label(screenf5,text=t,justify=LEFT).pack(padx=20)
     screenf5.focus_set()
+
+#------------------------------------------------------ prefixes
+def prefixes(event=NONE):
+    pfx=Toplevel(root)
+    pfx.geometry(msgpos())
+    if g.Win32: pfx.iconbitmap("wsjt.ico")
+    f=open(appdir+'/prefixes.txt','r')
+    s=f.readlines()
+    t2=""
+    for i in range(4):
+        t2=t2+s[i]
+    t=""
+    for i in range(len(s)-4):
+        t=t+s[i+4]
+    t=t.split()
+    t.sort()
+    t1=""
+    n=0
+    for i in range(len(t)):
+        t1=t1+t[i]+"  "
+        n=n+len(t[i])+2
+        if n>60:
+            t1=t1+"\n"
+            n=0
+    t1=t1+"\n"
+    if options.addpfx.get().lstrip():
+        t1=t1+"\nOptional prefix:  "+(options.addpfx.get().lstrip()+'    ')[:4]
+    t2=t2+"\n"+t1
+    Label(pfx,text=t2,justify=LEFT).pack(padx=20)
+    pfx.focus_set()
 
 #------------------------------------------------------ azdist
 def azdist():
@@ -862,6 +926,9 @@ def clear_avg(event=NONE):
     avetext.configure(state=NORMAL)
     avetext.delete('1.0',END)
     avetext.configure(state=DISABLED)
+    f=open(appdir+'/decoded.ave',mode='w')
+    f.truncate(0)                           #Delete contents of decoded.ave
+    f.close()
     Audio.gcom2.nclearave=1
 
 #------------------------------------------------------ defaults
@@ -961,6 +1028,18 @@ def mouse_up_g1(event):
 #    print event.x
     pass
 
+#------------------------------------------------------ right_arrow
+def right_arrow(event=NONE):
+    n=5*int(Audio.gcom2.mousedf/5) + 5
+    if n==Audio.gcom2.mousedf: n=n+5
+    Audio.gcom2.mousedf=n
+
+#------------------------------------------------------ left_arrow
+def left_arrow(event=NONE):
+    n=5*int(Audio.gcom2.mousedf/5)
+    if n==Audio.gcom2.mousedf: n=n-5
+    Audio.gcom2.mousedf=n
+    
 #------------------------------------------------------ GenStdMsgs
 def GenStdMsgs(event=NONE):
     t=ToRadio.get().upper().strip()
@@ -1183,7 +1262,7 @@ def plot_yellow():
 def update():
     global root_geom,isec0,naz,nel,ndmiles,ndkm,nhotaz,nhotabetter,nopen, \
            im,pim,cmap0,isync,isync441,isync6m,isync65,isync_save,idsec, \
-           first,itol
+           first,itol,txsnrdb
     
     utc=time.gmtime(time.time()+0.1*idsec)
     isec=utc[5]
@@ -1200,21 +1279,22 @@ def update():
         azdist()
         g.nfreq=nfreq.get()
 
-        g.AzSun,g.ElSun,g.AzMoon,g.ElMoon,g.AzMoonB,g.ElMoonB,g.ntsky, \
-            g.ndop,g.ndop00,g.dbMoon,g.RAMoon,g.DecMoon,g.HA8,g.Dgrd,  \
-            g.sd,g.poloffset,g.MaxNR,g.dfdt,g.dfdt0,g.RaAux,g.DecAux, \
-            g.AzAux,g.ElAux = Audio.astro0(utc[0],utc[1],utc[2],  \
-            utchours,nfreq.get(),options.MyGrid.get(), \
-                options.auxra.get()+'         '[:9],     \
-                options.auxdec.get()+'         '[:9])
+        if Audio.gcom2.ndecoding==0:
+            g.AzSun,g.ElSun,g.AzMoon,g.ElMoon,g.AzMoonB,g.ElMoonB,g.ntsky, \
+                g.ndop,g.ndop00,g.dbMoon,g.RAMoon,g.DecMoon,g.HA8,g.Dgrd,  \
+                g.sd,g.poloffset,g.MaxNR,g.dfdt,g.dfdt0,g.RaAux,g.DecAux, \
+                g.AzAux,g.ElAux = Audio.astro0(utc[0],utc[1],utc[2],  \
+                utchours,nfreq.get(),options.MyGrid.get().upper(), \
+                    options.auxra.get()+'         '[:9],     \
+                    options.auxdec.get()+'         '[:9])
 
         if mode.get()[:4]=='JT65' or mode.get()[:2]=='CW' :
             graph2.delete(ALL)
-            g2font='Arial 16'
+            g2font='Helvetica 16'
             graph2.create_text(75,13,anchor=CENTER,text="Moon",font=g2font)
-            graph2.create_text(26,37,anchor=W, text="Az: %9.2f" % g.AzMoon,font=g2font)
+            graph2.create_text(26,37,anchor=W, text="Az: %8.2f" % g.AzMoon,font=g2font)
             graph2.create_text(26,61,anchor=W, text="El:  %8.2f" % g.ElMoon,font=g2font)
-            graph2.create_text(26,85,anchor=W, text="Dop: %6d" % g.ndop,font=g2font)
+            graph2.create_text(26,85,anchor=W, text="Dop:  %6d" % g.ndop,font=g2font)
             graph2.create_text(26,109,anchor=W,text="Dgrd:%8.1f" % g.Dgrd,font=g2font)
 
     if g.freeze_decode and mode.get()[:4]=='JT65':
@@ -1239,7 +1319,8 @@ def update():
         msg4.configure(text=t,bg='red')
 
     t=g.ftnstr(Audio.gcom2.decodedfile)
-    i=t.rfind(".")
+#    i=t.rfind(".")
+    i=g.rfnd(t,".")
     t=t[:i]
     lab3.configure(text=t)
     if mode.get() != g.mode or first:
@@ -1292,6 +1373,17 @@ def update():
     tx4.configure(bg='white')
     tx5.configure(bg='white')
     tx6.configure(bg='white')
+    if tx6.get()[:1]=='#':
+        try:
+            txsnrdb=float(tx6.get()[1:])
+            if txsnrdb>-99.0 and txsnrdb<40.0:
+                Audio.gcom1.txsnrdb=txsnrdb
+                tx6.configure(bg='orange')
+        except:
+            txsnrdb=99.0
+    else:
+        txsnrdb=99.0
+        Audio.gcom1.txsnrdb=txsnrdb
     if Audio.gcom2.monitoring and not Audio.gcom1.transmitting:
         bmonitor.configure(bg='green')
     else:
@@ -1301,10 +1393,13 @@ def update():
         t=g.ftnstr(Audio.gcom2.sending)
         if t[:3]=="CQ ": nsked.set(0)
         t="Transmitting:  "+t[:nmsg]
+#        t="Transmitting:  "
 #        t="Txing:  "+t[:nmsg]
         bgcolor='yellow'
-        if Audio.gcom2.sendingsh==1:  bgcolor='#66FFFF'
-        if Audio.gcom2.sendingsh==-1: bgcolor='red'
+        if Audio.gcom2.sendingsh==1:  bgcolor='#66FFFF'    #Shorthand (lt blue)
+        if Audio.gcom2.sendingsh==-1: bgcolor='red'        #Plain Text
+        if Audio.gcom2.sendingsh==2: bgcolor='pink'        #Test file
+        if txsnrdb<90.0: bgcolor='orange'                  #Simulation mode
         if Audio.gcom2.ntxnow==1: tx1.configure(bg=bgcolor)
         elif Audio.gcom2.ntxnow==2: tx2.configure(bg=bgcolor)
         elif Audio.gcom2.ntxnow==3: tx3.configure(bg=bgcolor)
@@ -1544,6 +1639,8 @@ helpbutton['menu'] = helpmenu
 helpmenu.add('command', label = 'Keyboard shortcuts', command = shortcuts)
 helpmenu.add('command', label = 'Special mouse commands', command = mouse_commands)
 helpmenu.add('command', label = 'What message to send?', command = what2send)
+helpmenu.add('command', label = 'Available suffixes and add-on prefixes', \
+             command = prefixes)
 helpmenu.add('command', label = 'About WSJT', command = about)
 
 #------------------------------------------------------ Graphics areas
@@ -1583,7 +1680,7 @@ iframe2.pack(expand=1, fill=X, padx=4)
 
 #-------------------------------------------------------- Decoded text
 iframe4 = Frame(frame, bd=1, relief=SUNKEN)
-text=Text(iframe4, height=6, width =90, font=(font3,9))
+text=Text(iframe4, height=6, width=80)
 text.bind('<Double-Button-1>',dbl_click_text)
 text.bind('<Double-Button-3>',dbl_click_text)
 
@@ -1603,6 +1700,7 @@ root.bind_all('<Control-F8>', ModeJT65C)
 root.bind_all('<Shift-F7>', ModeJT6M)
 root.bind_all('<Shift-Control-F8>', ModeCW)
 root.bind_all('<F9>', ModeEcho)
+root.bind_all('<F10>', showspecjt)
 
 root.bind_all('<Alt-Key-1>',btx1)
 root.bind_all('<Alt-Key-2>',btx2)
@@ -1619,6 +1717,8 @@ root.bind_all('<Alt-d>',decode)
 root.bind_all('<Alt-D>',decode)
 root.bind_all('<Alt-e>',erase)
 root.bind_all('<Alt-E>',erase)
+root.bind_all('<Alt-f>',toggle_freeze)
+root.bind_all('<Alt-F>',toggle_freeze)
 root.bind_all('<Alt-g>',GenStdMsgs)
 root.bind_all('<Alt-G>',GenStdMsgs)
 root.bind_all('<Alt-i>',decode_include)
@@ -1639,8 +1739,12 @@ root.bind_all('<Alt-v>',savelast)
 root.bind_all('<Alt-V>',savelast)
 root.bind_all('<Alt-x>',decode_exclude)
 root.bind_all('<Alt-X>',decode_exclude)
+root.bind_all('<Alt-z>',toggle_zap)
+root.bind_all('<Alt-Z>',toggle_zap)
 root.bind_all('<Control-l>',lookup_gen)
 root.bind_all('<Control-L>',lookup_gen)
+root.bind_all('<Left>',left_arrow)
+root.bind_all('<Right>',right_arrow)
 
 text.pack(side=LEFT, fill=X, padx=1)
 sb = Scrollbar(iframe4, orient=VERTICAL, command=text.yview)
@@ -1648,7 +1752,7 @@ sb.pack(side=RIGHT, fill=Y)
 text.configure(yscrollcommand=sb.set)
 iframe4.pack(expand=1, fill=X, padx=4)
 iframe4b = Frame(frame, bd=1, relief=SUNKEN)
-avetext=Text(iframe4b, height=2, width =90, font=(font3,9))
+avetext=Text(iframe4b, height=2, width=80)
 #avetext.bind('<Key>', lambda e: "break")
 avetext.bind('<Double-Button-1>',dbl_click_ave)
 avetext.bind('<Double-Button-3>',dbl_click_ave)
@@ -1699,22 +1803,22 @@ iframe5 = Frame(frame, bd=1, relief=FLAT,height=180)
 f5a=Frame(iframe5,height=170,bd=2,relief=GROOVE)
 labToRadio=Label(f5a,text='To radio:', width=9, relief=FLAT)
 labToRadio.grid(column=0,row=0)
-ToRadio=Entry(f5a,width=9,font=(font2,9))
+ToRadio=Entry(f5a,width=9)
 ToRadio.insert(0,'W8WN')
 ToRadio.grid(column=1,row=0,pady=3)
 bLookup=Button(f5a, text='Lookup',underline=0,command=lookup,padx=1,pady=1)
 bLookup.grid(column=2,row=0,sticky='EW',padx=4)
 labGrid=Label(f5a,text='Grid:', width=9, relief=FLAT)
 labGrid.grid(column=0,row=1)
-HisGrid=Entry(f5a,width=9,font=(font2,9))
+HisGrid=Entry(f5a,width=9)
 HisGrid.grid(column=1,row=1,pady=1)
 bAdd=Button(f5a, text='Add',command=addtodb,padx=1,pady=1)
 bAdd.grid(column=2,row=1,sticky='EW',padx=4)
-labAz=Label(f5a,text='Az 257  El 15',width=11)
+labAz=Label(f5a,text='Az 257  El 15',width=11,font=(font1,9))
 labAz.grid(column=1,row=2)
-labHotAB=Label(f5a,bg='#FFCCFF',text='HotA: 247')
+labHotAB=Label(f5a,bg='#FFCCFF',text='HotA: 247',font=(font1,9))
 labHotAB.grid(column=0,row=2,sticky='EW',padx=4,pady=3)
-labDist=Label(f5a,text='16753 km')
+labDist=Label(f5a,text='16753 km',font=(font1,9))
 labDist.grid(column=2,row=2)
 
 #------------------------------------------------------ Date and Time
@@ -1731,11 +1835,11 @@ lsync.grid(column=0,row=0,padx=2,pady=1,sticky='EW')
 Widget.bind(lsync,'<Button-1>',incsync)
 Widget.bind(lsync,'<Button-3>',decsync)
 nzap=IntVar()
-cbzap=Checkbutton(f5b,text='Zap',variable=nzap)
+cbzap=Checkbutton(f5b,text='Zap',underline=0,variable=nzap)
 cbzap.grid(column=1,row=0,padx=2,pady=1,sticky='W')
 cbnb=Checkbutton(f5b,text='NB',variable=nblank)
 cbnb.grid(column=1,row=1,padx=2,pady=1,sticky='W')
-cbfreeze=Checkbutton(f5b,text='Freeze',variable=nfreeze)
+cbfreeze=Checkbutton(f5b,text='Freeze',underline=0,variable=nfreeze)
 cbfreeze.grid(column=1,row=2,padx=2,sticky='W')
 cbafc=Checkbutton(f5b,text='AFC',variable=nafc)
 cbafc.grid(column=1,row=3,padx=2,pady=1,sticky='W')
@@ -1767,7 +1871,7 @@ f5c=Frame(iframe5,bd=2,relief=GROOVE)
 txfirst=Checkbutton(f5c,text='Tx First',justify=RIGHT,variable=TxFirst)
 f5c2=Frame(f5c,bd=0)
 labreport=Label(f5c2,text='Rpt',width=4)
-report=Entry(f5c2, width=4, font=(font2,10))
+report=Entry(f5c2, width=4)
 report.insert(0,'26')
 labreport.pack(side=RIGHT,expand=1,fill=BOTH)
 report.pack(side=RIGHT,expand=1,fill=BOTH)
@@ -1789,43 +1893,42 @@ auto.grid(column=0,row=5,sticky='EW',padx=4)
 #txstop.grid(column=0,row=6,sticky='EW',padx=4)
 
 ntx=IntVar()
-tx1=Entry(f5c,width=28, font=(font2,9))
+tx1=Entry(f5c,width=24)
 rb1=Radiobutton(f5c,value=1,variable=ntx)
 b1=Button(f5c, text='Tx1',underline=2,command=btx1,padx=1,pady=1)
 tx1.grid(column=1,row=0)
 rb1.grid(column=2,row=0)
 b1.grid(column=3,row=0)
 
-tx2=Entry(f5c,width=28, font=(font2,9))
-#tx2=Entry(f5c,width=28, font=('helvetica',9))
+tx2=Entry(f5c,width=24)
 rb2=Radiobutton(f5c,value=2,variable=ntx)
 b2=Button(f5c, text='Tx2',underline=2,command=btx2,padx=1,pady=1)
 tx2.grid(column=1,row=1)
 rb2.grid(column=2,row=1)
 b2.grid(column=3,row=1)
 
-tx3=Entry(f5c,width=28, font=(font2,9))
+tx3=Entry(f5c,width=24)
 rb3=Radiobutton(f5c,value=3,variable=ntx)
 b3=Button(f5c, text='Tx3',underline=2,command=btx3,padx=1,pady=1)
 tx3.grid(column=1,row=2)
 rb3.grid(column=2,row=2)
 b3.grid(column=3,row=2)
 
-tx4=Entry(f5c,width=28, font=(font2,9))
+tx4=Entry(f5c,width=24)
 rb4=Radiobutton(f5c,value=4,variable=ntx)
 b4=Button(f5c, text='Tx4',underline=2,command=btx4,padx=1,pady=1)
 tx4.grid(column=1,row=3)
 rb4.grid(column=2,row=3)
 b4.grid(column=3,row=3)
 
-tx5=Entry(f5c,width=28, font=(font2,9))
+tx5=Entry(f5c,width=24)
 rb5=Radiobutton(f5c,value=5,variable=ntx)
 b5=Button(f5c, text='Tx5',underline=2,command=btx5,padx=1,pady=1)
 tx5.grid(column=1,row=4)
 rb5.grid(column=2,row=4)
 b5.grid(column=3,row=4)
 
-tx6=Entry(f5c,width=28, font=(font2,9))
+tx6=Entry(f5c,width=24)
 rb6=Radiobutton(f5c,value=6,variable=ntx)
 b6=Button(f5c, text='Tx6',underline=2,command=btx6,padx=1,pady=1)
 tx6.grid(column=1,row=5)
@@ -1909,7 +2012,9 @@ try:
 #        elif key == 'RxDelay': options.RxDelay.set(value)
 #        elif key == 'TxDelay': options.TxDelay.set(value)
         elif key == 'IDinterval': options.IDinterval.set(value)
-        elif key == 'ComPort': options.ComPort.set(value)
+        elif key == 'ComPort':
+            options.ComPort.set(value)
+            Audio.gcom2.nport=int(options.ComPort.get())
         elif key == 'Mileskm': options.mileskm.set(value)
         elif key == 'MsgStyle': options.ireport.set(value)
         elif key == 'Region': options.iregion.set(value)
@@ -2054,7 +2159,7 @@ f.write("Debug " + str(ndebug.get()) + "\n")
 #f.write("TRPeriod " + str(Audio.gcom1.trperiod) + "\n")
 mrudir2=mrudir.replace(" ","#")
 f.write("MRUDir " + mrudir2 + "\n")
-if g.astro_geom[:7]=="200x200": g.astro_geom="242x281" + g.astro_geom[7:]
+if g.astro_geom[:7]=="200x200": g.astro_geom="268x423" + g.astro_geom[7:]
 f.write("AstroGeometry " + g.astro_geom + "\n")
 f.write("CWTRPeriod " + str(ncwtrperiod) + "\n")
 f.close()

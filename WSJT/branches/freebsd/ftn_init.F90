@@ -24,6 +24,7 @@ subroutine ftn_init
   include 'gcom3.f90'
   include 'gcom4.f90'
 
+  i=ptt(nport,0,iptt)                          !Clear the PTT line
   addpfx='    '
 
   do i=80,1,-1
@@ -31,6 +32,7 @@ subroutine ftn_init
   enddo
 1 iz=i
   lenappdir=iz
+  call pfxdump(appdir(:iz)//'/prefixes.txt')
 
 #ifdef Win32
   open(11,file=appdir(:iz)//'/decoded.txt',status='unknown',               &

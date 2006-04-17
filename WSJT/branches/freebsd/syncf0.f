@@ -1,4 +1,4 @@
-      subroutine syncf0(data,jz,NTol,jstart,f0,smax)
+      subroutine syncf0(data,jz,NFreeze,NTol,jstart,f0,smax)
 
 C  Does 512-pt FFTs of data with 256-pt step size.
 C  Finds sync tone and determines aproximate values for jstart and f0.
@@ -10,16 +10,21 @@ C  Finds sync tone and determines aproximate values for jstart and f0.
       complex z
       equivalence (x,cx)
 
-      ps(z)=real(z)**2 + imag(z)**2          !Power spectrum function
+      ps(z)=real(z)**2 + aimag(z)**2          !Power spectrum function
 
       call zero(s2,6*128)                    !Clear average
       df=11025./512.
-      ia=(1076-NTol)/df
-      ib=(1076+Ntol)/df
-      nblk=jz/256 - 6
+
+      ia=(f0-400)/df
+      ib=(f0+400)/df + 0.999
+      if(NFreeze.eq.1) then
+         ia=(f0-NTol)/df
+         ib=(f0+Ntol)/df + 0.999
+      endif
 
 C  Most of the time in this routine is in this loop.
 
+      nblk=jz/256 - 6
       do n=1,nblk                            !Accumulate avg spectrum for
          j=256*(n-1)+1                       !512-pt blocks, stepping by 256
          call move(data(j),x,512)

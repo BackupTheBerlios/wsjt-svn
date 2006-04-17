@@ -1,7 +1,6 @@
 !---------------------------------------------------- a2d
 subroutine a2d(iarg)
 
-#ifdef Win32
 ! Start the PortAudio streams for audio input and output.
   integer nchin(0:20),nchout(0:20)
   include 'gcom1.f90'
@@ -10,6 +9,8 @@ subroutine a2d(iarg)
 ! This call does not normally return, as the background portion of
 ! JTaudio goes into a test-and-sleep loop.
 
+  write(*,1000)
+1000 format('Using PortAudio.')
   idevin=ndevin
   idevout=ndevout
   call padevsub(numdevs,ndefin,ndefout,nchin,nchout)
@@ -33,6 +34,5 @@ subroutine a2d(iarg)
      write(*,1006) 
 1006 format('Audio streams terminated normally.')
   endif
-#endif
   return
 end subroutine a2d

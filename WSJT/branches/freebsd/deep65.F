@@ -8,11 +8,11 @@
       character*22 decoded,deepmsg
       character*22 testmsg(2*MAXCALLS + 2 + MAXRPT)
       character*15 callgrid(MAXCALLS)
-      character*80 line
+      character*180 line
       character*4 rpt(MAXRPT)
       logical first
       integer ncode(63,2*MAXCALLS)
-      common/tmp8/ p(64,63)
+      common/tmp9/ mrs(63),mrs2(63)
 
       data neme0/-99/
       data rpt/'-01','-02','-03','-04','-05',
@@ -43,7 +43,8 @@
             if(ichar(grid(4:4)).eq.0) grid(4:4)=' '
          else
             read(23,1002,end=20) line
- 1002       format(a80)
+ 1002       format (A80)
+            if(line(1:4).eq.'ZZZZ') go to 20
             if(line(1:2).eq.'//') go to 10
             i1=index(line,',')
             if(i1.lt.4) go to 10
@@ -90,43 +91,39 @@
  20   ntot=k
       neme0=neme
 
-      sum0=0.
+      ref0=0.
       do j=1,63
-         smax=-1.e30
-         do i=1,64
-            smax=max(smax,s3(i,j))
-         enddo
-         sum0=sum0+smax
+         ref0=ref0 + s3(mrs(j),j)
       enddo
 
       p1=-1.e30
       ip1=0
-      p2=-1.e30
-      ip2=0
       do k=1,ntot
 C  If sync=OOO, no CQ messages
          if(flip.lt.0.0 .and. testmsg(k)(1:3).eq.'CQ ') go to 30
          sum=0.
-         sum2=0.
+         ref=ref0
+         nhard=0
          do j=1,63
             i=ncode(j,k)+1
             sum=sum + s3(i,j)
-            sum2=sum2 + p(i,j)
+            if(i.eq.mrs(j)) then
+               ref=ref - s3(i,j) + s3(mrs2(j),j)
+               nhard=nhard+1
+            endif
          enddo
+         sum=sum/ref
          if(sum.gt.p1) then
             p1=sum
             ip1=k
-         endif
-         if(sum2.gt.p2) then
-            p2=sum2
-            ip2=k
+            ref1=ref
+            nhard1=nhard
          endif
  30   enddo
 
-      p1=p1/sum0
-      qual=100.0*(p1-0.40)
-      if(mode65.eq.1) qual=100.0*(p1-0.33)
-      if(mode65.eq.4) qual=100.0*(p1-0.50)
+      qual=100.0*(p1-0.405)
+      if(mode65.eq.1) qual=100.0*(p1-0.335)
+      if(mode65.eq.4) qual=100.0*(p1-0.505)
       if(qual.lt.0.) qual=0.
       if(qual.gt.10.) qual=10.
       decoded='                      '
@@ -136,23 +133,6 @@ C  If sync=OOO, no CQ messages
          decoded=testmsg(ip1)
       endif
       decoded(22:22)=c
-      deepmsg=decoded
-
-      q2=0.27*p2 + 81.3
-!      if(mode65.eq.1) qual=100.0*(p1-0.33)
-!      if(mode65.eq.4) qual=100.0*(p1-0.50)
-      if(q2.lt.0.) q2=0.
-      if(q2.gt.10.) q2=10.
-      decoded='                      '
-      c=' '
-      if(q2.gt.0.0) then
-         if(q2.lt.4.0) c='?'
-         decoded=testmsg(ip2)
-      endif
-      decoded(22:22)=c
-
-!      qual=q2
-      decoded=deepmsg
 
       return
       end

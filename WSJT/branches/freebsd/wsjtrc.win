@@ -1,6 +1,6 @@
-*font:			Arial 11
-*Label*font:		Arial 11
-*Text*font:		"Courier New" 12
+*font:			Arial 8
+*Label*font:		Arial 8
+*Text*font:		"Courier New" 9
 *background:		gray85
 *Text*background:	white
 *Entry*background:	white

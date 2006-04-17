@@ -15,17 +15,16 @@ C  already been done.
       character decoded*22,cfile6*6,special*5,cooo*3
       character*22 avemsg1,avemsg2,deepmsg,deepbest
       character*67 line,ave1,ave2
-      character*1 csync
+      character*1 csync,c1
       character*12 mycall
       character*12 hiscall
       character*6 hisgrid
-      real ccfblue(-5:28),ccfred(-224:224)
+      real ccfblue(-5:540),ccfred(-224:224)
       real ftrack(126)
       logical lmid
       integer itf(2,9)
       include 'avecom.h'
       common/avecom2/f0a
-      common/tmp3/nsync2,nsnr2,nstest2,line,ave1,ave2
       data first/.true./,ns10/0/,ns20/0/
       data itf/0,0, 1,0, -1,0, 0,-1, 0,1, 1,-1, 1,1, -1,-1, -1,1/
       save
@@ -127,6 +126,10 @@ C  result from the Reed-Solomon decoder.
          call decode65(dat,npts,dtxx,dfxx,flip,ndepth,neme,nsked,
      +        mycall,hiscall,hisgrid,mode65,lmid,ftrack,decoded,
      +        ncount,deepmsg,qual)
+         if(ncount.eq.-999) then
+            qbest=0                       !Bad data
+            go to 200
+         endif
          if(qual.gt.qbest) then
             qbest=qual
             dtbest=dtxx
@@ -157,6 +160,10 @@ C  result from the Reed-Solomon decoder.
       if(flip.lt.0.0 .and. (kvqual.eq.1 .or. nqual.ge.nq2)) cooo='OOO'
       if(kvqual.eq.0.and.nqual.ge.nq1.and.nqual.lt.nq2) cooo(2:3)=' ?'
       if(decoded.eq.'                      ') cooo='   '
+      do i=1,22
+         c1=decoded(i:i)
+         if(c1.ge.'a' .and. c1.le.'z') decoded(i:i)=char(ichar(c1)-32)
+      enddo
       write(line,1010) cfile6,nsync,nsnr,dtx-1.0,ndf,
      +    nint(width),csync,special,decoded(1:18),cooo,kvqual,nqual,itry
  1010 format(a6,i3,i5,f5.1,i5,i3,1x,a1,1x,a5,a18,1x,a3,i5,i3,i2)
@@ -172,7 +179,7 @@ C  Blank DT if shorthand message  (### wrong logic? ###)
       endif
 
 C  Blank the end-of-line numbers
-      if(naggressive.eq.0) line(58:67)='         '
+      if(naggressive.eq.0 .and. ndiag.eq.0) line(58:67)='         '
       if(ndiag.eq.0) line(66:67)='  '
 
       if(lcum) write(21,1011) line
@@ -184,7 +191,7 @@ C  Write decoded msg unless this is an "Exclude" request:
      +     ns1,ncount1)
       if(nsave.ge.1) call avemsg65(2,mode65,ndepth,avemsg2,nused2,
      +     ns2,ncount2)
-      
+
 C  Write the average line
       if(ns1.ge.1 .and. ns1.ne.ns10) then
          if(ns1.lt.10) write(ave1,1021) cfile6,1,nused1,ns1,avemsg1
@@ -217,16 +224,12 @@ C  If Monitor segment #2 is available, write that line also
       endif
       write(12,1011) ave1
       write(12,1011) ave2
+      call flushqqq(12)
  
  800  if(lumsg.ne.6) end file 11
       f0a=f0
 
  900  continue
-
-C### test only
-      nsync2=nsync
-      nsnr2=nsnr
-      nstest2=nstest
 
       return
       end

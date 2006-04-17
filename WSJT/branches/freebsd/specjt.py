@@ -19,8 +19,11 @@ from palettes import colormapblue, colormapgray0, colormapHot, \
 
 def hidespecjt():
     root.withdraw()
+    g.showspecjt=0
 def showspecjt():
     root.deiconify()
+    g.showspecjt=2
+    g.focus=1
 
 if(__name__=="__main__"):
     root = Tk()
@@ -153,17 +156,18 @@ def df_mark():
         if g.mode[4:5]=='C': fstep=4*fstep
 
 # Mark sync tone and top JT65 tone (green) and shorthand tones (red)
-        color='green'
-        x1=(Audio.gcom2.mousedf + 6.6*fstep)/df + 288.7
-        c.create_line(x1-0.5,25,x1-0.5,12,fill=color)
-        c.create_line(x1+0.5,25,x1+0.5,12,fill=color)
-        for i in range(5):
-            x1=(Audio.gcom2.mousedf+i*fstep)/df + 288.7
-            j=12
-            if i>0: j=15
-            if i!=1: c.create_line(x1-0.5,25,x1-0.5,j,fill=color)
-            if i!=1: c.create_line(x1+0.5,25,x1+0.5,j,fill=color)
-            color='red'
+        if g.mode[:4]=="JT65":
+            color='green'
+            x1=(Audio.gcom2.mousedf + 6.6*fstep)/df + 288.7
+            c.create_line(x1-0.5,25,x1-0.5,12,fill=color)
+            c.create_line(x1+0.5,25,x1+0.5,12,fill=color)
+            for i in range(5):
+                x1=(Audio.gcom2.mousedf+i*fstep)/df + 288.7
+                j=12
+                if i>0: j=15
+                if i!=1: c.create_line(x1-0.5,25,x1-0.5,j,fill=color)
+                if i!=1: c.create_line(x1+0.5,25,x1+0.5,j,fill=color)
+                color='red'
     
 #---------------------------------------------------- decode_request
 def decode_request(event):
@@ -202,9 +206,8 @@ def update():
         if isec==0: nscroll=0
         if isec==59: newMinute=1
 
-    if g.showspecjt:
+    if g.showspecjt==1:
         showspecjt()
-        g.showspecjt=0
     nspeed=nspeed0.get()                        #Waterfall update rate
     if (nspeed<6 and nspeed00>=6) or (nspeed>=6 and nspeed00<6):
         draw_axis()
@@ -214,7 +217,10 @@ def update():
     contrast=sc2.get()
     logm=logmap.get()
     g0=sc3.get()
-    if Audio.gcom2.monitoring or Audio.gcom2.ndiskdat:
+    
+# Don't calculate spectra for waterfall while decoding
+    if Audio.gcom2.ndecoding==0 and \
+           (Audio.gcom2.monitoring or Audio.gcom2.ndiskdat):
         Audio.spec(brightness,contrast,logm,g0,nspeed,a) #Call Fortran routine spec
         newdat=Audio.gcom1.newdat                   #True if new data available
     else:
@@ -226,7 +232,10 @@ def update():
             n=Audio.gcom2.nlines
             box=(0,0,750,300-n)                 #Define region
             region=im.crop(box)                 #Get all but last line(s)
-            im.paste(region,(0,n))              #Move waterfall down
+            try:
+                im.paste(region,(0,n))          #Move waterfall down
+            except:
+                print "Images did not match, continuing anyway."
             for i in range(n):
                 line0.putdata(a[750*i:750*(i+1)])   #One row of pixels to line0
                 im.paste(line0,(0,i))               #Paste in new top line
@@ -247,7 +256,6 @@ def update():
             if minsep.get():
                 draw.line((0,0,749,0),fill=128)     #Draw the minute separator
 
-# Don't update waterfall while decoding
         pim=ImageTk.PhotoImage(im)              #Convert Image to PhotoImage
         graph1.delete(ALL)
         #For some reason, top two lines are invisible, so we move down 2
@@ -279,6 +287,9 @@ def update():
         nfreeze0=int(Audio.gcom2.nfreeze)
 
     if g.mode!=mode0:
+        if g.mode[:4]=="JT65" and nspeed0.get()>5: nspeed0.set(3)
+        if g.mode=="FSK441" and nspeed0.get()<6: nspeed0.set(6)
+        if g.mode=="JT6M" and nspeed0.get()<6: nspeed0.set(6)
         draw_axis()
         mode0=g.mode
 
@@ -289,6 +300,8 @@ def update():
     if newdat: Audio.gcom2.ndiskdat=0
     Audio.gcom2.nlines=0
     Audio.gcom2.nflat=nflat.get()
+    if g.focus==2:
+        root.focus_set()
     ltime.after(200,update)                      #Reset the timer
 
 #-------------------------------------------------------- draw_axis
@@ -414,7 +427,7 @@ sc2.pack(side=LEFT)
 balloon.bind(sc1,"Brightness", "Brightness")
 balloon.bind(sc2,"Contrast", "Contrast")
 balloon.configure(statuscommand=status.helpmessage)
-ltime=Label(iframe2,bg='black',fg='yellow',width=8,bd=2,font=('Arial',16))
+ltime=Label(iframe2,bg='black',fg='yellow',width=8,bd=2,font=('Helvetica',16))
 ltime.pack(side=LEFT)
 msg1=Label(iframe2,padx=2,bd=2,text=" ")
 msg1.pack(side=LEFT)
@@ -484,6 +497,7 @@ Audio.audio_init(ndevin,ndevout)                #Start the audio stream
 ltime.after(200,update)
 
 root.deiconify()
+g.showspecjt=2
 if g.Win32: root.iconbitmap("wsjt.ico")
 root.title('  SpecJT     by K1JT')
 if(__name__=="__main__"):

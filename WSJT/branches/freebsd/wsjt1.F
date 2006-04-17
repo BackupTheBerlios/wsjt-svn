@@ -125,6 +125,7 @@
 	enddo
 	avesq=sq/jz
 	basevb=dB(avesq) - 44    !Base power level to send back to GUI
+	if(avesq.eq.0) go to 900
 
 	nz=600
 	nstep=jz/nz
@@ -196,11 +197,14 @@
 	   enddo
 ! For waterfall plot
 	   call spec2d(dat,jz,nstep,s2,nchan,nz,psavg,sigma)
-	   if(jz/11025.0.lt.3.9) go to 900
-	   call syncf0(dat,jz,DFTolerance,jstart,f0,smax)
-	   if(NFreeze.eq.1) f0=1076.66
+	   if(sigma.lt.0.0) basevb=-99.0
+	   if(jz/11025.0.lt.3.9 .or. sigma.lt.0.0) go to 900
+
+	   f0=1076.66
+	   if(NFreeze.eq.1) f0=1076.66+mousedf
+	   call syncf0(dat,jz,NFreeze,DFTolerance,jstart,f0,smax)
 	   call synct(dat,jz,jstart,f0,smax)
-	   call syncf1(dat,jz,jstart,f0,NFreeze,smax,red)
+	   call syncf1(dat,jz,jstart,f0,NFreeze,DFTolerance,smax,red)
 
 	   f0a=f0
 	   do i=1,512
@@ -247,6 +251,8 @@
 	dtbuf=nstep/11025.0
 	stlim=nslim2                !Single-tone threshold
 	call spec2d(dat,jz,nstep,s2,nchan,nz,psavg,sigma)
+	if(sigma.lt.0.0) basevb=-99.0
+	if(sigma.lt.0.0) go to 900
 	nline0=nline
 	STfound=.false.
 	npkept=0
@@ -264,24 +270,26 @@ C  Now the multi-tone decoding
      +    cfile6,ps0)
 
 	npkept=nline             !Number of pings that were kept
-	call indexx(npkept,tping,indx)  !Merge the ST and MT decodes
 	smax=0.
 	stbest=.false.
-	do i=1,npkept
-	   j=indx(i)
-	   if(pick .and. STFound .and.
-     +        line(j)(29:31).eq.'   ') goto 10
-	   write(lumsg,1050) line(j)       !Write to decoded.txt
- 1050	   format(a79)
-	   if(lcum) write(21,1050) line(j) !Write to decoded.cum
-	   read(line(j),1060) sig,msg3
- 1060	   format(16x,f3.0,9x,a3)
-	   if(sig.gt.smax) then
-	      smax=sig
-	      tbest=tping(j)
-	      stbest = (msg3.ne.'   ')
-	   endif
- 10	enddo
+	if(npkept.gt.0) then
+	   call indexx(npkept,tping,indx) !Merge the ST and MT decodes
+	   do i=1,npkept
+	      j=indx(i)
+	      if(pick .and. STFound .and.
+     +          line(j)(29:31).eq.'   ') goto 10
+	      write(lumsg,1050) line(j)	!Write to decoded.txt
+ 1050	      format(a79)
+	      if(lcum) write(21,1050) line(j) !Write to decoded.cum
+	      read(line(j),1060) sig,msg3
+ 1060	      format(16x,f3.0,9x,a3)
+	      if(sig.gt.smax) then
+		 smax=sig
+		 tbest=tping(j)
+		 stbest = (msg3.ne.'   ')
+	      endif
+ 10	   enddo
+	endif
 
 	dt=1.0/11025.0                !Compute spectrum for pink curve
 	if(stbest) then

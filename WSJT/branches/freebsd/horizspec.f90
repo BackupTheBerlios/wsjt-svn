@@ -36,10 +36,10 @@ subroutine horizspec(x,brightness,contrast,a)
      do i=1,nfft
         y(i)=1.4*x(i+i0)
      enddo
-     call xfft(y,nfft)
+     call xfft2(y,nfft)
      nq=nfft/4
      do i=1,nq
-        ss(i)=real(c(i))**2 + imag(c(i))**2
+        ss(i)=real(c(i))**2 + aimag(c(i))**2
      enddo
 
      p=0.

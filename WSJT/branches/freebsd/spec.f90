@@ -36,7 +36,9 @@ subroutine spec(brightness,contrast,logmap,ngain,nspeed,a)
   save
 
   if(first) then
-     call zero(ss,nq)
+     do i=1,nq
+        ss(i)=0.
+     enddo
      istep=2205
      nfft=4096
      nq=nfft/4
@@ -136,10 +138,10 @@ subroutine spec(brightness,contrast,logmap,ngain,nspeed,a)
      go to 900
   endif
 
-  call xfft(x,nfft)
+  call xfft2(x,nfft)
 
   do i=1,nq                               !Accumulate power spectrum
-     ss(i)=ss(i) + real(c(i))**2 + imag(c(i))**2
+     ss(i)=ss(i) + real(c(i))**2 + aimag(c(i))**2
   enddo
   nsum=nsum+1
 
@@ -167,7 +169,9 @@ subroutine spec(brightness,contrast,logmap,ngain,nspeed,a)
      enddo
      nsum=0
      newdat=1                          !Flag for new spectrum available
-     call zero(ss,nq)                  !Zero the accumulating array
+     do i=1,nq                         !Zero the accumulating array
+        ss(i)=0.
+     enddo
      if(jz.lt.300) jz=jz+1
   endif
 
@@ -195,7 +199,6 @@ subroutine spec(brightness,contrast,logmap,ngain,nspeed,a)
      nspeed0=nspeed
   endif
 
-!  print*,brightness,contrast,logmap,gain,gamma,offset
   do i=1,iz
      n=0
      if(a0(i).gt.0.0 .and. logmap.eq.1) n=gain*log10(0.001*a0(i)) + offset + 20
@@ -205,5 +208,6 @@ subroutine spec(brightness,contrast,logmap,ngain,nspeed,a)
   enddo
 
 900 continue
+  if(ndiskdat.eq.1) ndecoding=4
   return
 end subroutine spec

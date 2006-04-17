@@ -1,4 +1,8 @@
+#ifdef Win32
+extern int __stdcall IGRAY(int *n0, int *idir)
+#else
 int igray_(int *n0, int *idir)
+#endif
 {
   int n;
   unsigned long sh;

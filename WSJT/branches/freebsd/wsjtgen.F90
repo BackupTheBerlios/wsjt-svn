@@ -12,7 +12,7 @@ subroutine wsjtgen
   parameter (NMSGMAX=28)             !Max characters per message
   parameter (NSPD=25)                !Samples per dit
   parameter (NDPC=3)                 !Dits per character
-  parameter (NWMAX=60*11025)         !Max length of waveform
+  parameter (NWMAX=661500)         !Max length of waveform = 60*11025
   parameter (NTONES=4)               !Number of FSK tones
 
   integer   itone(84)
@@ -60,27 +60,31 @@ subroutine wsjtgen
 
   if(msg(1:1).eq.'@') then
      if(msg(2:2).eq.'/' .or. ichar(msg(2:2)).eq.92) then
-        if(msg(2:).ne.testfile) then
-           testfile=msg(2:)
-
+        txmsg=msg
+        testfile=msg(2:)
 #ifdef Win32
-           open(18,file=testfile,form='binary',status='old',err=12)
+        open(18,file=testfile,form='binary',status='old',err=12)
 #else
-           open(18,file=testfile,form='unformatted',status='old',err=12)
+        open(18,file=testfile,form='unformatted',status='old',err=12)
 #endif
 
-           go to 14
-12         print*,'Cannot open test file ',msg(2:)
-           go to 999
-14         read(18) hdr
-           if(ndata.gt.NTxMax) ndata=NTxMax
-           nwave=ndata
-           call rfile(18,iwave,2*nwave,ierr)
-           close(18)
-           if(ierr.ne.0) print*,'Error reading test file ',msg(2:)
-        endif
+        go to 14
+12      print*,'Cannot open test file ',msg(2:)
+        go to 999
+14      read(18) hdr
+        if(ndata.gt.NTxMax) ndata=NTxMax
+        call rfile(18,iwave,ndata,ierr)
+        close(18)
+        if(ierr.ne.0) print*,'Error reading test file ',msg(2:)
+        nwave=ndata/2
+        do i=nwave,NTXMAX
+           iwave(i)=0
+        enddo
+        sending=txmsg
+        sendingsh=2
         go to 999
      endif
+     
 
 ! Transmit a fixed tone at specified frequency
      freq=1000.0

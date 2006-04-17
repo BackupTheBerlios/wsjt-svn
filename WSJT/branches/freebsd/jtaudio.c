@@ -1,7 +1,5 @@
-#ifdef Win32
-
 #include <stdio.h>
-#include "portaudio.h"
+#include <portaudio.h>
 
 //  Definition of structure pointing to the audio data
 typedef struct
@@ -40,7 +38,23 @@ typedef struct _SYSTEMTIME
 #ifdef Win32
 extern void __stdcall GetSystemTime(SYSTEMTIME *st);
 #else
-extern void GetSystemTime(SYSTEMTIME *st);
+#include <sys/time.h>
+#include <time.h>
+
+void GetSystemTime(SYSTEMTIME *st){
+  struct timeval tmptimeofday;
+  struct tm tmptmtime;
+  gettimeofday(&tmptimeofday,NULL);
+  gmtime_r(&tmptimeofday.tv_sec,&tmptmtime);
+  st->Year = (short)tmptmtime.tm_year;
+  st->Month = (short)tmptmtime.tm_year;
+  st->DayOfWeek = (short)tmptmtime.tm_wday;
+  st->Day = (short)tmptmtime.tm_mday;
+  st->Hour = (short)tmptmtime.tm_hour;
+  st->Minute = (short)tmptmtime.tm_min;
+  st->Second = (short)tmptmtime.tm_sec;
+  st->Millisecond = (short)(tmptimeofday.tv_usec/1000);
+}
 #endif
 
 //  Input callback routine:
@@ -99,8 +113,8 @@ static int SoundIn( void *inputBuffer, void *outputBuffer,
   *data->ibuf=ib;
   data->tbuf[ib-1]=stime;
     for(i=0; i<framesPerBuffer; i++) {
-      data->y1[ia] = (*in++)>>1;       //NB: divide by 2!
-      data->y2[ia] = (*in++)>>1;
+      data->y1[ia] = (*in++);
+      data->y2[ia] = (*in++);
       ia++;
     }
   }
@@ -123,6 +137,7 @@ static int SoundOut( void *inputBuffer, void *outputBuffer,
   short *in = (short*)inputBuffer;
   short *wptr = (short*)outputBuffer;
   unsigned int i,n;
+  static short int n2;
   static int n0;
   static int ia=0;
   static int ib=0;
@@ -146,27 +161,29 @@ static int SoundOut( void *inputBuffer, void *outputBuffer,
     //    ic = framesPerBuffer*ic;
     ic = (int)(stime - *data->trperiod*n) * data->nfs;
     ic = ic % *data->nwave;
-    //    printf("%d\n",ic);
   }
 
   TxOKz=*data->TxOK;
   *data->Transmitting=*data->TxOK;
 
-  for(i=0 ; i<framesPerBuffer; i++ )  {
-    if(*data->TxOK)  {
-      *wptr++ = data->iwave[ic];        //left
-      *wptr++ = data->iwave[ic];        //right
+  if(*data->TxOK)  {
+    for(i=0 ; i<framesPerBuffer; i++ )  {
+      n2=data->iwave[ic];
+      addnoise_(&n2);
+      *wptr++ = n2;                   //left
+      *wptr++ = n2;                   //right
       ic++;
       if(ic>=*data->nwave) {
-	ic = ic % *data->nwave;       //Wrap buffer pointer if necessary
-	if(*data->nmode==2)
+	if(*data->nmode==2) {
 	  *data->TxOK=0;
+	  ic--;
+	}
+	else
+	  ic = ic % *data->nwave;       //Wrap buffer pointer if necessary
       }
     }
-    else {
-      *wptr++ = 0;                     //left
-      *wptr++ = 0;                     //right
-    }
+  } else {
+    memset((void*)outputBuffer, 0, 2*sizeof(short)*framesPerBuffer);
   }
   fivehztx_();                             //Call fortran routine
   return 0;
@@ -224,7 +241,7 @@ int jtaudio_(int *ndevin, int *ndevout, short y1[], short y2[],
   inputParameters.device=*ndevin;
   inputParameters.channelCount=2;
   inputParameters.sampleFormat=paInt16;
-  inputParameters.suggestedLatency=0.5;
+  inputParameters.suggestedLatency=1.0;
   inputParameters.hostApiSpecificStreamInfo=NULL;
   err2=Pa_OpenStream(
 		       &instream,       //address of stream
@@ -244,7 +261,7 @@ int jtaudio_(int *ndevin, int *ndevout, short y1[], short y2[],
   outputParameters.device=*ndevout;
   outputParameters.channelCount=2;
   outputParameters.sampleFormat=paInt16;
-  outputParameters.suggestedLatency=0.5;
+  outputParameters.suggestedLatency=1.0;
   outputParameters.hostApiSpecificStreamInfo=NULL;
   err2a=Pa_OpenStream(
 		       &outstream,      //address of stream
@@ -328,7 +345,7 @@ int padevsub_(int *numdev, int *ndefin, int *ndefout,
   }
 
 
-  printf("\n Audio    Input    Output     Device Name\n");
+  printf("\nAudio     Input    Output     Device Name\n");
   printf("Device  Channels  Channels\n");
   printf("------------------------------------------------------------------\n");
 
@@ -351,4 +368,3 @@ int padevsub_(int *numdev, int *ndefin, int *ndefout,
   return err;
 }
 
-#endif

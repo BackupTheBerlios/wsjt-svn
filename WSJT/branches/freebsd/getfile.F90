@@ -6,7 +6,7 @@ subroutine getfile(fname,len)
   use dflib
 #endif
 
-  parameter (NDMAX=60*11025)
+  parameter (NDMAX=661500)  ! =60*11025
   character*(*) fname
   include 'gcom1.f90'
   include 'gcom2.f90'
@@ -41,7 +41,6 @@ subroutine getfile(fname,len)
 #ifdef Win32
   open(10,file=fname,form='binary',status='old',err=998)
   read(10,end=998) hdr
-  
 #else
   call rfile2(fname,hdr,44+2*NDMAX,nr)
 #endif
@@ -75,16 +74,8 @@ subroutine getfile(fname,len)
 #endif
   endif
 
-  if(monitoring.eq.0) then
-! In this case, spec should read data from d2c
-!     jzc=jzc/2048
-!     jzc=jzc*2048
-     ndiskdat=1
-  endif
-
+  ndiskdat=1
   mousebutton=0
-  ndecoding=4
-
   go to 999
 
 998 ierr=1001

@@ -30,8 +30,8 @@ subroutine fivehz
 
   if(first) then
      rxdelay=0.2
-     txdelay=0.2
-     tlatency=3*2048/11025.0
+     txdelay=0.4
+     tlatency=1.0
      first=.false.
      iptt=0
      ntr0=-99
@@ -40,7 +40,7 @@ subroutine fivehz
      ibuf00=-99
      ncall=-1
      tt0=tt
-     u=0.05d0
+     u=0.1d0
      fsample=11025.d0
      maxms=0
      mfsample=110250
@@ -51,8 +51,9 @@ subroutine fivehz
 ! Measure average sampling frequency over a recent interval
 
   ncall=ncall+1
-  if(ncall.gt.0) then
-     fs=ncall*2048.d0/(tt-tt0)
+  if(ncall.eq.9) tt0=tt
+  if(ncall.ge.10 .and. mod(ncall,2).eq.1) then
+     fs=(ncall-9)*2048.d0/(tt-tt0)
      fsample=u*fs + (1.d0-u)*fsample
      mfsample=nint(10.d0*fsample)
   endif
@@ -62,7 +63,8 @@ subroutine fivehz
   tx2=trperiod-(tlatency+txdelay)      !Time to turn TX off
   if(mode(1:4).eq.'JT65') then
      if(nwave.lt.126*4096) nwave=126*4096
-     tx2=nwave/11025.0
+     tx2=txdelay + nwave/11025.0
+     if(tx2.gt.(trperiod-2.0)) tx2=trperiod-tlatency-1.0
   endif
 
   if(TxFirst.eq.0) then
@@ -83,9 +85,7 @@ subroutine fivehz
   endif
   ibuf000=ibuf
   iwrite000=iwrite
-
   nsec=Tsec
-
   ntr=mod(nsec/trperiod,2)             !ntr=0 in 1st sequence, 1 in 2nd
 
   if(ntr.ne.ntr0) then
@@ -121,15 +121,14 @@ subroutine fivehz
 ! If PTT was just raised, start a countdown for raising TxOK:
   nc1a=txdelay/0.18576
   if(nc1a.lt.2) nc1a=2
-  if(mode(1:4).eq.'JT65') nc1a=2                    !No extra delay for JT65
-  if(iptt.eq.1 .and. iptt0.eq.0) nc1=-nc1a
+  if(iptt.eq.1 .and. iptt0.eq.0) nc1=-nc1a-1
   if(nc1.le.0) nc1=nc1+1
   if(nc1.eq.0) TxOK=1                               ! We are transmitting
 
 ! If TxOK was just lowered, start a countdown for lowering PTT:
-  nc0a=txdelay/0.18576
-  if(nc0a.lt.4) nc0a=4
-  if(TxOK.eq.0 .and. TxOKz.eq.1 .and. iptt.eq.1) nc0=-nc0a
+  nc0a=(tlatency+txdelay)/0.18576
+  if(nc0a.lt.5) nc0a=5
+  if(TxOK.eq.0 .and. TxOKz.eq.1 .and. iptt.eq.1) nc0=-nc0a-1
   if(nc0.le.0) nc0=nc0+1
   if(nc0.eq.0) i3=ptt(nport,0,iptt)
 
@@ -147,18 +146,22 @@ subroutine fivehz
      ibuf00=ibuf0
   endif
 
-!  if(ndebug.ne.0) then
-!     t60=mod(tsec,60.d0)
-!     if(iptt.ne.iptt0) then
-!        if(iptt.eq.1) tstart=tsec
-!        if(iptt.eq.0) write(*,1101) tsec-tstop,t60
-!1101    format('Delay from TxOFF to PTT was',f6.2,' s at t=',f6.2)
+! Diagnostic timing information:
+!  t60=mod(tsec,60.d0)
+!  if(TxOK.ne.TxOKz) then
+!     if(TxOK.eq.1) write(*,1101) 'D2:',t
+!1101 format(a3,f8.1,i8)
+!     if(TxOK.eq.0) then
+!        tstop=tsec
+!        write(*,1101) 'D3:',t,nc0a
 !     endif
-!     if(TxOK.ne.TxOKz) then
-!        if(TxOK.eq.0) tstop=tsec
-!        if(TxOK.eq.1) write(*,1102) tsec-tstart,t60
-!1102    format('Delay from PTT to TxON was ',f6.2,' s at t=',f6.2)
+!  endif
+!  if(iptt.ne.iptt0) then
+!     if(iptt.eq.1) then
+!        tstart=tsec
+!        write(*,1101) 'D1:',t,nc1a
 !     endif
+!     if(iptt.eq.0) write(*,1101) 'D4:',t
 !  endif
 
   iptt0=iptt
@@ -190,19 +193,44 @@ subroutine fivehztx
   if(first) then
      first=.false.
      ncall=-1
-     tt0=tt
      fsample=11025.d0
      nsec0=-999
-     u=0.05d0
+     u=0.1d0
      mfsample2=110250
+     tt0=tt
   endif
 
   ncall=ncall+1
-  if(ncall.gt.0) then
-     fs=ncall*2048.d0/(tt-tt0)
+  if(ncall.eq.9) tt0=tt
+  if(ncall.ge.10 .and. mod(ncall,2).eq.1) then
+     fs=(ncall-9)*2048.d0/(tt-tt0)
      fsample=u*fs + (1.d0-u)*fsample
      mfsample2=nint(10.d0*fsample)
   endif
-
   return
 end subroutine fivehztx
+
+subroutine addnoise(n)
+  integer*2 n
+  real r(12)
+  real*8 txsnrdb0
+  include 'gcom1.f90'
+  save
+
+  if(txsnrdb.gt.40.0) return
+  if(txsnrdb.ne.txsnrdb0) then
+     snr=10.0**(0.05*(txsnrdb-1))
+     fac=3000.0
+     if(snr.gt.1.0) fac=3000.0/snr
+     txsnrdb0=txsnrdb
+  endif
+  call random_number(r)
+  x=sum(r)-6.0
+  i=fac*(x + n*snr/32768.0)
+  if(i>32767) i=32767;
+  if(i<-32767) i=-32767;
+  n=i
+
+  return
+end subroutine addnoise
+
