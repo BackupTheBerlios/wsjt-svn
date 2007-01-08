@@ -1,0 +1,139 @@
+CC ?= @CC@
+FFLAGS	= @FFLAGS@
+LDFLAGS	= @LDFLAGS@
+LIBS	= @LIBS@
+CPPFLAGS = @CPPFLAGS@
+CFLAGS	= @CFLAGS@
+# WSJT specific C flags
+CFLAGS	+= -DBIGSYM=1 -fPIC
+DEFS = @DEFS@
+CFLAGS += ${DEFS}
+CPPFLAGS += ${DEFS} -I.
+
+# WSJT specific Fortran flags
+FFLAGS += -Wall -fbounds-check -fno-second-underscore -ffixed-line-length-none -fPIC
+#FFLAGS += -Wall -fbounds-check -fno-second-underscore -fPIC
+#FFLAGS += -cpp -fno-second-underscore
+# The default rules
+.c.o:
+	${CC} ${CPPFLAGS} ${CFLAGS} -c -o ${<:.c=.o} $<
+
+.f.o:
+	${FC} ${CPPFLAGS} ${FFLAGS} -c -o ${<:.f=.o} $<
+
+.F90.o:
+	${FC} ${CPPFLAGS} ${FFLAGS} -c -o ${<:.F90=.o} $<
+
+OS=@OS@
+FC=@FC@
+COMPILER += @FC_LIB_PATH@
+
+LDFLAGS	+= -L${COMPILER}
+
+PYTHON	?= @PYTHON@
+RM	?= @RM@
+F2PY	= @F2PY@
+
+
+OBJS1 = JT65code.o nchar.o grid2deg.o packmsg.o packtext.o \
+	packcall.o packgrid.o unpackmsg.o unpacktext.o unpackcall.o \
+	unpackgrid.o deg2grid.o packdxcc.o chkmsg.o getpfx1.o \
+	getpfx2.o k2grid.o grid2k.o interleave63.o graycode.o set.o \
+	igray.o init_rs_int.o encode_rs_int.o decode_rs_int.o \
+	wrapkarn.o
+
+F2PYONLY = ftn_init ftn_quit audio_init spec getfile azdist0 astro0
+
+SRCS2F90 = abc441.F90 astro0.F90 audio_init.F90 azdist0.f90 \
+	blanker.f90 decode1.F90 decode2.f90 decode3.F90 ftn_init.F90 \
+	ftn_quit.f90 get_fname.F90 getfile.F90 horizspec.f90 hscroll.f90 \
+	i1tor4.f90 pix2d.f90 pix2d65.f90 rfile.f90 savedata.F90 spec.f90 \
+	wsjtgen.F90 runqqq.F90 fivehz.F90
+OBJS2F90 = ${SRCS2F90:.f90=.o}
+
+SRCS2F77 = wsjt1.f astro.f azdist.f coord.f dcoord.f deg2grid.f \
+	dot.f ftsky.f geocentric.f GeoDist.f grid2deg.f moon2.f \
+	MoonDop.f sun.f toxyz.f pfxdump.f \
+        avesp2.f bzap.f spec441.f spec2d.f mtdecode.f stdecode.f \
+        indexx.f s2shape.f flat2.f gen65.f chkmsg.f gen6m.f gentone.f \
+        syncf0.f syncf1.f synct.f decode6m.f avemsg6m.f \
+        set.f flatten.f db.f pctile.f sort.f ssort.f ps.f smooth.f \
+        ping.f longx.f peakup.f sync.f detect.f avemsg65.f decode65.f \
+        demod64a.f encode65.f extract.f flat1.f four2.f rfile2.f \
+        gencw.f getpfx1.f getpfx2.f getsnr.f graycode.f grid2k.f \
+        interleave63.f k2grid.f limit.f lpf1.f morse.f \
+        nchar.f packcall.f packgrid.f packmsg.f packtext.f setup65.f \
+        short65.f slope.f spec2d65.f sync65.f unpackcall.f \
+        unpackgrid.f unpackmsg.f unpacktext.f xcor.f xfft.f xfft2.f wsjt65.f \
+	ftpeak65.f fil651.f fil652.f fil653.f symsync65.f
+
+OBJS2F77 = ${SRCS2F77:.f=.o} deep65.o
+
+SRCS2C	= init_rs.c encode_rs.c decode_rs.c
+OBJS2C  = ${SRCS2C:.c=.o}
+
+# ok, so far for now
+# Windows @AUDIO@ will be a2d.f90 jtaudio.c since it uses portaudio
+#            for *nix @AUDIO@ will also be a2d.f90, jtaudio.c
+#               and start_portaudio.c for systems using portaudio
+#            for *nix @AUDIO@ will be start_alsa.c for alsa
+#            for *nix @AUDIO@ will be start_oss.c for oss
+#
+# ptt_unix.c vs. ptt.c I'll sort out later. 
+# ditto for cutil.c (only used on *nix)
+# --db
+# jtaudio.c/start_threads.c mess will have to be sorted out later
+# to minimise #ifdef's 
+# --db
+# and mostly sorted
+# --db
+#
+#  @NEEDPORTAUDIO@ will be filled in with libportaudio.a if portaudio is used
+#
+SRCS3C	= ptt_unix.c igray.c wrapkarn.c cutil.c
+OBJS3C  = ${SRCS3C:.c=.o}
+AUDIOSRCS = @AUDIO@
+
+all:	wsjt6 JT65code
+
+JT65code: $(OBJS1)
+	$(FC) -o JT65code $(OBJS1)
+
+portaudio-v19/lib/.libs/libportaudio.a:
+	(cd portaudio-v19;./configure --with-jack=no)
+	(cd portaudio-v19;${MAKE})
+
+wsjt6:	@NEEDPORTAUDIO@ Audio.so #wsjt.spec
+#	${PYTHON} c:\python23\installer\Build.py wsjt.spec
+#	${RM} wsjt6
+
+deep65.o: deep65.F
+	$(FC) -c -O0 -Wall -fPIC deep65.F
+
+Audio.so: $(OBJS2C) $(OBJS3C) $(OBJS2F77) $(SRCS2F90) $(AUDIOSRCS)
+	 ${F2PY} -c --quiet --opt="-O ${CFLAGS} \
+	-fno-second-underscore"	$(OBJS2C) $(OBJS2F77) -m Audio \
+	--f77exec=${FC} --f90exec=${FC} ${CPPFLAGS} ${LDFLAGS} ${LIBS} \
+	only: $(F2PYONLY) \
+	: $(SRCS2F90) \
+	${SRCS3C} ${AUDIOSRCS}
+
+wsjt.spec: wsjt.py astro.py g.py options.py palettes.py smeter.py specjt.py
+#	${PYTHON} c:\python23\installer\makespec.py --icon wsjt.ico \
+#	--tk --onefile wsjt.py
+
+
+init_rs_int.o: init_rs.c
+	$(CC) $(CFLAGS) -c -DBIGSYM=1 -o init_rs_int.o init_rs.c
+encode_rs_int.o: encode_rs.c
+	$(CC) $(CFLAGS) -c -DBIGSYM=1 -o encode_rs_int.o encode_rs.c
+decode_rs_int.o: decode_rs.c
+	$(CC) $(CFLAGS) -c -DBIGSYM=1 -o decode_rs_int.o decode_rs.c
+
+.PHONY : clean
+clean:
+	${RM} -f *.o *.pyc *.so *~ JT65code wsjt6
+	(cd portaudio-v19;${MAKE} clean)
+distclean: clean
+	${RM} -f config.log config.status Makefile
+	(cd portaudio-v19;${MAKE} distclean)
