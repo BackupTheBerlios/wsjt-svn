@@ -364,6 +364,7 @@ C  Look for single-tone messages
         if(nline.gt.nline0) STfound=.true.  !ST message(s) found
 
 C  Now the multi-tone decoding
+!        write(72) jz,nz,cfile6,(dat(j),j=1,jz)
         call mtdecode(dat,jz,nz,MinSigdB,MinWidth,
      +    NQRN,DFTolerance,istart,pick,cfile6,ps0)
 
