@@ -1,7 +1,7 @@
-subroutine smo(x,npts,nadd)
+subroutine smo(x,npts,y,nadd)
 
   real x(npts)
-  common/scratch/y(10000)
+  real y(npts)
 
   nh=nadd/2
   do i=1+nh,npts-nh

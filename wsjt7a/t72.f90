@@ -20,20 +20,22 @@ program t72
   complex zz(0:3)
   real r(0:3)
   real rf(0:3)
-  real th(0:3)
+  real spec(0:3)
+  integer nspec(0:3)
   real s(NMAX)
-  real ccf(-2400:2400)
+  real ccf(-6000:6000)
   integer itone(84)                       !Generated tones for msg fragment
   integer dftolerance
   integer dit(-3000:3000)
   real y(0:3,-3000:3000)
+  complex za(0:3,-3000:3000)
   real yf(0:3,0:86)
   integer nf(0:86)
   integer ditf(0:86)
   logical pick
   real pingdat(3,100)                     !Detected pings
   character c*48
-  common/scratch/work(10000)
+  common/scratch/work(NMAX)
   data c/' 123456789.,?/# $ABCD FGHIJKLMNOPQRSTUVWXY 0EZ  '/
 
   nargs=iargc()
@@ -44,7 +46,7 @@ program t72
   call getarg(1,arg)
   read(arg,*) nfile
   call getarg(2,frag)
-  open(72,file='dat.72',form='unformatted',status='old')
+  open(72,file='dat.72a',form='unformatted',status='old')
 
   do i=28,1,-1                          !Get length of fragment
      if(frag(i:i).ne.' ') go to 10
@@ -62,7 +64,8 @@ program t72
   call gen441(4,1,ct3)
 
 ! Initialize variables
-  jpk=0
+  ipk=0
+  twopi=8.0*atan(1.0)
   dt=1.0/11025.0
   minsigdb=2
   minwidth=40
@@ -127,11 +130,9 @@ program t72
         ccf(:-ia-1)=0.
         ccf(ia+1:)=0.
         nadd=2*nint(5.0/df1)+1
-        call smo(ccf(-ia),2*ia+1,nadd)
+        call smo(ccf(-ia),2*ia+1,work,nadd)
 
         do i=-ia,ia
-!           write(14,3001) i*df1,ccf(i)
-!3001       format(2f10.3)
            if(ccf(i).gt.ccfmax) then
               ccfmax=ccf(i)
               ipk=i
@@ -154,8 +155,6 @@ program t72
               sq=sq + real(cdat(j+i-1))**2 + aimag(cdat(j+i-1))**2
            enddo
            ss=(real(z)**2 + aimag(z)**2)/sq
-!           write(15,3002) i,(i+i0-1)*dt,ss
-!3002       format(i8,f12.6,f12.3)
            if(ss.gt.sbest) then
               sbest=ss
               ibest=i
@@ -163,9 +162,19 @@ program t72
            endif
         enddo
 
+        if(sbest.lt.ccfmax) go to 800         !Skip if not FSK441 data
+
 ! We know DF and DT; now decode the message.
-        k1=0
-        do i1=ibest,npts-nsps+1,nsps                  !Positive is
+        spec=0.
+        nspec=0
+        n=ibest/nsps - 1
+        i1a=ibest-n*nsps
+        n=(npts-nsps+1)/nsps - 1
+        i1b=i1a+n*nsps
+        is1=(1-ibest)/nsps
+        is2=(npts-nsps+1-ibest)/nsps
+
+        do i1=i1a,i1b,nsps
            is=(i1-ibest)/nsps
            sq=dot_product(cdat(i1:i1+nsps-1),cdat(i1:i1+nsps-1))
            rms=sqrt(sq)
@@ -177,61 +186,51 @@ program t72
            rmax=0.
            do i=0,3
               r(i)=abs(zz(i))
-              y(i,is)=r(i)
-              th(i)=atan2(aimag(zz(i)),real(zz(i)))
+              za(i,is)=zz(i)
               if(r(i).gt.rmax) then
                  rmax=r(i)
                  ipk=i
               endif
            enddo
-           k1=k1+1
-           dit(is)=ipk
-           write(17,3004) is,zz
-3004       format(i3,4(f8.2,f6.2))
-           write(18,3005) is,ipk,rmax,th(ipk),is/3
-3005       format(2i3,2f8.2,i6)
-           if(ipk.eq.0) write(20,3005) is,ipk,rmax,th(ipk),is/3
-           if(ipk.eq.1) write(21,3005) is,ipk,rmax,th(ipk),is/3
-           if(ipk.eq.2) write(22,3005) is,ipk,rmax,th(ipk),is/3
-           if(ipk.eq.3) write(23,3005) is,ipk,rmax,th(ipk),is/3
+           do i=0,3
+              if(i.ne.ipk) then
+                 spec(i)=spec(i)+r(i)
+                 nspec(i)=nspec(i)+1
+              endif
+           enddo
         enddo
 
-        k2=0
-        do i1=ibest-nsps,1,-nsps                             !Negative is
-           is=(i1-ibest)/nsps
-           sq=dot_product(cdat(i1:i1+nsps-1),cdat(i1:i1+nsps-1))
-           rms=sqrt(sq)
-           zz(0)=dot_product(cdat(i1:i1+nsps-1),conjg(ct0))/rms
-           zz(1)=dot_product(cdat(i1:i1+nsps-1),conjg(ct1))/rms
-           zz(2)=dot_product(cdat(i1:i1+nsps-1),conjg(ct2))/rms
-           zz(3)=dot_product(cdat(i1:i1+nsps-1),conjg(ct3))/rms
+        do i=0,3
+           if(nspec(i).gt.0) then
+              spec(i)=spec(i)/nspec(i)
+           else
+              spec(i)=1.0
+           endif
+        enddo
 
+        do i1=i1a,i1b,nsps
+           is=(i1-ibest)/nsps
            rmax=0.
            do i=0,3
+              za(i,is)=za(i,is)/spec(i)
+              zz(i)=za(i,is)
               r(i)=abs(zz(i))
               y(i,is)=r(i)
-              th(i)=atan2(aimag(zz(i)),real(zz(i)))
               if(r(i).gt.rmax) then
                  rmax=r(i)
                  ipk=i
               endif
            enddo
-           k2=k2+1
            dit(is)=ipk
-           write(17,3004) is,zz
-           write(18,3005) is,ipk,rmax,th(ipk),(is-2)/3
-           if(ipk.eq.0) write(20,3005) is,ipk,rmax,th(ipk),(is-2)/3
-           if(ipk.eq.1) write(21,3005) is,ipk,rmax,th(ipk),(is-2)/3
-           if(ipk.eq.2) write(22,3005) is,ipk,rmax,th(ipk),(is-2)/3
-           if(ipk.eq.3) write(23,3005) is,ipk,rmax,th(ipk),(is-2)/3
         enddo
 
 ! Get message length
         smax=0.
         sum0=1.
+        lenavg=1
         do lag=0,28
            sum=0.
-           do j=is,k1-3*28
+           do j=is1,is2-3*28
               sum=sum + y(0,j)*y(0,j+3*lag) + y(1,j)*y(1,j+3*lag) +      &
                         y(2,j)*y(2,j+3*lag) + y(3,j)*y(3,j+3*lag) 
            enddo
@@ -242,18 +241,15 @@ program t72
               sum=sum/sum0
               if(sum.gt.smax) then
                  smax=sum
-                 len=lag
+                 lenavg=lag
               endif
-!              if(smax.gt.0.85) go to 20
            endif
-           write(19,3006) lag,sum
-3006       format(i3,f12.3)
         enddo
-!20      continue
+        if(lenavg.eq.1) go to 800
 
         msg='                                        '
-        msglen=min((k1+k2)/3,40)
-        j=is/3
+        msglen=min((is2-is1+1)/3,40)
+        j=is1/3
         j=3*j
 
         do i=1,msglen
@@ -264,14 +260,14 @@ program t72
         enddo
 
         write(*,1110) cfile6,tbest,mswidth,nint(dfx),     &
-             ccfmax,sbest,len,msg(:msglen)
+             ccfmax,sbest,lenavg,msg(:msglen)
 1110    format(a6,f5.1,i5,i5,2f6.1,i3,2x,a)
 
 ! Fold the y() array
         yf=0.
         nf=0
-        do j=is,k1
-           k=mod(j+300*len,3*len)
+        do j=is1,is2
+           k=mod(j+300*lenavg,3*lenavg)
            yf(0,k)=yf(0,k) + y(0,j)
            yf(1,k)=yf(1,k) + y(1,j)
            yf(2,k)=yf(2,k) + y(2,j)
@@ -279,7 +275,7 @@ program t72
            nf(k)=nf(k)+1
         enddo
 
-        do k=0,3*len-1
+        do k=0,3*lenavg-1
            if(nf(k).gt.0) then
               rmax=0.
               do i=0,3
@@ -292,20 +288,19 @@ program t72
            endif
            ditf(k)=ipk
         enddo
-!        write(*,4001) (ditf(k),k=0,3*len-1)
+!        write(*,4001) (ditf(k),k=0,3*lenavg-1)
 !4001    format(10(i2,2i1))
 
-        msglen=len
         j=-3
         msg='                                        '
-        do i=1,msglen
+        do i=1,lenavg
            j=j+3
            nc=16*ditf(j) + 4*ditf(j+1) +ditf(j+2)
            msg(i:i)=' '
            if(nc.le.47 .and. nc.ge.0) msg(i:i)=c(nc+1:nc+1)
         enddo
 
-        write(*,1120) msg(:msglen)
+        write(*,1120) msg(:lenavg)
 1120    format(37x,a)
 
 

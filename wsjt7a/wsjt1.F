@@ -208,6 +208,7 @@ C  Intentionally degrade SNR by -nclip dB.
            do i=1,jz                    !### Why is it level-sensitive?
               dat(i)=dat(i)/25.0
            enddo
+!           write(73) jz,nz,cfile6,(dat(j),j=1,jz)
 ! For waterfall plot
            call spec2d(dat,jz,nstep,s2,nchan,nz,psavg,sigma)
            if(sigma.lt.0.0) basevb=-99.0
