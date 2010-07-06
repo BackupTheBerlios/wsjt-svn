@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#---------------------------------------------------------------------- WSJT
+#--------------------------------------------------------------------- WSJT
 # $Date$ $Revision$
 #
 from Tkinter import *
@@ -2707,7 +2707,7 @@ Audio.gcom2.nhighpri=options.HighPri.get()
 Audio.gcom4.addpfx=(options.addpfx.get().lstrip()+(' '*8))[:8]
 stopmon()
 if g.Win32: root.iconbitmap("wsjt.ico")
-root.title('  WSJT 7     by K1JT')
+root.title('  WSJT 7.1     by K1JT')
 from WsjtMod import astro
 from WsjtMod import specjt
 
