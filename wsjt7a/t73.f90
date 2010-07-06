@@ -128,7 +128,8 @@ program t73
            write(16,3005) j,sym(j)
 3005       format(i4,f12.3)
         enddo
-        print*,fsym
+        fsmin=min(fsym(0),fsym(1),fsym(2))
+        print*,fsym/fsmin
 
      print*,ifile,f0,dfx,jpk
 

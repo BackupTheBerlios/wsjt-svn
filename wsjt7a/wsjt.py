@@ -24,7 +24,7 @@ from types import *
 import array
 
 root = Tk()
-Version="7.06 r" + "$Rev$"[6:-1]
+Version="7.1 r" + "$Rev$"[6:-1]
 print "******************************************************************"
 print "WSJT Version " + Version + ", by K1JT"
 print "Revision date: " + \
@@ -1451,6 +1451,11 @@ def GenAltMsgs(event=NONE):
 #------------------------------------------------------ setmsg
 def setmsg(template,r):
     msg=""
+    t=options.MyCall.get()
+    n=len(t)
+    MySuffix=t[n-3:]
+    if MySuffix[0:1].isdigit()or MySuffix[1:2].isdigit():
+        MySuffix=MySuffix[1:]
     npct=0
     for i in range(len(template)):
         if npct:
@@ -1459,6 +1464,7 @@ def setmsg(template,r):
             if template[i]=="R": msg=msg+r
             if template[i]=="G": msg=msg+options.MyGrid.get()[:4]
             if template[i]=="L": msg=msg+options.MyGrid.get()
+            if template[i]=="S": msg=msg+MySuffix
             npct=0
         else:
             npct=0
