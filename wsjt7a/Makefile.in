@@ -60,7 +60,7 @@ OBJS1 = JT65code.o nchar.o grid2deg.o packmsg.o packtext.o \
 
 OBJS5 = t72.o analytic.o four2a.o smooth.o pctile.o db.o \
 	thnix_stub.o sort.o ssort.o gen441.o abc441.o ping441.o \
-	indexx.o ping.o smo.o tweak1.o
+	indexx.o ping.o smo.o tweak1.o enc441.o
 
 F2PYONLY = ftn_init ftn_quit audio_init spec getfile azdist0 astro0 chkt0
 
