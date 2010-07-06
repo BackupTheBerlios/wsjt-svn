@@ -16,6 +16,7 @@ C  Decode Multi-Tone FSK441 mesages.
       real ps(128)
       real ps0(128)
       character msg*40,msg3*3
+      character frag*28
       character*90 line
       common/ccom/nline,tping(100),line(100)
 

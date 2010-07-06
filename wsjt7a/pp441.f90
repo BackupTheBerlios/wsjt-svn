@@ -1,4 +1,4 @@
-subroutine pp441(dat,jz,tstart,width,dftolerance,frag)
+subroutine pp441(dat,jz,tstart,width,dftolerance)
 
 ! FSK441++ decoder
 
@@ -32,17 +32,18 @@ subroutine pp441(dat,jz,tstart,width,dftolerance,frag)
   integer ditf(0:86)
   character c*48
   common/scratch/work(NMAX)
-  data c/' 123456789.,?/# $ABCD FGHIJKLMNOPQRSTUVWXY 0EZ  '/
+  data c/' 123456789.,?/# $ABCD FGHIJKLMNOPQRSTUVWXY 0EZ*!'/
   data frag0/'xxxxx'/
   save frag0,cfrag,ct0,ct1,ct2,ct3,ndits
 
+!  frag='_'
+  frag='$!'
   if(frag.ne.frag0) then
      frag0=frag
-     frag='_'
      do i=28,1,-1                          !Get length of fragment
         if(frag(i:i).ne.' ') go to 10
      enddo
-10   nfrag=i
+10   nfrag=1000+i
 
 ! Generate waveform for message fragment
      call abc441(frag,nfrag,itone,ndits)
@@ -54,6 +55,7 @@ subroutine pp441(dat,jz,tstart,width,dftolerance,frag)
      call gen441(3,1,ct2)
      call gen441(4,1,ct3)
   endif
+
 
   cfile6='A:'
   nsps=25
@@ -83,7 +85,7 @@ subroutine pp441(dat,jz,tstart,width,dftolerance,frag)
   ccf(ia+1:)=0.
   nadd=2*nint(5.0/df1)+1
   call smo(ccf(-ia),2*ia+1,work,nadd)
-  
+
   do i=-ia,ia
      if(ccf(i).gt.ccfmax) then
         ccfmax=ccf(i)
@@ -212,6 +214,9 @@ subroutine pp441(dat,jz,tstart,width,dftolerance,frag)
   enddo
 
   call cs_lock('pp441')
+  do i=1,msglen-3
+     if(msg(i:i+1).eq.'$!') print*,'a ',i,msg(i:i+3)
+  enddo
   write(*,1110) cfile6,tbest,mswidth,nint(dfx),     &
        ccfmax,sbest,lenavg,msg(:msglen)
 1110 format(a6,f5.1,i5,i5,2f6.1,i3,2x,a)
@@ -251,7 +256,7 @@ subroutine pp441(dat,jz,tstart,width,dftolerance,frag)
      msg(i:i)=' '
      if(nc.le.47 .and. nc.ge.0) msg(i:i)=c(nc+1:nc+1)
   enddo
-  
+
   call cs_lock('pp441')
   write(*,1120) msg(:lenavg)
 1120 format('B:',35x,a)
