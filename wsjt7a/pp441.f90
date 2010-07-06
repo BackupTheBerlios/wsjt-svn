@@ -1,4 +1,4 @@
-subroutine pp441(dat,jz,tstart,width,dftolerance)
+subroutine pp441(dat,jz,cfile6,tstart,width,dftolerance)
 
 ! FSK441++ decoder
 
@@ -9,6 +9,7 @@ subroutine pp441(dat,jz,tstart,width,dftolerance)
   character cfile6*6                      !File time
   character frag*28,frag0*28              !Message fragment to be matched
   character msg*40
+  character*28 msg1,msg2
   complex cfrag(2100)                     !Complex waveform of message fragment
   complex ct0(25)
   complex ct1(25)
@@ -56,8 +57,6 @@ subroutine pp441(dat,jz,tstart,width,dftolerance)
      call gen441(4,1,ct3)
   endif
 
-
-  cfile6='A:'
   nsps=25
   nsam=nsps*ndits
   mswidth=10*nint(100.0*width)
@@ -215,11 +214,19 @@ subroutine pp441(dat,jz,tstart,width,dftolerance)
 
   call cs_lock('pp441')
   do i=1,msglen-3
-     if(msg(i:i+1).eq.'$!') print*,'a ',i,msg(i:i+3)
+!     if(msg(i:i+1).eq.'$!') print*,'a ',i,msg(i:i+3)
+     if(msg(i:i+1).eq.'$!') then
+        msg1=msg(i:)
+        call dec441(msg1,msg2)
+        i3=index(msg2,'$')
+        if(i3.gt.1) msg2=msg2(:i3-1)
+        i4=index(msg2,'!')
+        if(i4.gt.1) msg2=msg2(:i4-2)
+        write(*,1110) cfile6,tbest,mswidth,nint(dfx),     &
+             ccfmax,sbest,lenavg,msg2
+1110    format(a6,f5.1,i5,i5,2f6.1,i3,2x,a28)
+     endif
   enddo
-  write(*,1110) cfile6,tbest,mswidth,nint(dfx),     &
-       ccfmax,sbest,lenavg,msg(:msglen)
-1110 format(a6,f5.1,i5,i5,2f6.1,i3,2x,a)
   call cs_unlock
 
 ! Fold the y() array
@@ -257,10 +264,11 @@ subroutine pp441(dat,jz,tstart,width,dftolerance)
      if(nc.le.47 .and. nc.ge.0) msg(i:i)=c(nc+1:nc+1)
   enddo
 
-  call cs_lock('pp441')
-  write(*,1120) msg(:lenavg)
-1120 format('B:',35x,a)
-  call cs_unlock
+!### Temporary:
+!  call cs_lock('pp441')
+!  write(*,1120) msg(:lenavg)
+!1120 format('B:',35x,a)
+!  call cs_unlock
 
 800 continue
 

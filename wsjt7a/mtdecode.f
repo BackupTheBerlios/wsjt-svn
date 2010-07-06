@@ -86,7 +86,7 @@ C  Find starting place and length of data to be analyzed:
          tstart=pingdat(1,iping)
          width=pingdat(2,iping)
 !###
-         call pp441(dat,jz,tstart,width,dftolerance)
+         call pp441(dat,jz,cfile6,tstart,width,dftolerance)
 !###
          peak=pingdat(3,iping)
          mswidth=10*nint(100.0*width)
