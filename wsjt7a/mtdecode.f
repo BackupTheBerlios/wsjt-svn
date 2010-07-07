@@ -19,6 +19,7 @@ C  Decode Multi-Tone FSK441 mesages.
       character frag*28
       character*90 line
       common/ccom/nline,tping(100),line(100)
+      data frag/'$!'/
 
       slim=MinSigdB
       wmin=0.001*MinWidth * (19.95/20.0)
@@ -130,22 +131,21 @@ C  If it's the best ping yet, save the spectrum:
             enddo
          endif
    
-         tstart=tstart + dt*(istart-1)
+         t2=tstart + dt*(istart-1)
          if(nline.le.99) nline=nline+1
-         tping(nline)=tstart
+         tping(nline)=t2
          call cs_lock('mtdecode')
 
          do i=37,1,-1                             !Remove Sync and tokens
             if(msg(i:i+1).eq.'$!') msg=msg(:i-1)//'  '//msg(i+4:)
          enddo
 
-         write(line(nline),1050) cfile6,tstart,mswidth,int(peak),
+         write(line(nline),1050) cfile6,t2,mswidth,int(peak),
      +        nrpt,noffset,msg3,msg,'A'
  1050    format(a6,f5.1,i5,i3,1x,i2.2,i5,1x,a3,1x,a40,3x,a1)
          call cs_unlock
  100     continue
-         frag='$!'
-         print*,pick,jz,tstart,width,npeak,nrpt
+
          call pp441(dat,jz,cfile6,tstart,width,npeak,nrpt,
      +              dftolerance,frag,0)
       enddo
