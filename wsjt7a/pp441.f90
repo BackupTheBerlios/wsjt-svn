@@ -219,12 +219,12 @@ subroutine pp441(dat,jz,cfile6,tstart,width,npeak,nrpt,     &
         if(i4.gt.1) msg2=msg2(:i4-2)
         if(msg2.ne.msg0) then
            if(ncon.ne.0) write(*,1110) cfile6,tbest,mswidth,npeak,     &
-                nrpt,nint(dfx),msg2,n2,'B'
-1110       format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,10x,i4,1x,a1)
+                nrpt,nint(dfx),msg2,'B',n2
+1110       format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,10x,5x,a1,i3)
            if(nline.le.99) nline=nline+1
            tping(nline)=tstart
            write(line(nline),1110) cfile6,tstart,mswidth,npeak,        &
-                nrpt,nint(dfx),msg2,n2,'B'
+                nrpt,nint(dfx),msg2,'B',n2
            msg0=msg2
         endif
      endif
@@ -278,11 +278,11 @@ subroutine pp441(dat,jz,cfile6,tstart,width,npeak,nrpt,     &
 
      call cs_lock('pp441')
      if(ncon.ne.0) write(*,1110) cfile6,tbest,mswidth,npeak,nrpt,     &
-          nint(dfx),msg3,n2,'C'
+          nint(dfx),msg3,'C',n2
         if(nline.le.99) nline=nline+1
         tping(nline)=tstart
         write(line(nline),1110) cfile6,tstart,mswidth,npeak,          &
-             nrpt,nint(dfx),msg3,n2,'C'
+             nrpt,nint(dfx),msg3,'C',n2
      call cs_unlock
   endif
 

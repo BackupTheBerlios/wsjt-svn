@@ -33,7 +33,7 @@ SRCS2F90 = a2d.f90 abc441.f90 astro0.f90 audio_init.f90 azdist0.f90 \
 	packname.f90 unpackname.f90 packtext2.f90 unpacktext2.f90 \
 	packprop.f90 unpackprop.f90 hash.f90 wsjtwspr.f90 gen64.f90 \
 	thnix.f90 enc441.f90 pp441.f90 tweak1.f90 smo.f90 analytic.f90 \
-	gen441.f90
+	gen441.f90 dec441.f90 token.f90
 
 
 SRCS2F77 = wsjt1.f avesp2.f bzap.f spec441.f spec2d.f mtdecode.f \

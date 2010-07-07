@@ -145,6 +145,7 @@ C  If it's the best ping yet, save the spectrum:
          call cs_unlock
  100     continue
          frag='$!'
+         print*,pick,jz,tstart,width,npeak,nrpt
          call pp441(dat,jz,cfile6,tstart,width,npeak,nrpt,
      +              dftolerance,frag,0)
       enddo
