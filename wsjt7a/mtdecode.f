@@ -7,7 +7,7 @@ C  Decode Multi-Tone FSK441 mesages.
       integer NQRN
       integer DFTolerance
       logical pick
-      character*6 cfile6,cf*1
+      character*6 cfile6
 
       real sigdb(3100)             !Detected signal in dB, sampled at 20 ms
       real work(3100)
@@ -85,9 +85,6 @@ C  at center of data.
 C  Find starting place and length of data to be analyzed:
          tstart=pingdat(1,iping)
          width=pingdat(2,iping)
-!###
-         call pp441(dat,jz,cfile6,tstart,width,dftolerance)
-!###
          peak=pingdat(3,iping)
          mswidth=10*nint(100.0*width)
          jj=(tstart-0.02)/dt
@@ -104,7 +101,6 @@ C  Decode the message.
      +     msglen,bauderr)
          qrnlimit=4.4*1.5**(5.0-NQRN)
          if(NQRN.eq.0) qrnlimit=99.
-         if(msglen.eq.0) go to 100
 
 C  Assemble a signal report:
          nwidth=0
@@ -115,11 +111,10 @@ C  Assemble a signal report:
          if(peak.ge.11.0) nstrength=7
          if(peak.ge.17.0) nstrength=8
          if(peak.ge.23.0) nstrength=9
+         npeak=peak
+         nrpt=10*nwidth + nstrength
 
-!         if(peak.gt.5.0 .and.mswidth.ge.100) then
-!            call specsq(dat(jj),jjz,DFTolerance,0,noffset2)
-!            noffset=noffset2
-!         endif
+         if(msglen.eq.0) go to 100
 
 C  Discard this ping if DF outside tolerance limits or bauderr too big.
 C  (However, if the ping was mouse-picked, proceed anyway.)
@@ -136,15 +131,22 @@ C  If it's the best ping yet, save the spectrum:
          endif
    
          tstart=tstart + dt*(istart-1)
-         cf=' '
          if(nline.le.99) nline=nline+1
          tping(nline)=tstart
          call cs_lock('mtdecode')
+
+         do i=37,1,-1                             !Remove Sync and tokens
+            if(msg(i:i+1).eq.'$!') msg=msg(:i-1)//'  '//msg(i+4:)
+         enddo
+
          write(line(nline),1050) cfile6,tstart,mswidth,int(peak),
-     +        nwidth,nstrength,noffset,msg3,msg,cf
- 1050    format(a6,f5.1,i5,i3,1x,2i1,i5,1x,a3,1x,a40,1x,a1)
+     +        nrpt,noffset,msg3,msg,'A'
+ 1050    format(a6,f5.1,i5,i3,1x,i2.2,i5,1x,a3,1x,a40,3x,a1)
          call cs_unlock
- 100  continue
+ 100     continue
+         frag='$!'
+         call pp441(dat,jz,cfile6,tstart,width,npeak,nrpt,
+     +              dftolerance,frag,0)
       enddo
 
       return

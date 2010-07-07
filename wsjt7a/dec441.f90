@@ -35,7 +35,7 @@ subroutine dec441(msg2,msg)
      do i=1,12
         if(ctok(i:i).eq.msg2(3:3)) go to 12
      enddo
-12   len2=len(i)
+12   if(i.le.12) len2=len(i)
   endif
 
   len0=0

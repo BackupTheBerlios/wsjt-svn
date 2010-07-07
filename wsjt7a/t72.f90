@@ -14,7 +14,7 @@ program t72
   real pingdat(3,100)                     !Detected pings
   character c*48
   common/scratch/work(NMAX)
-  data c/' 123456789.,?/# $ABCD FGHIJKLMNOPQRSTUVWXY 0EZ  '/
+  data c/' 123456789.,?/# $ABCD FGHIJKLMNOPQRSTUVWXY 0EZ*!'/
 
   nargs=iargc()
   if(nargs.ne.2) then
@@ -24,7 +24,7 @@ program t72
   call getarg(1,arg)
   read(arg,*) nfile
   call getarg(2,frag)
-  open(72,file='dat.72',form='unformatted',status='old')
+  open(72,file='dat.72c',form='unformatted',status='old')
 
 ! Initialize variables
   minsigdb=2
@@ -36,6 +36,7 @@ program t72
   xn=log(float(nsam))/log(2.0)
   n=xn
   if(xn-n .gt.0.001) n=n+1
+  cfile6='441++'
 
   do ifile=1,nfile
      read(72,end=999) jz,nz,cfile6,(dat0(j),j=1,jz)
@@ -61,7 +62,20 @@ program t72
      do iping=1,nping                        !Process each ping
         tstart=pingdat(1,iping)
         width=pingdat(2,iping)
-        call pp441(dat,jz,tstart,width,dftolerance,frag)
+        peak=pingdat(3,iping)
+        npeak=peak
+!  Assemble a signal report:
+        nwidth=0
+        if(width.ge.0.04) nwidth=1     !These might depend on NSPD
+        if(width.ge.0.12) nwidth=2
+        if(width.gt.1.00) nwidth=3
+        nstrength=6
+        if(peak.ge.11.0) nstrength=7
+        if(peak.ge.17.0) nstrength=8
+        if(peak.ge.23.0) nstrength=9
+        nrpt=10*nwidth + nstrength
+
+        call pp441(dat,jz,cfile6,tstart,width,npeak,nrpt,dftolerance,frag,1)
      enddo
 
 900  continue

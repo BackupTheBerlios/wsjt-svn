@@ -19,7 +19,7 @@ C  Longest allowed data analysis is 1 second.
       character msg*40
       character c*48
       common/acom/a1,a2,a3,a4
-      data c/' 123456789.,?/# $ABCD FGHIJKLMNOPQRSTUVWXY 0EZ  '/
+      data c/' 123456789.,?/# $ABCD FGHIJKLMNOPQRSTUVWXY 0EZ*!'/
       data wgt/1.0,4.0,6.0,4.0,1.0/
 
       kpk=0 !shut up compiler warnings -db

@@ -60,7 +60,13 @@ OBJS1 = JT65code.o nchar.o grid2deg.o packmsg.o packtext.o \
 
 OBJS5 = t72.o analytic.o four2a.o smooth.o pctile.o db.o \
 	thnix_stub.o sort.o ssort.o gen441.o abc441.o ping441.o \
-	indexx.o ping.o smo.o tweak1.o enc441.o pp441.o
+	indexx.o ping.o smo.o tweak1.o enc441.o pp441.o dec441.o \
+	token.o
+
+OBJS6 = test441pp.o analytic.o four2a.o smooth.o pctile.o db.o \
+	thnix_stub.o sort.o ssort.o gen441.o abc441.o ping441.o \
+	indexx.o ping.o smo.o tweak1.o enc441.o pp441.o dec441.o \
+	rfile2.o cutil.o token.o
 
 F2PYONLY = ftn_init ftn_quit audio_init spec getfile azdist0 astro0 chkt0
 
@@ -73,7 +79,7 @@ SRCS2F90 = abc441.F90 astro0.F90 audio_init.F90 azdist0.f90 \
 	packname.f90 unpackname.f90 packtext2.f90 unpacktext2.f90 \
 	packprop.f90 unpackprop.f90 hash.f90 wsjtwspr.f90 gen64.f90 \
 	thnix.f90 enc441.f90 pp441.f90 tweak1.f90 smo.f90 analytic.f90 \
-	gen441.f90
+	gen441.f90 dec441.f90 token.f90
 
 OBJS2F90 = ${SRCS2F90:.f90=.o}
 
@@ -116,6 +122,9 @@ JT65code: $(OBJS1)
 
 t72:	$(OBJS5)
 	$(FC) -o t72 $(OBJS5) -lfftw3f
+
+test441pp: $(OBJS6)
+	$(FC) -o test441pp $(OBJS6) -lfftw3f
 
 build:	WsjtMod/Audio.so
 
