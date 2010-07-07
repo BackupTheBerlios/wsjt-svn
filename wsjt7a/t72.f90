@@ -75,7 +75,9 @@ program t72
         if(peak.ge.23.0) nstrength=9
         nrpt=10*nwidth + nstrength
 
-        call pp441(dat,jz,cfile6,tstart,width,npeak,nrpt,dftolerance,frag,1)
+        t2=tstart
+        call pp441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,           &
+             dftolerance,frag,1)
      enddo
 
 900  continue
