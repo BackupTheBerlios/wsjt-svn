@@ -1,44 +1,41 @@
 subroutine genscat6(msg,itone)
 
-  character*28 msg
+  character msg*28,msg1*29
+  character c*43
+  integer imsg(29)
   integer itone(645)
   integer icos6(6)
-  integer nt(6)
-  character c*43
-  data icos6/1,2,3,4,5,6/
-  data nt/13,17,19,23,29,31/
-  data c/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ .,?/#$'/
+  data icos6/0,1,4,3,5,2/
+  data c/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ .,?/#$'/  !1-43
+  data nsync/7/,ndat/14/
 
-  do i=24,1,-1
+  do i=28,1,-1
      if(msg(i:i).ne.' ') go to 10
   enddo
-10 msglen=i
+10 msglen=i+1                      !Message length, including leading '$'
+  msg1='$'//msg
 
-  do i=1,6
-     ntot=nt(i)
-     if(ntot.ge.msglen+7) go to 20
-  enddo
-
-20 ndext=ntot-7 
-  itone(1:6)=icos6
-  itone(7)=ntot
   do i=1,msglen
-     i1=index(c,msg(i:i))
-     itone(7+i)=i1-1
-  enddo
-  if(ntot.gt.msglen+7) itone(msglen+8:ntot)=ntot
-
-  write(*,3001) msglen,ndext,ntot,(itone(i),i=1,ntot)
-3001 format(3i3,2x,7i3/(20i3))
-
-  j=ntot
-  do nrpt=1,999
-     do i=1,ntot
-        j=j+1
-        if(j.gt.645) go to 900
-        itone(j)=itone(i)
-     enddo
+     i1=index(c,msg1(i:i))
+     imsg(i)=i1-1
   enddo
 
-900 return
+  ntot=ndat+nsync
+  k=0
+  kk=1
+  do i=1,645
+     j=mod(i-1,ntot)+1
+     if(j.lt.nsync) then
+        itone(i)=icos6(j)
+     else if(j.eq.nsync) then
+        itone(i)=ndat
+     else
+        k=k+1
+        kk=mod(k-1,msglen)+1
+        itone(i)=imsg(kk)
+     endif
+  enddo
+
+  return
+
 end subroutine genscat6
