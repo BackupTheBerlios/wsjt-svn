@@ -121,7 +121,8 @@ subroutine pp441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,     &
      endif
   enddo
 
-  if(sbest.lt.ccfmax) go to 800         !Skip if not FSK441 data
+!  print*,'aa',ccfmax,sbest
+  if(sbest.lt.0.25*ccfmax) go to 800     !Skip if not decodable FSK441++ data
 
 ! We know DF and DT; now demodulate and decode.
   spec=0.
@@ -188,11 +189,13 @@ subroutine pp441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,     &
 
   nc=16*dit(6) + 4*dit(7) +dit(8)
   c1=' '
-  if(nc.le.47 .and. nc.ge.0) c1=c(nc+1:nc+1)
+  if(nc.ge.0 .and. nc.le.47) c1=c(nc+1:nc+1)
+  if(c1.eq.' ') c1='_'
   call token(c1,n1,tok1,n2)                     !Get length encoded in msg, n2
   nc=16*dit(9) + 4*dit(10) +dit(11)
   c1=' '
-  if(nc.le.47 .and. nc.ge.0) c1=c(nc+1:nc+1)
+  if(nc.ge.0 .and. nc.le.47) c1=c(nc+1:nc+1)
+  if(c1.eq.' ') c1='_'
   call token(c1,n3,tok2,n4)                     !Get encoded token, if any
 
   msg='                                        '
@@ -209,22 +212,27 @@ subroutine pp441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,     &
 
   call cs_lock('pp441')
 ! Probably shouldn't write multiple times, just use the best one:
+  msg0='@'
+!  print*,'a ',ccfmax,sbest,n2,msglen
+!  print*,'b ',msg
+!  print*,'a ',n1,n2,n3,n4,msglen,' ',c1,' ',tok2
   do i=1,msglen-n2-1
      if(msg(i:i+1).eq.'$!') then
         msg1=msg(i:i+n2-1)
-        call dec441(msg1,msg2)
+        call dec441(msg1,n2,msg2)
         i3=index(msg2,'$')
-        if(i3.gt.1) msg2=msg2(:i3-1)
+        if(i3.gt.3) msg2=msg2(:i3-1)
         i4=index(msg2,'!')
-        if(i4.gt.1) msg2=msg2(:i4-2)
+        if(i4.gt.4) msg2=msg2(:i4-2)
+        call msgtrim(msg2,junk)
         if(msg2.ne.msg0) then
            if(ncon.ne.0) write(*,1110) cfile6,tbest,mswidth,npeak,     &
-                nrpt,nint(dfx),msg2,'B',n2
-1110       format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,10x,5x,a1,i3)
+                nrpt,nint(dfx),msg2,' +',n2
+1110       format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,10x,4x,a2,i3)
            if(nline.le.99) nline=nline+1
            tping(nline)=t2
            write(line(nline),1110) cfile6,t2,mswidth,npeak,        &
-                nrpt,nint(dfx),msg2,'B',n2
+                nrpt,nint(dfx),msg2,' +',n2
            msg0=msg2
         endif
      endif
@@ -266,23 +274,29 @@ subroutine pp441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,     &
         msg(i:i)=' '
         if(nc.le.47 .and. nc.ge.0) msg(i:i)=c(nc+1:nc+1)
      enddo
-     call token(msg(4:4),n3,tok2,n4)              !Get encoded token, if any
+     c1=msg(4:4)
+     if(c1.eq.' ') c1='_'
+     call token(c1,n3,tok2,n4)              !Get encoded token, if any
      msg3=msg(5:n2)
-     if(n3.ge.1 .and. n3.le.3) msg3=tok2//msg3
+     if(n3.ge.1 .and. n3.le.3) then
+        if(tok2(3:3).eq.' ') msg3=tok2(1:3)//msg3
+        if(tok2(3:3).ne.' ') msg3=tok2//msg3
+     endif
      if(n3.ge.4 .and. n3.le.11) then
-        do i=28,1,-1
+        do i=n2,1,-1
            if(msg3(i:i).ne.' ') go to 100
         enddo
 100     msg3=msg3(1:i)//tok2
+        if(i.eq.0) msg3=msg3(1:i)//tok2(2:)
      endif
 
      call cs_lock('pp441')
      if(ncon.ne.0) write(*,1110) cfile6,tbest,mswidth,npeak,nrpt,     &
-          nint(dfx),msg3,'C',n2
+          nint(dfx),msg3,'++',n2
         if(nline.le.99) nline=nline+1
         tping(nline)=t2
         write(line(nline),1110) cfile6,t2,mswidth,npeak,              &
-             nrpt,nint(dfx),msg3,'C',n2
+             nrpt,nint(dfx),msg3,'++',n2
      call cs_unlock
   endif
 

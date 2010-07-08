@@ -4,11 +4,11 @@ program t72
 
   parameter (NMAX=512*1024)
   parameter (MAXFFT=8192)
-  real dat0(NMAX)                          !Raw signal, 30 s at 11025 sps
   real dat(NMAX)                          !Raw signal, 30 s at 11025 sps
   character arg*12                        !Command-line argument
   character cfile6*6                      !File time
   character frag*28                       !Message fragment to be matched
+  character infile*40
   integer dftolerance
   logical pick
   real pingdat(3,100)                     !Detected pings
@@ -17,14 +17,15 @@ program t72
   data c/' 123456789.,?/# $ABCD FGHIJKLMNOPQRSTUVWXY 0EZ*!'/
 
   nargs=iargc()
-  if(nargs.ne.2) then
-     print*,'Usage: t72 nfile frag'
+  if(nargs.ne.3) then
+     print*,'Usage: t72 infile nrec frag'
      go to 999
   endif
-  call getarg(1,arg)
-  read(arg,*) nfile
-  call getarg(2,frag)
-  open(72,file='dat.72c',form='unformatted',status='old')
+  call getarg(1,infile)
+  call getarg(2,arg)
+  read(arg,*) nrec
+  call getarg(3,frag)
+  open(72,file=infile,form='unformatted',status='old')
 
 ! Initialize variables
   minsigdb=2
@@ -38,24 +39,9 @@ program t72
   if(xn-n .gt.0.001) n=n+1
   cfile6='441++'
 
-  do ifile=1,nfile
-     read(72,end=999) jz,nz,cfile6,(dat0(j),j=1,jz)
-     if(ifile.ne.nfile .and. nfile.ne.999) go to 900
-
-! If necessary, correct sample-rate errors
-     if(ifile.eq.3 .or. ifile.eq.4 .or. ifile.eq.5) then
-        j=0
-        do i=1,jz
-           j=j+1
-           if(mod(i,147).eq.0) then
-              j=j-1
-           endif
-           dat(i)=dat0(j)
-        enddo
-        dat(j:jz)=0.
-     else
-        dat(1:jz)=dat0(1:jz)
-     endif
+  do irec=1,nrec
+     read(72,end=999) jz,nz,cfile6,(dat(j),j=1,jz)
+     if(irec.ne.nrec .and. nrec.ne.999) go to 900
 
      call ping441(dat,jz,nz,MinSigdB,MinWidth,pick,pingdat,nping)   !Find pings
 

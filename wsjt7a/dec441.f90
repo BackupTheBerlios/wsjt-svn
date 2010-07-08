@@ -1,6 +1,6 @@
-subroutine dec441(msg2,msg)
+subroutine dec441(msg1,n2,msg2)
 
-  character*28 msg2,msg
+  character*28 msg1,msg2
   character*4 tok(12)
   character*12 ctok
   integer ntok(12)
@@ -26,41 +26,27 @@ subroutine dec441(msg2,msg)
 ! Token indexes, as characters
   data ctok/'168_$GINRTOZ'/
 
-  do i=28,1,-1
-     if(msg2(i:i).ne.' ') go to 10
-  enddo
-10 len2=i                                !Encoded message length
-
-  if(msg2(1:2).eq.'$!') then
-     do i=1,12
-        if(ctok(i:i).eq.msg2(3:3)) go to 12
-     enddo
-12   if(i.le.12) len2=len(i)
-  endif
-
   len0=0
   do j=1,12
-     if(msg2(3:3).eq.ctok(j:j)) len0=len(j)
+     if(msg1(3:3).eq.ctok(j:j)) len0=len(j)
   enddo
 
   iz=0
   do i=1,12
-     if(msg2(4:4).eq.ctok(i:i)) iz=i
+     if(msg1(4:4).eq.ctok(i:i)) iz=i
   enddo
+  if(msg1(4:4).eq.' ') iz=4
 
   if(iz.eq.0) then
-     msg=msg2
+     msg2=msg1
+     if(msg1(1:2).eq.'$!') msg2=msg1(5:)
   else if(iz.le.3) then
-     msg=tok(iz)(1:ntok(iz))//msg2(5:)
+     msg2=tok(iz)(1:ntok(iz))//msg1(5:)
   else
-     if(len2.eq.4) then
-        msg=tok(iz)(2:)
+     if(n2.eq.4) then
+        msg2=tok(iz)(2:)
      else
-        do i=28,1,-1
-           if(msg2(i:i).ne.' ') go to 20
-        enddo
-20      i2=i
-        msg=msg2(5:i2)//tok(iz)
+        msg2=msg1(5:n2)//tok(iz)
      endif
   endif
 

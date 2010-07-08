@@ -16,7 +16,7 @@ C  Decode Multi-Tone FSK441 mesages.
       real ps(128)
       real ps0(128)
       character msg*40,msg3*3
-      character frag*28
+      character frag*28,tok1*4,tok2*4,c1*1
       character*90 line
       common/ccom/nline,tping(100),line(100)
       data frag/'$!'/
@@ -114,6 +114,10 @@ C  Assemble a signal report:
          if(peak.ge.23.0) nstrength=9
          npeak=peak
          nrpt=10*nwidth + nstrength
+         t2=tstart + dt*(istart-1)
+
+         call pp441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,
+     +              dftolerance,frag,0)
 
          if(msglen.eq.0) go to 100
 
@@ -131,23 +135,30 @@ C  If it's the best ping yet, save the spectrum:
             enddo
          endif
    
-         t2=tstart + dt*(istart-1)
          if(nline.le.99) nline=nline+1
          tping(nline)=t2
          call cs_lock('mtdecode')
 
-         do i=37,1,-1                             !Remove Sync and tokens
-            if(msg(i:i+1).eq.'$!') msg=msg(:i-1)//'  '//msg(i+4:)
+         do i=37,1,-1                             !Detect sync and tokens
+            if(msg(i:i+1).eq.'$!') then
+               c1=msg(i+2:i+2)
+               if(c1.eq.' ') c1='_'
+               call token(c1,i1,tok1,n1)
+               c1=msg(i+3:i+3)
+               if(c1.eq.' ') c1='_'
+               call token(c1,i2,tok2,n2)
+!               print*,'length:',n1,'   token:',tok2
+               msg3=tok2
+               if(tok2(1:1).eq.' ') msg3=tok2(2:)
+               msg=msg(:i-1)//'..'//msg(i+4:)
+            endif
          enddo
 
          write(line(nline),1050) cfile6,t2,mswidth,int(peak),
-     +        nrpt,noffset,msg3,msg,'A'
- 1050    format(a6,f5.1,i5,i3,1x,i2.2,i5,1x,a3,1x,a40,3x,a1)
+     +        nrpt,noffset,msg3,msg
+ 1050    format(a6,f5.1,i5,i3,1x,i2.2,i5,1x,a3,1x,a40)
          call cs_unlock
  100     continue
-
-         call pp441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,
-     +              dftolerance,frag,0)
       enddo
 
       return
