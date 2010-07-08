@@ -28,7 +28,7 @@ subroutine genscat6(msg,itone)
      if(j.lt.nsync) then
         itone(i)=icos6(j)
      else if(j.eq.nsync) then
-        itone(i)=ndat
+        itone(i)=msglen
      else
         k=k+1
         kk=mod(k-1,msglen)+1
