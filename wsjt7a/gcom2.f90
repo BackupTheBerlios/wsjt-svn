@@ -33,7 +33,6 @@ integer nzap           !Is Zap checked?                         GUI
 integer nsavecum       !(why is this here?)
 integer minsigdb       !Decoder threshold setting               GUI
 integer nclearave      !Set to 1 to clear JT65 avg         GUI,Decoder
-integer newdat2        !Set to 1 when new WSPR data           Decoder
 integer nfreeze        !Is Freeze checked?                      GUI
 integer nafc           !Is AFC checked?                         GUI
 integer nmode          !Which WSJT mode?                   GUI,Decoder
@@ -75,7 +74,6 @@ integer ntdecode       !Time to start decoding in JT65 modes    GUI
 integer ntxreq         !Tx msg# requested                       GUI
 integer ntxnow         !Tx msg# being sent now                  GUI
 integer ndepth         !Requested "depth" of JT65 decoding      GUI
-integer ndwspr         !Requested "depth" of WSPR decoding      GUI
 integer nspecial       !JT65 shorthand msg#: RO=2 RRR=3 73=4    Decoder
 integer ndf            !Measured DF in Hz                       Decoder
 real ss1               !Magenta curve for JT65 shorthand msg    Decoder
@@ -109,7 +107,7 @@ common/gcom2/ps0(431),psavg(450),s2(64,3100),ccf(-5:540),             &
      mousedf,neme,nsked,naggressive,ntx2,nslim2,nagain,nsavelast,ntxdf, &
      shok,sendingsh,d2a(ND2MAX),d2b(ND2MAX),b(60000),jza,jzb,ntime,   &
      idinterval,msmax,lenappdir,idf,ndiskdat,nfsam,nlines,nflat,      &
-     ntdecode,ntxreq,ntxnow,nchallenge,ndepth,ndwspr,nspecial,ndf,    &
+     ntdecode,ntxreq,ntxnow,nchallenge,ndepth,nspecial,ndf,           &
      nfmid,nforce,nfrange,ss1(-224:224),ss2(-224:224),                &
      mycall,hiscall,hisgrid,txmsg,sending,mode,fname0,fnamea,         &
      fnameb,decodedfile,AppDir,AzElDir,filetokilla,filetokillb,       &

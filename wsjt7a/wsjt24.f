@@ -2,7 +2,7 @@
      +  DFTolerance,NFreeze,mode,mode4,Nseg,MouseDF,NAgain,
      +  idf,lumsg,lcum,nspecial,ndf,NSyncOK,ccfblue,ccfred,ndiag)
 
-C  Orchestrates the process of decoding JT2 and JT4 messages, using 
+C  Orchestrates the process of decoding JT4 messages, using 
 C  data that have been 2x downsampled.  
 
       real dat(npts)                        !Raw data

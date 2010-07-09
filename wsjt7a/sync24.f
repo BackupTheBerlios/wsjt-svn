@@ -1,7 +1,7 @@
       subroutine sync24(dat,jz,DFTolerance,NFreeze,MouseDF,
      +  mode,mode4,dtx,dfx,snrx,snrsync,ccfblue,ccfred1,flip,width)
 
-C  Synchronizes JT2 and JT4 data, finding the best-fit DT and DF.  
+C  Synchronizes JT4 data, finding the best-fit DT and DF.  
 
       parameter (NFFTMAX=2520)         !Max length of FFTs
       parameter (NHMAX=NFFTMAX/2)      !Max length of power spectra

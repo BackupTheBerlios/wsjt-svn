@@ -26,7 +26,6 @@ subroutine decode3(d2,jz,istart,filename)
   if(mode(1:4).eq.'Echo') nmode=3
   if(mode(1:4).eq.'JT6M') nmode=4
   if(mode(1:2).eq.'CW') nmode=5
-  if(mode(1:3).eq.'JT2') nmode=6
   if(mode(1:3).eq.'JT4') nmode=7
   if(mode(1:4).eq.'WSPR') nmode=8
   if(mode(1:4).eq.'JT64') nmode=9
@@ -85,7 +84,7 @@ subroutine decode3(d2,jz,istart,filename)
   
   nclearave=0
   nagain=0
-  if(mode(1:4).eq.'JT65' .or. nmode.ge.6) then
+  if(mode(1:4).eq.'JT65') then
      call pix2d65(d2d,jz)
   else if(mode.eq.'FSK441') then
      nz=s2(1,1)

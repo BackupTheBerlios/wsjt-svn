@@ -58,39 +58,19 @@ C  Set up necessary constants
       j0=0
       ndata=(nsym*11025.d0*samfac*tsymbol)/2
       ndata=2*ndata
-      if(mode(1:3).eq.'JT2') then                 !JT2 mode
-         ss=1.0
-         s=0.0
-         u=0.04
-         do i=1,ndata
-            t=t+dt
-            j=int(t/tsymbol) + 1                  !Symbol number, 1-207
-            if(j.ne.j0) then
-               f=f0 + npr2(j)*dfgen
-               if(flip.lt.0.0) f=f0 + (1-npr2(j))*dfgen
-               dphi=twopi*dt*f
-               if(symbol(j).gt.0) ss=-ss
-               j0=j
-            endif
-            phi=phi+dphi
-            s=s + u*(ss-s)
-            iwave(i)=32767.0 * s * sin(phi)
-         enddo
-      else                                        !JT4x mode
-         do i=1,ndata
-            t=t+dt
-            j=int(t/tsymbol) + 1                  !Symbol number, 1-207
-            if(j.ne.j0) then
-               f=f0 + (npr2(j)+2*symbol(j)-1.5) * dfgen * mode4
-               if(flip.lt.0.0) 
-     +              f=f0+((1-npr2(j))+2*symbol(j)-1.5)*dfgen*mode4
-               dphi=twopi*dt*f
-               j0=j
-            endif
-            phi=phi+dphi
-            iwave(i)=32767.0*sin(phi)
-         enddo
-      endif
+      do i=1,ndata
+         t=t+dt
+         j=int(t/tsymbol) + 1   !Symbol number, 1-207
+         if(j.ne.j0) then
+            f=f0 + (npr2(j)+2*symbol(j)-1.5) * dfgen * mode4
+            if(flip.lt.0.0) 
+     +           f=f0+((1-npr2(j))+2*symbol(j)-1.5)*dfgen*mode4
+            dphi=twopi*dt*f
+            j0=j
+         endif
+         phi=phi+dphi
+         iwave(i)=32767.0*sin(phi)
+      enddo
 
       do j=1,5512                !Put another 0.5 sec of silence at end
          i=i+1

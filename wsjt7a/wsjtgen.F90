@@ -118,9 +118,8 @@ subroutine wsjtgen
   dt=1.d0/fsample_out
   LTone=2
 
-  if(mode(1:4).eq.'JT65' .or. mode(1:3).eq.'JT2' .or.                  &
-       mode(1:3).eq.'JT4' .or. mode(1:4).eq.'WSPR' .or.                &
-       mode(1:4).eq.'JT64') then
+  if(mode(1:4).eq.'JT65' .or.                                          &
+       mode(1:3).eq.'JT4' .or. mode(1:4).eq.'JT64') then
 
      if(mode(1:4).eq.'JT65') then
 !  We're in JT65 mode.
@@ -129,17 +128,11 @@ subroutine wsjtgen
         if(mode(5:5).eq.'C') mode65=4
         call gen65(msg,mode65,samfacout,ntxdf,ndebug,iwave,nwave,sendingsh,   &
              msgsent,nmsg0)
-     else if(mode(1:4).eq.'WSPR') then
-        call cs_unlock                            !genwspr calls cs_lock
-        call genwspr(msg,samfacout,ntxdf,iwave,nwave,sendingsh,msgsent)
-        call cs_lock('wsjtgen')
-     else if(mode(1:3).eq.'JT2' .or. mode(1:3).eq.'JT4' ) then
+     else if(mode(1:3).eq.'JT4' ) then
         call gen24(msg,mode,mode4,samfacout,ntxdf,ndebug,iwave,nwave,      &
              sendingsh,msgsent,nmsg0)
-     else if(mode(1:4).eq.'JT64') then
-        mode64=1
-        call gen64(msg,mode64,samfacout,ntxdf,iwave,nwave,sendingsh,   &
-             msgsent,nmsg0)
+     else if(mode(1:4).eq.'JT43') then
+        continue
      else
         stop 'Unknown Tx mode requested.'
      endif
@@ -234,8 +227,8 @@ subroutine wsjtgen
   nwave=k
   
 900 sending=txmsg
-  if((mode(1:4).eq.'JT65' .or. mode(1:4).eq.'JT64' .or. &
-       mode(1:4).eq.'WSPR') .and. sendingsh.ne.1) sending=msgsent
+  if((mode(1:4).eq.'JT65' .or. mode(1:4).eq.'JT64') .and.              &
+       sendingsh.ne.1) sending=msgsent
   do i=NMSGMAX,1,-1
      if(sending(i:i).ne.' '.and. ichar(sending(i:i)).ne.0) go to 910
   enddo

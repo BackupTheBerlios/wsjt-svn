@@ -14,9 +14,8 @@ subroutine savedata
   equivalence (nfmt2,n4)
   save
 
-  if(mode(1:4).eq.'JT65' .or. mode(1:3).eq.'JT2' .or. mode(1:3).eq.'JT4'   &
-       .or. mode(1:2).eq.'CW' .or. mode(1:4).eq.'WSPR' .or.                &
-       mode(1:4).eq.'JT64') then
+  if(mode(1:4).eq.'JT65' .or. mode(1:3).eq.'JT4'   &
+       .or. mode(1:2).eq.'CW' .or. mode(1:4).eq.'JT64') then
      call get_fname(hiscall,iyr,imo,ida,ntime,lauto,fname0)
      ibuf1=ibuf0
      ibuf2=ibuf
@@ -36,11 +35,11 @@ subroutine savedata
   if(jza.lt.110250) go to 999           !Don't save files less than 10 s
   if(jza.gt.120*11025) go to 999         !Don't save if something's fishy
   k=2048*(ibuf1-1)
-  if(mode(1:4).ne.'JT65' .and. mode(1:3).ne.'JT2' .and. mode(1:3).ne.'JT4'   &
-       .and. mode(1:4).ne.'WSPR' .and. mode(1:2).ne.'CW' .and.               &
+  if(mode(1:4).ne.'JT65' .and. mode(1:3).ne.'JT4'   &
+       .and. mode(1:2).ne.'CW' .and.               &
        mode(1:4).ne.'JT64') k=k+3*2048
-  if(mode(1:4).ne.'JT65' .and. mode(1:3).ne.'JT2' .and. mode(1:3).ne.'JT4'   &
-       .and. mode(1:4).ne.'WSPR' .and. mode(1:2).ne.'CW' .and.               &
+  if(mode(1:4).ne.'JT65' .and. mode(1:3).ne.'JT4'   &
+       .and. mode(1:2).ne.'CW' .and.               &
        mode(1:4).ne.'JT64' .and. jza.gt.30*11025) then
      k=k + (jza-30*11025)
      if(k.gt.NRxMax) k=k-NRxMax
@@ -151,7 +150,7 @@ subroutine savedata
      call cs_unlock
   endif
 
-999 if(mode(1:4).ne.'JT65' .and. mode(1:3).ne.'JT2' .and. mode(1:3).ne.'JT2' &
+999 if(mode(1:4).ne.'JT65' .and. mode(1:3).ne.'JT2' &
          .and. mode(1:3).ne.'JT4' .and. mode(1:2).ne.'CW' .and.              &
          mode(1:4).ne.'JT64') then
      ibuf0z=ibuf0
