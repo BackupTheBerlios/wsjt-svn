@@ -82,7 +82,6 @@ MyCall0=""
 nafc=IntVar()
 naz=0
 ndepth=IntVar()
-ndwspr=IntVar()
 nel=0
 nblank=IntVar()
 ncall=0
@@ -188,39 +187,15 @@ def testmsgs():
     tx5.insert(0,"@1000")
     tx6.insert(0,"@2000")
 
-#------------------------------------------------------ msg6list
-def msg6list(event=NONE):
-    if mode.get()=='WSPR':
-        t="OP name 73 GL"
-        if options.myname.get()!="":
-            t1=options.myname.get().strip()
-            if t1!="name": t1=t1.upper()
-            t="OP " + t1 + " 73 GL"
-        tx6list=("73 DE call grid", "73 DE p/call", "TNX name 73 GL",
-             t, "pwr W gain dbd", "pwr W gain dbd 73 GL",
-             "pwr W DIPOLE", "pwr W VERTICAL", "PSE QSY freq KHZ",
-             "WX wx temp F wind", "WX wx temp C wind")
-        tx6dialog=Pmw.ComboBoxDialog(root, title="Message Tx6",
-            buttons=('OK','cancel'),defaultbutton='OK',
-            scrolledlist_items=tx6list,listbox_width=22)
-        tx6dialog.geometry(msgpos())
-        if g.Win32: tx6dialog.iconbitmap("wsjt.ico")
-        tx6dialog.tkraise()
-        t=tx6dialog.activate()
-        if t=='OK':
-            t=tx6dialog.get()
-            tx6.delete(0,99)
-            tx6.insert(0,t)
-
 #------------------------------------------------------ textsize
 def textsize():
     global textheight
     if textheight <= 9:
         textheight=21
     else:
-        if mode.get()[:4]=='JT65' or mode.get()=='WSPR' or \
+        if mode.get()[:4]=='JT65' or \
                mode.get()[:3]=='JT2' or mode.get()[:3]=='JT4' \
-               or mode.get()[:4]=='JT64':
+               or mode.get()[:4]=='JT43':
             textheight=7
         else:
             textheight=9
@@ -260,21 +235,14 @@ def dbl_click_text(event):
 
 #------------------------------------------------------ dbl_click3_text
 def dbl_click3_text(event):
-    if mode.get()[:4]=='JT65' or mode.get()=='WSPR' or \
+    if mode.get()[:4]=='JT65' or \
            mode.get()[:3]=='JT2' or mode.get()[:3]=='JT4' \
-           or mode.get()[:4]=='JT64':
+           or mode.get()[:4]=='JT43':
         t=text.get('1.0',END)           #Entire contents of text box
         t1=text.get('1.0',CURRENT)      #Contents from start to mouse pointer
         n=t1.rfind("\n")
         rpt=t1[n+12:n+15]
         if rpt[0:1] == " ": rpt=rpt[1:]
-        if mode.get()=='WSPR' or mode.get()[:4]=='JT64':
-            i=int((int(rpt)+33)/3)
-            if i<1: i=1
-            if i>9: i=9
-            rpt="S%d" % (i,)
-            report.delete(0,END)
-            report.insert(0,rpt)
         dbl_click_call(t,t1,rpt,event)
 
 #------------------------------------------------------ dbl_click_ave
@@ -664,15 +632,15 @@ def ModeJT65C(event=NONE):
         mode.set("JT65C")
         ModeJT65()
 
-#------------------------------------------------------ ModeJT64A
-def ModeJT64A(event=NONE):
-    if g.mode != "JT64A":
+#------------------------------------------------------ ModeJT43
+def ModeJT43(event=NONE):
+    if g.mode != "JT43":
         if lauto: toggleauto()
-    ModeJT65()
-    mode.set("JT64A")
+    ModeJT6M()
+    mode.set("JT43")
     report.configure(state=NORMAL)
     report.delete(0,END)
-    report.insert(0,'S1')
+    report.insert(0,'-15')
 
 #------------------------------------------------------ ModeJT6M
 def ModeJT6M(event=NONE):
@@ -719,39 +687,6 @@ def ModeCW(event=NONE):
         ntx.set(1)
         GenStdMsgs()
         erase()
-
-#------------------------------------------------------ ModeWSPR
-def ModeWSPR():
-    global slabel,isync,isync65,textheight,itol
-    ModeJT65()
-    mode.set("WSPR")
-    if lauto: toggleauto()
-    cleartext()
-    lab2.configure(text='FileID      Sync     dB       DT          DF  Drift')
-    Audio.gcom1.trperiod=120
-    iframe4b.pack_forget()
-    text.configure(height=9)
-    bclravg.configure(state=DISABLED)
-    binclude.configure(state=DISABLED)
-    bexclude.configure(state=DISABLED)
-    cbafc.configure(state=DISABLED)
-    cbnb.configure(state=DISABLED)
-    cbzap.configure(state=DISABLED)
-    lclip.configure(state=DISABLED)
-    nfreeze.set(1)
-    nzap.set(0)
-    cbfreeze.configure(state=DISABLED)
-##    btxdf.configure(state=DISABLED)
-
-    if ltxdf: toggletxdf()
-    report.configure(state=NORMAL)
-    report.delete(0,END)
-    report.insert(0,'S1')
-    itol=2
-    inctol()
-    ntx.set(1)
-    GenStdMsgs()
-    erase()
 
 #------------------------------------------------------ ModeJT2
 def ModeJT2():
@@ -839,12 +774,12 @@ WSJT is a weak signal communications program.  It supports
 these operating modes:
 
   1. FSK441 - fast mode for meteor scatter
-  2. JT6M   - optimized for meteor and ionospheric scatter on 50 MHz
+  2. JT6M   - for meteor and ionospheric scatter on 50 MHz
   3. JT65   - for HF, EME, and troposcatter
   4. CW     - 15 WPM Morse code, messages structured for EME
   5. JT2    - for HF and EME
   6. JT4    - for HF and EME
-  7. WSPR   - for HF and EME
+  7. JT43   - for meteor and ionospheric scatter on 50 MHz
 
 Copyright (c) 2001-2010 by Joseph H. Taylor, Jr., K1JT, with
 contributions from additional authors.  WSJT is Open Source 
@@ -868,7 +803,6 @@ F1	List keyboard shortcuts
 Shift+F1	List special mouse commands
 Ctrl+F1	About WSJT
 F2	Options
-Shift+F2   WSPR structured messages
 F3	Tx Mute
 F4	Clear "To Radio"
 Alt+F4      Exit program
@@ -905,21 +839,6 @@ Alt+S	Stop Monitoring or Decoding
 Alt+V	Save Last
 Alt+X	Exclude
 Alt+Z	Toggle Zap
-"""
-    Label(scwid,text=t,justify=LEFT).pack(padx=20)
-    scwid.focus_set()
-
-#------------------------------------------------------ wspr_msgs
-def wspr_msgs(event=NONE):
-    scwid=Toplevel(root)
-    scwid.geometry(msgpos())
-    if g.Win32: scwid.iconbitmap("wsjt.ico")
-    t="""
-Examples of "partially canned" message parameters
-
-wx:    CLEAR CLOUDY RAIN SNOW
-temp:  76 F    -5 C
-wind:  CALM BREEZES WINDY
 """
     Label(scwid,text=t,justify=LEFT).pack(padx=20)
     scwid.focus_set()
@@ -1052,7 +971,7 @@ def azdist():
     else:
         if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT2' or \
                mode.get()[:3]=='JT4' or mode.get()[:2]=="CW" or \
-               mode.get()=='WSPR' or mode.get()[:4]=='JT64':
+               mode.get()[:4]=='JT43':
             labAz.configure(text="Az: %d" % (naz,))
             labHotAB.configure(text="",bg='gray85')
         else:
@@ -1100,8 +1019,7 @@ def decclip(event):
 def inctol(event=NONE):
     global itol
     maxitol=5
-    if mode.get()[:4]=='JT65' or mode.get()[:4]=='JT64': maxitol=6
-    if mode.get()=='WSPR': maxitol=3
+    if mode.get()[:4]=='JT65' or mode.get()[:4]=='JT43': maxitol=6
     if itol<maxitol: itol=itol+1
     ltol.configure(text='Tol    '+str(ntol[itol]))
 
@@ -1159,8 +1077,8 @@ def dectrperiod(event):
 def erase(event=NONE):
     graph1.delete(ALL)
     if mode.get()[:4]!="JT65" and mode.get()[:2]!="CW" and \
-            mode.get()!="WSPR" and mode.get()[:3]!='JT2' and \
-            mode.get()[:3]!='JT4' and mode.get()[:4]!='JT64':
+            mode.get()[:3]!='JT2' and \
+            mode.get()[:3]!='JT4' and mode.get()[:4]!='JT43':
         graph2.delete(ALL)
     text.configure(state=NORMAL)
     text.delete('1.0',END)
@@ -1189,12 +1107,9 @@ def defaults():
     lclip.configure(text='Clip   '+str(iclip))
     itol=5
     ltol.configure(text='Tol    '+str(ntol[itol]))
-    if g.mode=="JT6M":
+    if g.mode=="JT6M" or g.mode=="JT43":
         isync=-10
         itol=4
-        ltol.configure(text='Tol    '+str(ntol[itol]))
-    if g.mode=="WSPR":
-        itol=3
         ltol.configure(text='Tol    '+str(ntol[itol]))
     lsync.configure(text=slabel+str(isync))
 
@@ -1249,8 +1164,8 @@ def toggletxdf(event=NONE):
 # Readout of graphical cursor location
 def dtdf_change(event):
     if mode.get()[:4]!='JT65' and mode.get()[:3]!='JT2' and \
-               mode.get()[:3]!='JT4' and mode.get()[:4]!='WSPR' \
-               and mode.get()[:4]!='JT64':
+               mode.get()[:3]!='JT4' \
+               and mode.get()[:4]!='JT43':
         t="%.1f" % (event.x*30.0/500.0,)
         lab6.configure(text=t,bg='green')
     else:
@@ -1262,17 +1177,11 @@ def dtdf_change(event):
                  (event.y<95 and Audio.gcom2.nspecial>0):
             lab1.configure(text='DF (Hz)',bg='red')
             idf=Audio.gcom2.idf
-            if mode.get()[:4]=='WSPR':
-                t="%d" % int(0.7324*(event.x-250.0))
-            else:
-                t="%d" % int(idf+1200.0*event.x/500.0-600.0,)
+            t="%d" % int(idf+1200.0*event.x/500.0-600.0,)
             lab6.configure(text=t,bg="red")
         else:
             lab1.configure(text='Time (s)',bg='green')
-            if mode.get()=='WSPR':
-                t="%.1f" % (114.0*event.x/500.0,)
-            else:
-                t="%.1f" % (53.0*event.x/500.0,)
+            t="%.1f" % (53.0*event.x/500.0,)
             lab6.configure(text=t,bg="green")
 
 #---------------------------------------------------- mouse_click_g1
@@ -1280,11 +1189,8 @@ def mouse_click_g1(event):
     global nopen
     if not nopen:
         if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT2' or \
-               mode.get()[:3]=='JT4' or mode.get()[:4]=='JT64':
+               mode.get()[:3]=='JT4' or mode.get()[:4]=='JT43':
             Audio.gcom2.mousedf=int(Audio.gcom2.idf+(event.x-250)*2.4)
-        elif mode.get()=='WSPR':
-# Fix this: ??  (idf dependence?)
-            Audio.gcom2.mousedf=int(Audio.gcom2.idf+(event.x-250)*0.7324)
         else:
             if Audio.gcom2.ndecoding==0:              #If decoder is busy, ignore
                 Audio.gcom2.nagain=1
@@ -1299,8 +1205,8 @@ def mouse_click_g1(event):
 #------------------------------------------------------ double-click_g1
 def double_click_g1(event):
     if (mode.get()[:4]=='JT65' or mode.get()[:3]=='JT2' or \
-        mode.get()[:3]=='JT4' or mode.get()=='WSPR' \
-        or mode.get()[:4]=='JT64') and Audio.gcom2.ndecoding==0:
+        mode.get()[:3]=='JT4' \
+        or mode.get()[:4]=='JT43') and Audio.gcom2.ndecoding==0:
         g.freeze_decode=1
     
 #------------------------------------------------------ mouse_up_g1
@@ -1331,7 +1237,7 @@ def GenStdMsgs(event=NONE):
     Audio.gcom2.hiscall=(ToRadio.get()+(' '*12))[:12]
     for m in (tx1, tx2, tx3, tx4, tx5, tx6):
         m.delete(0,99)
-    if mode.get()=="FSK441" or mode.get()=="JT6M":
+    if mode.get()=="FSK441" or mode.get()=="JT6M" or mode.get()=="JT43":
         r=report.get()
         tx1.insert(0,setmsg(options.tx1.get(),r))
         tx2.insert(0,setmsg(options.tx2.get(),r))
@@ -1383,48 +1289,6 @@ def GenStdMsgs(event=NONE):
         tx4.insert(0,ToRadio.get() + " " + options.MyCall.get()+" [RRR]")
         tx5.insert(0,ToRadio.get() + " " + options.MyCall.get()+" [73]")
         tx6.insert(0,"[CQ " + options.MyCall.get() + "]")
-    elif mode.get()=="WSPR" or mode.get()[:4]=='JT64':
-        if options.MyCall.get()!= MyCall0 or \
-               options.addpfx.get()!= addpfx0 or ToRadio.get()!=ToRadio0:
-            MyCall0=options.MyCall.get()
-            addpfx0=options.addpfx.get()
-            ToRadio0=ToRadio.get()
-            t0=("SM5BSZ "+options.MyCall.get()).upper()
-            Audio.gcom2.t0msg=(t0+' '*22)[:22]
-            nplain,naddon,ndiff=Audio.chkt0()
-            if nplain==1:
-                MsgBox("Bad 'MyCall' or bad prefix/suffix?\nPlease check on Setup | Options screen.")
-                options1()
-            t0=("SM5BSZ "+ToRadio0).upper()
-            Audio.gcom2.t0msg=(t0+' '*22)[:22]
-            nplain,naddon,ndiff=Audio.chkt0()
-            if nplain==1:
-                MsgBox("Bad callsign in 'To Radio'?\nPlease check.")
-            
-        t0=("<" + ToRadio.get() + "> "+options.MyCall.get()).upper()
-        Audio.gcom2.t0msg=(t0+' '*22)[:22]
-##        nplain,naddon,ndiff=Audio.chkt0()
-##        if nplain==0 and naddon==0 and ndiff==0:
-##            t0=t0 + " "+options.MyGrid.get()[:4]
-        tx1.insert(0,t0.upper())
-        r=report.get()
-        t2=(ToRadio.get() + " <"+options.MyCall.get() + "> " + r).upper()
-        Audio.gcom2.t0msg=(t0+' '*22)[:22]
-        tx2.insert(0,t2)
-        t3=(ToRadio.get() + " <"+options.MyCall.get() + "> R " + r).upper()
-        tx3.insert(0,t3)
-        t4=("<" + ToRadio.get() + "> " + options.MyCall.get() + " RRR").upper()
-        tx4.insert(0,t4)
-        t5=("73 DE "+options.MyCall.get()+ " "+options.MyGrid.get()[:4]).upper()
-        tx5.insert(0,t5)
-
-        t0="CQ " + options.MyCall.get().upper()
-        Audio.gcom2.t0msg=(t0+' '*22)[:22]
-        nplain,naddon,ndiff=Audio.chkt0()
-        if nplain==0 and naddon==0 and ndiff==0:
-            t0=t0 + " "+options.MyGrid.get()[:4]
-        tx6.insert(0,t0.upper())
-        altmsg=0
     
 #------------------------------------------------------ GenAltMsgs
 def GenAltMsgs(event=NONE):
@@ -1511,8 +1375,6 @@ def plot_large():
                 x=i*fac
                 if mode.get()[:3]=='JT2' or mode.get()[:3]=='JT4':
                     x=i*500.0/548.571 + 47                      #empirical
-                if mode.get()[:4]=='WSPR':
-                    x=(i-224) + 250                #empirical
                 psavg=Audio.gcom2.psavg[i+1]
                 n=int(90.0-yfac*psavg)
                 xy.append(x)
@@ -1599,7 +1461,8 @@ def plot_small():
         x=int(i*df*fac)
         xy.append(x)
         psavg=Audio.gcom2.psavg[i]
-        if mode.get()=="JT6M": psavg=psavg + 27.959
+        if mode.get()=="JT6M" or mode.get()=="JT6M":
+            psavg=psavg + 27.959
         n=int(150.0-2*psavg)
         xy.append(n)
         if mode.get()=='FSK441':    
@@ -1688,7 +1551,7 @@ def update():
 
         if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT2' or \
                mode.get()[:3]=='JT4' or mode.get()[:2]=='CW' or \
-               mode.get()=='WSPR' or mode.get()[:4]=='JT64':
+               mode.get()[:4]=='JT43':
             graph2.delete(ALL)
             graph2.create_text(80,13,anchor=CENTER,text="Moon",font=g2font)
             graph2.create_text(13,37,anchor=W, text="Az: %6.2f" % g.AzMoon,font=g2font)
@@ -1697,8 +1560,8 @@ def update():
             graph2.create_text(13,109,anchor=W,text="Dgrd:%5.1f" % g.Dgrd,font=g2font)
 
     if (mode.get()[:4]=='JT65' or mode.get()[:3]=='JT2' or \
-        mode.get()[:3]=='JT4' or mode.get()=='WSPR' \
-        or mode.get()[:4]=='JT64') and g.freeze_decode:
+        mode.get()[:3]=='JT4' \
+        or mode.get()[:4]=='JT43') and g.freeze_decode:
         itol=2
         ltol.configure(text='Tol    '+str(50))
         Audio.gcom2.dftolerance=50
@@ -1738,9 +1601,7 @@ def update():
             msg2.configure(bg='#FF00FF')
         elif mode.get()=="CW":
             msg2.configure(bg='#00FF00')
-        elif mode.get()=="WSPR":
-            msg2.configure(bg='#FF8888')
-        elif mode.get()[:4]=="JT64":
+        elif mode.get()[:4]=="JT43":
             msg2.configure(bg='#CCFFFF')
         elif mode.get()=="JT2":
             msg2.configure(bg='#8888FF')
@@ -1875,8 +1736,7 @@ def update():
             cmap0=g.cmap
 
         if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT2' or \
-                mode.get()[:3]=='JT4' or mode.get()=='WSPR' \
-                or mode.get()[:4]=='JT64':
+                mode.get()[:3]=='JT4' or mode.get()[:4]=='JT43':
             plot_large()
         else:    
             im.putdata(Audio.gcom2.b)
@@ -1894,7 +1754,8 @@ def update():
     g.mode=mode.get()
     g.report=report.get()
     if mode.get()=='FSK441': isync441=isync
-    elif mode.get()=='JT6M': isync6m=isync
+    elif mode.get()=='JT6M' or mode.get()=="JT6M":
+        isync6m=isync
     elif mode.get()[:4]=='JT65': isync65=isync
     Audio.gcom1.txfirst=TxFirst.get()
     try:
@@ -1927,11 +1788,8 @@ def update():
     Audio.gcom2.dftolerance=ntol[itol]
     Audio.gcom2.neme=neme.get()
     Audio.gcom2.ndepth=ndepth.get()
-    Audio.gcom2.ndwspr=ndwspr.get()
     if mode.get()=='CW':
         Audio.gcom2.ntdecode=56
-    elif mode.get()=='WSPR':
-        Audio.gcom2.ntdecode=114
     else:
         if qdecode.get():
             Audio.gcom2.ntdecode=48
@@ -2074,8 +1932,7 @@ modemenu.add_radiobutton(label = 'JT4D', variable=mode, command = ModeJT4D)
 modemenu.add_radiobutton(label = 'JT4E', variable=mode, command = ModeJT4E)
 modemenu.add_radiobutton(label = 'JT4F', variable=mode, command = ModeJT4F)
 modemenu.add_radiobutton(label = 'JT4G', variable=mode, command = ModeJT4G)
-modemenu.add_radiobutton(label = 'WSPR', variable=mode, command = ModeWSPR)
-modemenu.add_radiobutton(label = 'JT64A', variable=mode, command = ModeJT64A)
+modemenu.add_radiobutton(label = 'JT43', variable=mode, command = ModeJT43)
 #modemenu.add_radiobutton(label = 'Echo', variable=mode, command = ModeEcho,
 #                         state=DISABLED)
 
@@ -2107,13 +1964,8 @@ decodemenu.JT65.add_radiobutton(label = 'Aggressive Deep Search',
 decodemenu.JT65.add_radiobutton(label ='Include Average in Aggressive Deep Search',
                                 variable=ndepth, value=3)
 
-decodemenu.WSPR=Menu(decodemenu,tearoff=0)
-decodemenu.WSPR.add_radiobutton(label='Quick decode',variable=ndwspr, value=0)
-decodemenu.WSPR.add_radiobutton(label='Deepest decode',variable=ndwspr, value=1)
-
 decodemenu.add_cascade(label = 'FSK441',menu=decodemenu.FSK441)
 decodemenu.add_cascade(label = 'JT65',menu=decodemenu.JT65)
-decodemenu.add_cascade(label = 'WSPR',menu=decodemenu.WSPR)
 
 if (sys.platform == 'darwin'):
     mbar.add_cascade(label="Decode", menu=decodemenu)
@@ -2240,7 +2092,6 @@ root.bind_all('<F1>', shortcuts)
 root.bind_all('<Shift-F1>', mouse_commands)
 root.bind_all('<Control-F1>', about)
 root.bind_all('<F2>', options1)
-root.bind_all('<Shift-F2>',wspr_msgs)
 root.bind_all('<F3>', txmute)
 root.bind_all('<F4>', clrToRadio)
 root.bind_all('<Alt-F4>', quit)
@@ -2494,7 +2345,6 @@ b6=Button(f5c, text='Tx6',underline=2,command=btx6,padx=1,pady=1)
 tx6.grid(column=1,row=5)
 rb6.grid(column=2,row=5)
 b6.grid(column=3,row=5)
-Widget.bind(tx6,'<Button-3>',msg6list)
 
 f5c.pack(side=LEFT,fill=BOTH)
 iframe5.pack(expand=1, fill=X, padx=4)
@@ -2526,7 +2376,6 @@ lauto=0
 isync=1
 ntx.set(1)
 ndepth.set(0)
-ndwspr.set(0)
 from WsjtMod import options
 options.defaults()
 ModeFSK441()
@@ -2567,10 +2416,8 @@ try:
                 ModeJT6M()
             elif value=='CW':
                 ModeCW()
-            elif value=='WSPR':
-                ModeWSPR()
-            elif value=='JT64A':
-                ModeJT64A()
+            elif value=='JT43':
+                ModeJT43()
             elif value=='JT2':
                 ModeJT2()
             elif value[:3]=='JT4':
@@ -2668,7 +2515,6 @@ try:
         elif key == 'QDecode': qdecode.set(value)
         elif key == 'NEME': neme.set(value)
         elif key == 'NDepth': ndepth.set(value)
-        elif key == 'Ndwspr': ndwspr.set(value)
         elif key == 'Debug': ndebug.set(value)
         elif key == 'HisCall':
             Audio.gcom2.hiscall=(value+' '*12)[:12]
@@ -2687,7 +2533,7 @@ except:
 
 g.mode=mode.get()
 if mode.get()=='FSK441': isync=isync441
-elif mode.get()=='JT6M': isync=isync6m
+elif mode.get()=='JT6M' or mode.get()=="JT6M": isync=isync6m
 elif mode.get()[:4]=='JT65': isync=isync65
 elif mode.get()[:3]=='JT4':
     if mode.get()[3:4]=='A': Audio.gcom2.mode4=1
@@ -2702,7 +2548,6 @@ lsync.configure(text=slabel+str(isync))
 lclip.configure(text='Clip   '+str(iclip))
 Audio.gcom2.azeldir=(options.azeldir.get()+' '*80)[:80]
 Audio.gcom2.ndepth=ndepth.get()
-Audio.gcom2.ndwspr=ndwspr.get()
 Audio.gcom2.nhighpri=options.HighPri.get()
 Audio.gcom4.addpfx=(options.addpfx.get().lstrip()+(' '*8))[:8]
 stopmon()
@@ -2777,7 +2622,6 @@ f.write("NoShJT65 " + str(noshjt65.get()) + "\n")
 f.write("QDecode " + str(qdecode.get()) + "\n")
 f.write("NEME " + str(neme.get()) + "\n")
 f.write("NDepth " + str(ndepth.get()) + "\n")
-f.write("Ndwspr " + str(ndwspr.get()) + "\n")
 f.write("Debug " + str(ndebug.get()) + "\n")
 #f.write("TRPeriod " + str(Audio.gcom1.trperiod) + "\n")
 mrudir2=mrudir.replace(" ","#")
