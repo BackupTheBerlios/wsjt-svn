@@ -234,7 +234,7 @@ def dbl_click_text(event):
 #------------------------------------------------------ dbl_click3_text
 def dbl_click3_text(event):
     if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4' \
-           or mode.get()[:4]=='JT43':
+           or mode.get()[:4]=='JT41':
         t=text.get('1.0',END)           #Entire contents of text box
         t1=text.get('1.0',CURRENT)      #Contents from start to mouse pointer
         n=t1.rfind("\n")
@@ -629,12 +629,12 @@ def ModeJT65C(event=NONE):
         mode.set("JT65C")
         ModeJT65()
 
-#------------------------------------------------------ ModeJT43
-def ModeJT43(event=NONE):
-    if g.mode != "JT43":
+#------------------------------------------------------ ModeJT41
+def ModeJT41(event=NONE):
+    if g.mode != "JT41":
         if lauto: toggleauto()
     ModeJT6M()
-    mode.set("JT43")
+    mode.set("JT41")
     report.configure(state=NORMAL)
     report.delete(0,END)
     report.insert(0,'-15')
@@ -769,7 +769,7 @@ these operating modes:
   3. JT65   - for HF, EME, and troposcatter
   4. CW     - 15 WPM Morse code, messages structured for EME
   5. JT4    - for HF and EME
-  6. JT43   - for meteor and ionospheric scatter on 50 MHz
+  6. JT41   - for meteor and ionospheric scatter on 50 MHz
 
 Copyright (c) 2001-2010 by Joseph H. Taylor, Jr., K1JT, with
 contributions from additional authors.  WSJT is Open Source 
@@ -961,7 +961,7 @@ def azdist():
     else:
         if mode.get()[:4]=='JT65' or \
                mode.get()[:3]=='JT4' or mode.get()[:2]=="CW" or \
-               mode.get()[:4]=='JT43':
+               mode.get()[:4]=='JT41':
             labAz.configure(text="Az: %d" % (naz,))
             labHotAB.configure(text="",bg='gray85')
         else:
@@ -1009,7 +1009,7 @@ def decclip(event):
 def inctol(event=NONE):
     global itol
     maxitol=5
-    if mode.get()[:4]=='JT65' or mode.get()[:4]=='JT43': maxitol=6
+    if mode.get()[:4]=='JT65' or mode.get()[:4]=='JT41': maxitol=6
     if itol<maxitol: itol=itol+1
     ltol.configure(text='Tol    '+str(ntol[itol]))
 
@@ -1067,7 +1067,7 @@ def dectrperiod(event):
 def erase(event=NONE):
     graph1.delete(ALL)
     if mode.get()[:4]!="JT65" and mode.get()[:2]!="CW" and \
-            mode.get()[:3]!='JT4' and mode.get()[:4]!='JT43':
+            mode.get()[:3]!='JT4' and mode.get()[:4]!='JT41':
         graph2.delete(ALL)
     text.configure(state=NORMAL)
     text.delete('1.0',END)
@@ -1096,7 +1096,7 @@ def defaults():
     lclip.configure(text='Clip   '+str(iclip))
     itol=5
     ltol.configure(text='Tol    '+str(ntol[itol]))
-    if g.mode=="JT6M" or g.mode=="JT43":
+    if g.mode=="JT6M" or g.mode=="JT41":
         isync=-10
         itol=4
         ltol.configure(text='Tol    '+str(ntol[itol]))
@@ -1153,7 +1153,7 @@ def toggletxdf(event=NONE):
 # Readout of graphical cursor location
 def dtdf_change(event):
     if mode.get()[:4]!='JT65' and mode.get()[:3]!='JT4' \
-               and mode.get()[:4]!='JT43':
+               and mode.get()[:4]!='JT41':
         t="%.1f" % (event.x*30.0/500.0,)
         lab6.configure(text=t,bg='green')
     else:
@@ -1177,7 +1177,7 @@ def mouse_click_g1(event):
     global nopen
     if not nopen:
         if mode.get()[:4]=='JT65' or \
-               mode.get()[:3]=='JT4' or mode.get()[:4]=='JT43':
+               mode.get()[:3]=='JT4' or mode.get()[:4]=='JT41':
             Audio.gcom2.mousedf=int(Audio.gcom2.idf+(event.x-250)*2.4)
         else:
             if Audio.gcom2.ndecoding==0:              #If decoder is busy, ignore
@@ -1193,7 +1193,7 @@ def mouse_click_g1(event):
 #------------------------------------------------------ double-click_g1
 def double_click_g1(event):
     if (mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4' \
-        or mode.get()[:4]=='JT43') and Audio.gcom2.ndecoding==0:
+        or mode.get()[:4]=='JT41') and Audio.gcom2.ndecoding==0:
         g.freeze_decode=1
     
 #------------------------------------------------------ mouse_up_g1
@@ -1224,7 +1224,7 @@ def GenStdMsgs(event=NONE):
     Audio.gcom2.hiscall=(ToRadio.get()+(' '*12))[:12]
     for m in (tx1, tx2, tx3, tx4, tx5, tx6):
         m.delete(0,99)
-    if mode.get()=="FSK441" or mode.get()=="JT6M" or mode.get()=="JT43":
+    if mode.get()=="FSK441" or mode.get()=="JT6M" or mode.get()=="JT41":
         r=report.get()
         tx1.insert(0,setmsg(options.tx1.get(),r))
         tx2.insert(0,setmsg(options.tx2.get(),r))
@@ -1536,7 +1536,7 @@ def update():
 
         if mode.get()[:4]=='JT65' or \
                mode.get()[:3]=='JT4' or mode.get()[:2]=='CW' or \
-               mode.get()[:4]=='JT43':
+               mode.get()[:4]=='JT41':
             graph2.delete(ALL)
             graph2.create_text(80,13,anchor=CENTER,text="Moon",font=g2font)
             graph2.create_text(13,37,anchor=W, text="Az: %6.2f" % g.AzMoon,font=g2font)
@@ -1545,7 +1545,7 @@ def update():
             graph2.create_text(13,109,anchor=W,text="Dgrd:%5.1f" % g.Dgrd,font=g2font)
 
     if (mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4' \
-        or mode.get()[:4]=='JT43') and g.freeze_decode:
+        or mode.get()[:4]=='JT41') and g.freeze_decode:
         itol=2
         ltol.configure(text='Tol    '+str(50))
         Audio.gcom2.dftolerance=50
@@ -1585,7 +1585,7 @@ def update():
             msg2.configure(bg='#FF00FF')
         elif mode.get()=="CW":
             msg2.configure(bg='#00FF00')
-        elif mode.get()[:4]=="JT43":
+        elif mode.get()[:4]=="JT41":
             msg2.configure(bg='#CCFFFF')
         elif mode.get()[:3]=="JT4":
             msg2.configure(bg='#88FF88')
@@ -1718,7 +1718,7 @@ def update():
             cmap0=g.cmap
 
         if mode.get()[:4]=='JT65' or \
-                mode.get()[:3]=='JT4' or mode.get()[:4]=='JT43':
+                mode.get()[:3]=='JT4' or mode.get()[:4]=='JT41':
             plot_large()
         else:    
             im.putdata(Audio.gcom2.b)
@@ -1913,7 +1913,7 @@ modemenu.add_radiobutton(label = 'JT4D', variable=mode, command = ModeJT4D)
 modemenu.add_radiobutton(label = 'JT4E', variable=mode, command = ModeJT4E)
 modemenu.add_radiobutton(label = 'JT4F', variable=mode, command = ModeJT4F)
 modemenu.add_radiobutton(label = 'JT4G', variable=mode, command = ModeJT4G)
-modemenu.add_radiobutton(label = 'JT43', variable=mode, command = ModeJT43)
+modemenu.add_radiobutton(label = 'JT41', variable=mode, command = ModeJT41)
 #modemenu.add_radiobutton(label = 'Echo', variable=mode, command = ModeEcho,
 #                         state=DISABLED)
 
@@ -2397,8 +2397,8 @@ try:
                 ModeJT6M()
             elif value=='CW':
                 ModeCW()
-            elif value=='JT43':
-                ModeJT43()
+            elif value=='JT41':
+                ModeJT41()
             elif value[:3]=='JT4':
                 ModeJT4()
         elif key == 'MyCall': options.MyCall.set(value)

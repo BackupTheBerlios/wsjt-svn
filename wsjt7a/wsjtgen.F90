@@ -128,11 +128,11 @@ subroutine wsjtgen
         if(mode(5:5).eq.'C') mode65=4
         call gen65(msg,mode65,samfacout,ntxdf,ndebug,iwave,nwave,sendingsh,   &
              msgsent,nmsg0)
+     else if(mode(1:4).eq.'JT41') then
+        call gen41(msg,nmsg,iwave,nwave,sendingsh,msgsent)
      else if(mode(1:3).eq.'JT4' ) then
         call gen24(msg,mode,mode4,samfacout,ntxdf,ndebug,iwave,nwave,      &
              sendingsh,msgsent,nmsg0)
-     else if(mode(1:4).eq.'JT43') then
-        continue
      else
         stop 'Unknown Tx mode requested.'
      endif
