@@ -83,7 +83,7 @@ subroutine gen41(msg,nmsg,iwave,nwave,sendingsh,msgsent)
 20 k=0
   pha=0.
   do m=1,nsym
-     f=f0 + (16+itone(m))*df
+     f=f0 + itone(m)*df
      dpha=twopi*f*dt
      do i=1,NSPS
         k=k+1
