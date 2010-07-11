@@ -206,7 +206,7 @@ C  If Monitor segment #2 is available, write that line also
       if(ave2(31:40).eq.'          ') ave2=ave2(:30)
       write(12,1011) ave1
       write(12,1011) ave2
-      call flushqqq(12)
+      call flush(12)
  
       if(lumsg.ne.6) end file 11
 

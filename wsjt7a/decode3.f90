@@ -1,9 +1,5 @@
 subroutine decode3(d2,jz,istart,filename)
 
-#ifdef CVF
-  use dfport
-#endif
-
   integer*2 d2(jz),d2d(125*11025)
   character*24 filename
   character FileID*40

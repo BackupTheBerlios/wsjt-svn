@@ -63,18 +63,6 @@ subroutine wsjtgen
      if(msg(2:2).eq.'/' .or. ichar(msg(2:2)).eq.92) then
         txmsg=msg
         testfile=msg(2:)
-#ifdef CVF
-        open(18,file=testfile,form='binary',status='old',err=12)
-        go to 14
-12      print*,'Cannot open test file ',msg(2:)
-        go to 999
-14      read(18) hdr
-        if(ndata.gt.NTxMax) ndata=NTxMax
-        call rfile(18,iwave,ndata,ierr)
-        close(18)
-        if(ierr.ne.0) print*,'Error reading test file ',msg(2:)
-
-#else
         tfile2=testfile
         call rfile2(tfile2,hdr,44+2*120*12000,nr)
         if(nr.le.0) then
@@ -84,7 +72,7 @@ subroutine wsjtgen
         do i=1,ndata/2
            iwave(i)=jwave(i)
         enddo
-#endif
+
         nwave=ndata/2
         do i=nwave,NTXMAX
            iwave(i)=0

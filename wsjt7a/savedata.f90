@@ -1,9 +1,5 @@
 subroutine savedata
 
-#ifdef CVF
-  use dfport
-#endif
-
   integer*1 n4
   integer*2 iswap_short
   character fname*24,longname*80
@@ -116,12 +112,6 @@ subroutine savedata
 
 
      call cs_lock('savedata')
-#ifdef CVF
-     open(17,file=longname,status='unknown',form='binary',err=20)
-     write(17) ariff,nchunk,awave,afmt,lenfmt,nfmt2,nchan2,nsamrate, &
-          nbytesec,nbytesam2,nbitsam2,adata,ndata,(d2a(j),j=1,jza)
-     close(17)
-#else
      open(17,file=longname,status='unknown',form='unformatted',      &
           access='direct',recl=nbytes,err=20)
      if (n4.ne.nfmt2) then
@@ -141,7 +131,7 @@ subroutine savedata
             nbytesec,nbytesam2,nbitsam2,adata,ndata,(d2a(j),j=1,jza)
      endif
      close(17)     
-#endif
+
      filetokillb=filetokilla
      filetokilla=longname
      go to 30

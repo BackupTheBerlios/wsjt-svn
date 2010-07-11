@@ -359,9 +359,9 @@ subroutine wsjt1(d,jz0,istart,samfacin,FileID,ndepth,              &
   
 900 LDecoded = ((NSyncOK.gt.0) .or. npkept.gt.0)
   endfile 11
-  call flushqqq(11)
-  call flushqqq(12)
-  call flushqqq(21)
+  call flush(11)
+  call flush(12)
+  call flush(21)
 
   return
 end subroutine wsjt1

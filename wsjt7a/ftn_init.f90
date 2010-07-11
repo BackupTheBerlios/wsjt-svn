@@ -42,63 +42,29 @@ subroutine ftn_init
   lenappdir=iz
   call pfxdump(appdir(:iz)//'/prefixes.txt')
 
-#ifdef CVF
-  open(11,file=appdir(:iz)//'/decoded.txt',status='unknown',               &
-       share='denynone',err=910)
-#else
   open(11,file=appdir(:iz)//'/decoded.txt',status='unknown',               &
        err=910)
-#endif
   endfile 11
 
-#ifdef CVF
-  open(12,file=appdir(:iz)//'/decoded.ave',status='unknown',               &
-       share='denynone',err=920)
-#else
   open(12,file=appdir(:iz)//'/decoded.ave',status='unknown',               &
        err=920)
-#endif
   endfile 12
 
-#ifdef CVF
-  open(14,file=appdir(:iz)//'/azel.dat',status='unknown',                 &
-       share='denynone',err=930)
-#else
   open(14,file=appdir(:iz)//'/azel.dat',status='unknown',                 &
        err=930)
-#endif
 
-#ifdef CVF
-  open(15,file=appdir(:iz)//'/debug.txt',status='unknown',                 &
-       share='denynone',err=940)
-#else
   open(15,file=appdir(:iz)//'/debug.txt',status='unknown',                 &
        err=940)
-#endif
 
-#ifdef CVF
-  open(21,file=appdir(:iz)//'/ALL.TXT',status='unknown',                   &
-       access='append',share='denynone',err=950)
-#else
   open(21,file=appdir(:iz)//'/ALL.TXT',status='unknown',                   &
        position='append',err=950)
-#endif
 
-#ifdef CVF
-  open(22,file=appdir(:iz)//'/kvasd.dat',access='direct',recl=1024,        &
-       status='unknown',share='denynone')
-#else
   open(22,file=appdir(:iz)//'/kvasd.dat',access='direct',recl=1024,        &
        status='unknown')
-#endif
 
   call zero(nsky,180*180)
   fname=appdir(:iz)//'/TSKY.DAT'
-#ifdef CVF
-  open(13,file=fname,status='old',form='binary',err=10)
-  read(13) nsky
-  close(13)
-#else
+
   call rfile2(fname,nsky,129600,nr)
   if(nr.ne.129600) go to 10
   nsky4=nsky(1,1)
@@ -111,7 +77,6 @@ subroutine ftn_init
         enddo
      enddo
   endif
-#endif
 
 10 call cs_unlock
   return

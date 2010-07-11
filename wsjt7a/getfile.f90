@@ -1,10 +1,6 @@
 subroutine getfile(fname,len)
 !f2py threadsafe
 
-#ifdef CVF
-  use dflib
-#endif
-
   parameter (NDMAX=120*11025)
   character*(*) fname
   include 'gcom1.f90'
@@ -22,11 +18,7 @@ subroutine getfile(fname,len)
   equivalence (ariff,hdr),(d1,d2)
 
 1 if(ndecoding.eq.0) go to 2
-#ifdef CVF
-  call sleepqq(100)
-#else
   call usleep(100*1000)
-#endif
 
   go to 1
 
@@ -38,21 +30,11 @@ subroutine getfile(fname,len)
   ierr=0
 
   call cs_lock('getfile')
-#ifdef CVF
-  open(10,file=fname,form='binary',status='old',err=997)
-  read(10,end=997) hdr
-#else
   call rfile2(fname,hdr,44+2*NDMAX,nr)
-#endif
 
   call check_endian
   if(nbitsam2.eq.8) then
      if(ndata.gt.NDMAX) ndata=NDMAX
-
-#ifdef CVF
-     call rfile(10,d1,ndata,ierr)
-     if(ierr.ne.0) go to 998
-#endif
 
      do i=1,ndata
         n4=d1(i)
@@ -63,27 +45,15 @@ subroutine getfile(fname,len)
 
   else if(nbitsam2.eq.16) then
      if(ndata.gt.2*NDMAX) ndata=2*NDMAX
-#ifdef CVF
-     call rfile(10,d2c,ndata,ierr)
-     jzc=ndata/2
-     if(ierr.ne.0) go to 998
-#else
      jzc=ndata/2
      do i=1,jzc
         d2c(i)=d2(i)
      enddo
-#endif
   endif
 
   ndiskdat=1
   mousebutton=0
   close(10)
-  go to 999
-
-#ifdef CVF
-997 ierr=1001
-998 close(10)
-#endif
 
 999 call cs_unlock
   return

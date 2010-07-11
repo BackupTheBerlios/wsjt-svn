@@ -3,10 +3,6 @@ subroutine decode1(iarg)
 ! Get data and parameters from gcom, then call the decoders when needed.
 ! This routine runs in a background thread and will never return.
 
-#ifdef CVF
-  use dflib
-#endif
-
   character sending0*28,mode0*6,cshort*11
   integer sendingsh0
   integer*8 mtx
@@ -57,7 +53,7 @@ subroutine decode1(iarg)
      call cs_lock('decode1a')
      write(21,1001) utcdate(:11)
 1001 format(/'UTC Date: ',a11/'---------------------')
-     call flushqqq(21)
+     call flush(21)
      call cs_unlock
      ns0=n
   endif
@@ -72,19 +68,14 @@ subroutine decode1(iarg)
      call cs_lock('decode1b')
      write(21,1010) ih,im,is,mode,sending,cshort
 1010 format(3i2.2,'  Transmitting: ',a6,2x,a28,2x,a11)
-     call flushqqq(21)
+     call flush(21)
      call cs_unlock
      sending0=sending
      sendingsh0=sendingsh
      mode0=mode
   endif
        
-#ifdef CVF
-  call sleepqq(100)
-#else
   call usleep(100*1000)
-#endif
-
   go to 10
 
 end subroutine decode1
