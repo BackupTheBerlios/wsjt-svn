@@ -9,12 +9,7 @@ subroutine fivehz
 !  Disk I/O is a bad idea.  Writing to stdout (for diagnostic purposes)
 !  seems to be OK.
 
-#ifdef CVF
-  use dflib
-  use dfport
-#else
   integer time
-#endif
 
   parameter (NTRING=64)
   real*8 tt1(0:NTRING-1)
@@ -241,11 +236,6 @@ end subroutine fivehz
 subroutine fivehztx
 
 !  Called at interrupt level from the PortAudio output callback.
-
-#ifdef CVF
-  use dflib
-  use dfport
-#endif
 
   parameter (NTRING=64)
   real*8 tt1(0:NTRING-1)
