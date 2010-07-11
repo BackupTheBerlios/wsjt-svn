@@ -48,8 +48,12 @@ subroutine astro0(nyear,month,nday,uth8,nfreq,grid,cauxra,cauxdec,       &
   if(mode(1:4).eq.'Echo') nmode=3
   if(mode(1:4).eq.'JT6M') nmode=4
   if(mode(1:2).eq.'CW') nmode=5
-  if(mode(1:3).eq.'JT4') nmode=7
-  if(mode(1:4).eq.'JT41') nmode=9
+  if(mode(1:4).eq.'JT41') then
+     nmode=9
+  else if(mode(1:3).eq.'JT4') then
+     nmode=7
+  endif
+
   uth=uth8
   call cs_unlock
 

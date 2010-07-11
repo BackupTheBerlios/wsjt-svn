@@ -1,7 +1,7 @@
       subroutine gen24(message,mode,mode4,samfac,ntxdf,ndebug,
      +    iwave,nwave,sendingsh,msgsent,nmsg)
 
-C  Encodes a JT2 or JT4 message into a wavefile.
+C  Encode a JT4 message into a wavefile.
 
       parameter (NMAX=60*11025)     !Max length of wave file
       character*22 message          !Message to be generated
@@ -38,7 +38,7 @@ C  Encodes a JT2 or JT4 message into a wavefile.
       symbol(1)=0                            !Reference phase
       sendingsh=0
       if(iand(dgen(10),8).ne.0) sendingsh=-1 !Plain text flag
-      call interleave24(symbol(2),1)         !Apply JT2/JT4 interleaving
+      call interleave24(symbol(2),1)         !Apply JT4 interleaving
 
       if(ndebug.ne.0) then
          rewind 51

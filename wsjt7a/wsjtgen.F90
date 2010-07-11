@@ -119,7 +119,7 @@ subroutine wsjtgen
   LTone=2
 
   if(mode(1:4).eq.'JT65' .or.                                          &
-       mode(1:3).eq.'JT4' .or. mode(1:4).eq.'JT64') then
+       (mode(1:3).eq.'JT4' .and. mode(1:4).ne.'JT41')) then
 
      if(mode(1:4).eq.'JT65') then
 !  We're in JT65 mode.
@@ -227,8 +227,7 @@ subroutine wsjtgen
   nwave=k
   
 900 sending=txmsg
-  if((mode(1:4).eq.'JT65' .or. mode(1:4).eq.'JT64') .and.              &
-       sendingsh.ne.1) sending=msgsent
+  if(mode(1:4).eq.'JT65' .and. sendingsh.ne.1) sending=msgsent
   do i=NMSGMAX,1,-1
      if(sending(i:i).ne.' '.and. ichar(sending(i:i)).ne.0) go to 910
   enddo

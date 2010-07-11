@@ -22,9 +22,11 @@ subroutine audio_init(ndin,ndout)
   if(mode(1:4).eq.'Echo') nmode=3
   if(mode(1:4).eq.'JT6M') nmode=4
   if(mode(1:2).eq.'CW') nmode=5
-  if(mode(1:3).eq.'JT4') nmode=7
-  if(mode(1:4).eq.'JT41') nmode=9
-
+  if(mode(1:4).eq.'JT41') then
+     nmode=9
+  else if(mode(1:3).eq.'JT4') then
+     nmode=7
+  endif
   ndevin=ndin
   ndevout=ndout
   TxOK=0
