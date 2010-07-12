@@ -69,10 +69,11 @@ subroutine jt41(dat,npts,cfile6)
      fs0(1:nq,k)=fs0(1:nq,k) + s0(1:nq,j)
   enddo
 
-  i0=2*16
+  i0=2*13
   smax=0.
   ipk=9999
   jpk=9999
+
   do j=0,4*nblk-1                            !Find the sync pattern
      do i=-10,10
         ss=0.
@@ -88,14 +89,22 @@ subroutine jt41(dat,npts,cfile6)
         endif
      enddo
   enddo
+  tping=jpk*kstep/11025.0
+  nsig=nint(db(smax)-22.0)
+  ndf0=nint((ipk-i0) * 11025.0/nfft)
+  print*,ipk,jpk,smax
 
   if(ipk.gt.100 .or. jpk.gt.96) then
      print*,'ipk:',ipk,'   jpk:',jpk
      go to 900
   endif
   smax=0.
+  ja=jpk+16
+  if(ja.gt.4*nblk) ja=ja-4*nblk
+  jb=jpk+16
+  if(jb.gt.4*nblk) jb=jb-4*nblk
   do i=ipk,ipk+40,2                         !Find User's message length
-     ss=fs0(i,jpk+16) + fs0(i+10,jpk+20)
+     ss=fs0(i,ja) + fs0(i+10,jb)
      if(ss.gt.smax) then
         smax=ss
         ipk2=i
@@ -152,14 +161,11 @@ subroutine jt41(dat,npts,cfile6)
      msg=msg1(1:msglen-1)
   endif
 
-  tping=jpk*kstep/11025.0
   width=0.0
-  nsig=nint(db(smax))
-  ndf0=nint((ipk-i0) * 11025.0/nfft)
-  write(*,1010) cfile6,tping,width,nsig,ndf0,msg
-  write(11,1010) cfile6,tping,width,nsig,ndf0,msg
-  write(21,1010) cfile6,tping,width,nsig,ndf0,msg
-1010 format(a6,2f5.1,i4,i5,6x,a28)
+  write(*,1010) cfile6,tping,width,nsig,ndf0,msg,msglen
+  write(11,1010) cfile6,tping,width,nsig,ndf0,msg,msglen
+  write(21,1010) cfile6,tping,width,nsig,ndf0,msg,msglen
+1010 format(a6,2f5.1,i4,i5,6x,a28,i3)
 
 900 return
 end subroutine jt41

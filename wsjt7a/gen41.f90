@@ -20,7 +20,7 @@ subroutine gen41(msg,nmsg,iwave,nwave,sendingsh,msgsent)
   twopi=8.d0*atan(1.d0)
   df=11025.d0/NSPS
   dt=1.d0/11025.d0
-  f0=16*df
+  f0=13*df
   nsym=NMAX/NSPS
   sendingsh=0
 
