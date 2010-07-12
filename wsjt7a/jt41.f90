@@ -56,10 +56,10 @@ subroutine jt41(dat,npts,cfile6)
 !     savg(i)=savg(i)/(jsym*base)               !May be a problem for shorthands
 !  enddo
 
-  do i=3,nq
-     write(13,3001) i*df,savg(i)
-3001 format(2f10.3)
-  enddo
+!  do i=3,nq
+!     write(13,3001) i*df,savg(i)
+!3001 format(2f10.3)
+!  enddo
 
   fs0=0.
   jb=(jsym-4*nblk+1)/4
@@ -89,8 +89,6 @@ subroutine jt41(dat,npts,cfile6)
      enddo
   enddo
 
-  print*,'b',ipk,jpk,smax
-
   smax=0.
   do i=ipk,ipk+40,2                         !Find User's message length
      ss=fs0(i,jpk+16) + fs0(i+10,jpk+20)
@@ -102,7 +100,6 @@ subroutine jt41(dat,npts,cfile6)
 !3003 format(i5,e12.3)
   enddo
   msglen=(ipk2-i0)/2
-  print*,'d',msglen,smax
 
   fs1=0.
   jb=(jsym-4*nblk+1)/4
@@ -122,10 +119,10 @@ subroutine jt41(dat,npts,cfile6)
      endif
   enddo
 
-  do i=0,40
-     write(16,4002) i,(nint(10*fs1(i,j)),j=1,10)
-4002 format(i2,10i7)
-  enddo
+!  do i=0,40
+!     write(16,4002) i,(nint(10*fs1(i,j)),j=1,10)
+!4002 format(i2,10i7)
+!  enddo
 
 ! Read out the message:
 
@@ -141,7 +138,6 @@ subroutine jt41(dat,npts,cfile6)
      enddo
      if(ipk3.eq.41) mpk=m
      msg1(m:m)=c41(ipk3:ipk3)
-     print*,m,ipk3,mpk,' ',msg1(m:m)
   enddo
 
   if(mpk.eq.1) then
@@ -151,7 +147,16 @@ subroutine jt41(dat,npts,cfile6)
   else
      msg=msg1(1:msglen-1)
   endif
-  print*,msg
+
+  tping=jpk*kstep/11025.0
+  width=0.0
+  nsig=nint(db(smax))
+  ndf0=nint((ipk-i0) * 11025.0/nfft)
+  write(*,1010) cfile6,tping,width,nsig,ndf0,msg
+  write(11,1010) cfile6,tping,width,nsig,ndf0,msg
+  write(21,1010) cfile6,tping,width,nsig,ndf0,msg
+1010 format(a6,2f5.1,i4,i5,6x,a28)
+
 
   return
 end subroutine jt41

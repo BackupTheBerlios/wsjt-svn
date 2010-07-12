@@ -6,6 +6,7 @@ program t74
   real dat(NMAX)                          !Raw signal, 30 s at 11025 sps
   character arg*12                        !Command-line argument
   character cfile6*6                      !File time
+  character msg*28
 
   nargs=iargc()
   if(nargs.ne.1) then
@@ -21,7 +22,6 @@ program t74
      if(ifile.ne.nfile .and. nfile.ne.999) go to 900
 
      call jt41(dat,jz,cfile6)
-
 900  continue
   enddo
 
