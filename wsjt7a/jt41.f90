@@ -89,6 +89,10 @@ subroutine jt41(dat,npts,cfile6)
      enddo
   enddo
 
+  if(ipk.gt.100 .or. jpk.gt.96) then
+     print*,'ipk:',ipk,'   jpk:',jpk
+     go to 900
+  endif
   smax=0.
   do i=ipk,ipk+40,2                         !Find User's message length
      ss=fs0(i,jpk+16) + fs0(i+10,jpk+20)
@@ -157,6 +161,5 @@ subroutine jt41(dat,npts,cfile6)
   write(21,1010) cfile6,tping,width,nsig,ndf0,msg
 1010 format(a6,2f5.1,i4,i5,6x,a28)
 
-
-  return
+900 return
 end subroutine jt41
