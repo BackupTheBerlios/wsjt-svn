@@ -172,7 +172,8 @@ SoundOut( void *inputBuffer, void *outputBuffer,
       ic++;
 
       if(ic >= *data->nwave) {
-        if((*data->nmode != 1) && (*data->nmode != 4)) {
+	/*             FSK441               JT6M                 JT41  */
+        if((*data->nmode != 1) && (*data->nmode != 4) && (*data->nmode != 9)) {
           *data->TxOK = 0;
           ic--;
         } else {

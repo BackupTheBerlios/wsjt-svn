@@ -106,8 +106,7 @@ subroutine wsjtgen
   dt=1.d0/fsample_out
   LTone=2
 
-  if(mode(1:4).eq.'JT65' .or.                                          &
-       (mode(1:3).eq.'JT4' .and. mode(1:4).ne.'JT41')) then
+  if(mode(1:4).eq.'JT65' .or. mode(1:3).eq.'JT4') then
 
      if(mode(1:4).eq.'JT65') then
 !  We're in JT65 mode.
