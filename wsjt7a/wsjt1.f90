@@ -5,7 +5,7 @@ subroutine wsjt1(d,jz0,istart,samfacin,FileID,ndepth,              &
      ps0,npkept,lumsg,basevb,rmspower,nslim2,psavg,ccf,Nseg,       &
      MouseDF,NAgain,LDecoded,nspecial,ndf,ss1,ss2)
 
-  parameter (NP2=120*12000)
+  parameter (NP2=120*11025)
 
   integer*2 d(jz0)        !Buffer for raw one-byte data
   integer istart          !Starting location in original d() array

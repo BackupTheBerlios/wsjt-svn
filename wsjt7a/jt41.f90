@@ -8,11 +8,12 @@ subroutine jt41(dat,npts,cfile6)
   character c41*41
   character msg*28,msg1*28
   real x(NSZ),x2(NSZ)
-  complex c(128)
+  complex c(512)
   real s0(128,NSZ)
   real fs0(128,96)
   real fs1(0:40,30)
   real savg(128)
+  real b(128)
   real ccfred(-10:10)
   real ccfblue(0:95)
   integer dftolerance
@@ -29,7 +30,7 @@ subroutine jt41(dat,npts,cfile6)
   nh=nfft/2
   nq=nfft/4
   df=11025.0/nfft
-  fac=1.0/32768.0                      !Somewhat arbitrary
+  fac=1.0/1000.0                      !Somewhat arbitrary
   savg=0.
 
   ia=1-kstep
@@ -48,18 +49,26 @@ subroutine jt41(dat,npts,cfile6)
 
 10 jsym=j
 
-!  do i=1,nq
-!     do j=1,jsym
-!        x(j)=s0(i,j)
-!     enddo
-!     call pctile(x,x2,jsym,20,base)
-!     savg(i)=savg(i)/(jsym*base)               !May be a problem for shorthands
-!  enddo
+  savg=savg/jsym
+  do i=1,nq
+     ia=max(i-20,1)
+     ib=min(i+20,nq)
+     call pctile(savg(ia),x,ib-ia+1,10,b(i))
+  enddo
 
-!  do i=3,nq
-!     write(13,3001) i*df,savg(i)
-!3001 format(2f10.3)
-!  enddo
+! This may not be the best way to normalize s0, but ...
+!  rewind 53
+  do i=1,nq
+!     yy=savg(i)
+     savg(i)=savg(i)/b(i)
+!     write(53,3001) i*df,yy,b(i),savg(i)
+!3001 format(4f10.3)
+  enddo
+!  call flush(53)
+
+  do j=1,jsym
+     s0(1:nq,j)=s0(1:nq,j)/savg(1:nq)
+  enddo
 
   fs0=0.
   jb=(jsym-4*nblk+1)/4
@@ -89,28 +98,45 @@ subroutine jt41(dat,npts,cfile6)
         endif
      enddo
   enddo
+
+  ref=fs0(ipk+2,jpk) + fs0(ipk+4,jpk) + fs0(ipk+6,jpk)  +        &
+      fs0(ipk,jpk+4) + fs0(ipk+4,jpk+4) + fs0(ipk+6,jpk+4) +     &
+      fs0(ipk,jpk+8) + fs0(ipk+2,jpk+8) + fs0(ipk+4,jpk+8) +     &
+      fs0(ipk,jpk+12) + fs0(ipk+2,jpk+12) + fs0(ipk+6,jpk+12)
+  ref=ref/3.0
+
   tping=jpk*kstep/11025.0
-  nsig=nint(db(smax)-22.0)
-  ndf0=nint((ipk-i0) * 11025.0/nfft)
-  print*,ipk,jpk,smax
+  nsig=nint(db(smax/ref)-18.0)
+  ndf0=nint((ipk-i0-1) * 11025.0/nfft)       !### Why the "-1" ??? ###
 
   if(ipk.gt.100 .or. jpk.gt.96) then
      print*,'ipk:',ipk,'   jpk:',jpk
      go to 900
   endif
   smax=0.
+  smax1=0.
+  smax2=0.
   ja=jpk+16
   if(ja.gt.4*nblk) ja=ja-4*nblk
-  jb=jpk+16
+  jb=jpk+20
   if(jb.gt.4*nblk) jb=jb-4*nblk
-  do i=ipk,ipk+40,2                         !Find User's message length
+  do i=ipk,ipk+60,2                         !Find User's message length
+     ss1=fs0(i,ja)
+     ss2=fs0(i,jb)
+     if(ss1.gt.smax1) then
+        smax1=ss1
+        ipk2a=i
+     endif
+     if(ss2.gt.smax2) then
+        smax2=ss2
+        ipk2b=i
+     endif
+     
      ss=fs0(i,ja) + fs0(i+10,jb)
      if(ss.gt.smax) then
         smax=ss
         ipk2=i
      endif
-!     write(19,3003) i,ss
-!3003 format(i5,e12.3)
   enddo
   msglen=(ipk2-i0)/2
 
@@ -124,35 +150,37 @@ subroutine jt41(dat,npts,cfile6)
      if(mod(k-1,nblk)+1.gt.6) then
         n=n+1
         m=mod(n-1,msglen)+1
-!        write(15,4001) j,k,m
-!4001    format(3i6)
         do i=0,40
            fs1(i,m)=fs1(i,m) + s0(ipk+2*i,j)
         enddo
      endif
   enddo
 
-!  do i=0,40
-!     write(16,4002) i,(nint(10*fs1(i,j)),j=1,10)
-!4002 format(i2,10i7)
-!  enddo
-
 ! Read out the message:
-
   msg1='                            '
   mpk=0
+  worst=9999.
+  sum=0.
   do m=1,msglen
      smax=0.
+     smax2=0.
      do i=0,40
         if(fs1(i,m).gt.smax) then
            smax=fs1(i,m)
-           ipk3=i+1
+           ipk3=i
         endif
      enddo
-     if(ipk3.eq.41) mpk=m
-     msg1(m:m)=c41(ipk3:ipk3)
+     do i=0,40
+        if(fs1(i,m).gt.smax2 .and. i.ne.ipk3) smax2=fs1(i,m)
+     enddo
+     rr=smax/smax2
+     sum=sum + rr
+     if(rr.lt.worst) worst=rr
+     if(ipk3.eq.40) mpk=m
+     msg1(m:m)=c41(ipk3+1:ipk3+1)
   enddo
 
+  avg=sum/msglen
   if(mpk.eq.1) then
      msg=msg1(2:)
   else if(mpk.lt.msglen) then
@@ -162,10 +190,11 @@ subroutine jt41(dat,npts,cfile6)
   endif
 
   width=0.0
-  write(*,1010) cfile6,tping,width,nsig,ndf0,msg,msglen
-  write(11,1010) cfile6,tping,width,nsig,ndf0,msg,msglen
-  write(21,1010) cfile6,tping,width,nsig,ndf0,msg,msglen
-1010 format(a6,2f5.1,i4,i5,6x,a28,i3)
+  nworst=nint(10.0*(worst-1.0))
+  navg=nint(10.0*(avg-1.0))
+  write(11,1010) cfile6,tping,width,nsig,ndf0,msg,msglen,nworst,navg
+  write(21,1010) cfile6,tping,width,nsig,ndf0,msg,msglen,nworst,navg
+1010 format(a6,2f5.1,i4,i5,6x,a28,i4,2i3)
 
 900 return
 end subroutine jt41
