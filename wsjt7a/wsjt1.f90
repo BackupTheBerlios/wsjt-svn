@@ -297,7 +297,7 @@ subroutine wsjt1(d,jz0,istart,samfacin,FileID,ndepth,              &
 
   if(mode.eq.9) then                             !JT41 mode
      print*,'JT41: ',cfile6,jz
-!     write(74) jz,cfile6,(dat(j),j=1,jz)
+     write(74) jz,cfile6,(dat(j),j=1,jz)
      go to 900
   endif
 

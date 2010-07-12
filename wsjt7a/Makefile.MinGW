@@ -1,12 +1,23 @@
 # Makefile for Windows
-# !include <dfinc.mak>   #Some definitions for Compaq Visual Fortran
 CC = /mingw/bin/gcc
 FC = /mingw/bin/g95
 
-# FFLAGS = -O2
+FFLAGS = -O2 -fbounds-check -Wall -Wno-precision-loss
 CFLAGS = -I. -fbounds-check
 
-all:    JT65code.exe WSJT7.EXE
+# Default rules
+%.o: %.c
+	${CC} ${CFLAGS} -c $<
+%.o: %.f
+	${FC} ${FFLAGS} -c $<
+%.o: %.F
+	${FC} ${FFLAGS} -c $<
+%.o: %.f90
+	${FC} ${FFLAGS} -c $<
+%.o: %.F90
+	${FC} ${FFLAGS} -c $<
+
+all:    WSJT7.EXE t74
 
 OBJS1 = JT65code.o nchar.o grid2deg.o packmsg.o packtext.o \
 	packcall.o packgrid.o unpackmsg.o unpacktext.o \
@@ -21,6 +32,17 @@ JT65code.exe: $(OBJS1)
 
 OBJS2C   = init_rs.o encode_rs.o decode_rs.o jtaudio.o fano.o \
 	tab.o nhash.o
+
+OBJS4	= t74.o analytic.o four2b.o jt41.o sync41.o db.o pctile.o \
+	sort.o ssort.o
+
+#smooth.o pctile.o db.o \
+#	thnix_stub.o  gen441.o abc441.o ping441.o \
+#	indexx.o ping.o smo.o tweak1.o enc441.o pp441.o dec441.o \
+#	token.o msgtrim.o 
+
+t74:	$(OBJS4)
+	$(FC) -o t74 $(OBJS4) libfftw3f_win.a
 
 F2PYONLY = ftn_init ftn_quit audio_init spec getfile azdist0 astro0 chkt0
 
