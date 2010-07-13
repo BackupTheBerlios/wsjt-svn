@@ -637,7 +637,7 @@ def ModeJT41(event=NONE):
     ModeJT6M()
     mode.set("JT41")
     lab2.configure(text='FileID      Avg dB        DF')
-    isync=-20
+    isync=-18
     report.configure(state=NORMAL)
     report.delete(0,END)
     report.insert(0,'-15')

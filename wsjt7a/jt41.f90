@@ -138,7 +138,7 @@ subroutine jt41(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
 
   tping=jpk*kstep/11025.0
   xsync=smax/ref
-  nsig=nint(db(smax/ref - 1.0) -17.0)
+  nsig=nint(db(smax/ref - 1.0) -15.0)
   if(nsig.lt.-20) nsig=-20
   ndf0=nint((ipk-i0) * 11025.0/nfft)
   if(nsig.lt.MinSigdB) go to 800
