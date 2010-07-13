@@ -1,6 +1,7 @@
-subroutine jt41(dat,npts,cfile6)
+subroutine jt41(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
 
-! Find sync 
+! Decoder for JT41 
+
   parameter (NMAX=512*1024)
   parameter (NSZ=4*1292)
   real dat(NMAX)                          !Raw signal, 30 s at 11025 sps
@@ -8,14 +9,17 @@ subroutine jt41(dat,npts,cfile6)
   character c41*41
   character msg*28,msg1*28
   real x(NSZ),x2(NSZ)
-  complex c(512)
+  complex c(0:512)
   real s0(128,NSZ)
-  real fs0(128,96)
+  real fs0(128,108)                       !108 = 96 + 3*4
   real fs1(0:40,30)
   real savg(128)
+  real savg2(128)
   real b(128)
   real ccfred(-10:10)
   real ccfblue(0:95)
+  real ccf(-5:540)
+  real psavg(450)         !Average spectrum of the whole file
   integer dftolerance
   integer icos(4)
   equivalence (x,c)
@@ -47,27 +51,28 @@ subroutine jt41(dat,npts,cfile6)
      enddo
   enddo
 
-10 jsym=j
+10 jsym=j-1
 
   savg=savg/jsym
   do i=1,nq
-     ia=max(i-20,1)
-     ib=min(i+20,nq)
-     call pctile(savg(ia),x,ib-ia+1,10,b(i))
+     x(1:jsym)=s0(i,1:jsym)
+     call pctile(x,x2,jsym,30,b(i))
+  enddo
+  b(1:10)=b(11)
+  do i=1,nq/2
+     psavg(i)=2*db(savg(2*i)) + 10.0
   enddo
 
-! This may not be the best way to normalize s0, but ...
 !  rewind 53
-  do i=1,nq
-!     yy=savg(i)
-     savg(i)=savg(i)/b(i)
-!     write(53,3001) i*df,yy,b(i),savg(i)
+!  do i=1,nq
+!     savg2(i)=savg(i)/b(i)
+!     write(53,3001) i*df,savg(i),b(i),savg2(i)
 !3001 format(4f10.3)
-  enddo
+!  enddo
 !  call flush(53)
 
   do j=1,jsym
-     s0(1:nq,j)=s0(1:nq,j)/savg(1:nq)
+     s0(1:nq,j)=s0(1:nq,j)/b(1:nq)
   enddo
 
   fs0=0.
@@ -78,13 +83,23 @@ subroutine jt41(dat,npts,cfile6)
      fs0(1:nq,k)=fs0(1:nq,k) + s0(1:nq,j)
   enddo
 
+  do j=1,12
+     fs0(1:nq,96+j)=fs0(1:nq,j)
+  enddo
+
   i0=2*13
   smax=0.
   ipk=9999
   jpk=9999
+  ia=-10
+  ib=10
+  if(nfreeze.eq.1) then
+     ia=(mousedf-dftolerance)/df
+     ib=(mousedf+dftolerance)/df
+  endif
 
-  do j=0,4*nblk-1                            !Find the sync pattern
-     do i=-10,10
+  do j=0,4*nblk-1                            !Find sync pattern, lags 0-95
+     do i=ia,ib
         ss=0.
         do n=1,4
            k=j+4*n-3
@@ -105,40 +120,52 @@ subroutine jt41(dat,npts,cfile6)
       fs0(ipk,jpk+12) + fs0(ipk+2,jpk+12) + fs0(ipk+6,jpk+12)
   ref=ref/3.0
 
+  kk=0
+!  rewind 54
+  do j=0,4*nblk-1
+     ss=0.
+     do n=1,4
+        k=j+4*n-3
+        if(k.gt.4*nblk) k=k-4*nblk
+        ss=ss + fs0(ipk+2*icos(n),k)
+     enddo
+     kk=kk+1
+     ccf(kk)=ss/ref
+!     write(54,3101) kk,ss/ref
+!3101 format(i5,f12.3)
+  enddo
+!  call flush(54)
+
   tping=jpk*kstep/11025.0
-  nsig=nint(db(smax/ref)-18.0)
-  ndf0=nint((ipk-i0-1) * 11025.0/nfft)       !### Why the "-1" ??? ###
+  xsync=smax/ref
+  nsig=nint(db(smax/ref - 1.0) -17.0)
+  if(nsig.lt.-20) nsig=-20
+  ndf0=nint((ipk-i0) * 11025.0/nfft)
+  if(nsig.lt.MinSigdB) go to 800
 
   if(ipk.gt.100 .or. jpk.gt.96) then
      print*,'ipk:',ipk,'   jpk:',jpk
      go to 900
   endif
   smax=0.
-  smax1=0.
-  smax2=0.
   ja=jpk+16
   if(ja.gt.4*nblk) ja=ja-4*nblk
   jb=jpk+20
   if(jb.gt.4*nblk) jb=jb-4*nblk
   do i=ipk,ipk+60,2                         !Find User's message length
-     ss1=fs0(i,ja)
-     ss2=fs0(i,jb)
-     if(ss1.gt.smax1) then
-        smax1=ss1
-        ipk2a=i
-     endif
-     if(ss2.gt.smax2) then
-        smax2=ss2
-        ipk2b=i
-     endif
-     
      ss=fs0(i,ja) + fs0(i+10,jb)
      if(ss.gt.smax) then
         smax=ss
         ipk2=i
      endif
   enddo
-  msglen=(ipk2-i0)/2
+
+  msglen=(ipk2-ipk)/2
+  if(msglen.lt.1 .or. msglen.gt.28) msglen=2         !### tests only ###
+!  if(msglen.lt.1 .or. msglen.gt.28) then
+!     print*,'msglen:',msglen
+!     go to 900
+!  endif
 
   fs1=0.
   jb=(jsym-4*nblk+1)/4
@@ -189,12 +216,26 @@ subroutine jt41(dat,npts,cfile6)
      msg=msg1(1:msglen-1)
   endif
 
-  width=0.0
-  nworst=nint(10.0*(worst-1.0))
-  navg=nint(10.0*(avg-1.0))
-  write(11,1010) cfile6,tping,width,nsig,ndf0,msg,msglen,nworst,navg
-  write(21,1010) cfile6,tping,width,nsig,ndf0,msg,msglen,nworst,navg
-1010 format(a6,2f5.1,i4,i5,6x,a28,i4,2i3)
+800 continue
+  if(nsig.lt.MinSigdB) then
+     msglen=0
+     worst=1.
+     avg=1.
+  endif
+  nworst=10.0*(worst-1.0)
+  navg=10.0*(avg-1.0)
+  if(nworst.gt.10) nworst=10
+  if(navg.gt.10) navg=10
+  xsync=xsync-0.3
+  isync=xsync
+  if(navg.le.0) msg=' '
+
+!  write(*,1020)  cfile6,isync,width,nsig,ndf0,msg,msglen,nworst,navg
+  write(11,1020) cfile6,nsig,ndf0,msg,msglen,nworst,navg
+  write(21,1020) cfile6,nsig,ndf0,msg,msglen,nworst,navg
+1020 format(a6,i5,i5,6x,a28,i4,2i3)
+  call flush(11)
+  call flush(21)
 
 900 return
 end subroutine jt41

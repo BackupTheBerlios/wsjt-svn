@@ -635,6 +635,7 @@ def ModeJT41(event=NONE):
         if lauto: toggleauto()
     ModeJT6M()
     mode.set("JT41")
+    lab2.configure(text='FileID      Avg dB        DF')
     report.configure(state=NORMAL)
     report.delete(0,END)
     report.insert(0,'-15')
@@ -1327,9 +1328,9 @@ def setmsg(template,r):
 #------------------------------------------------------ plot_large
 def plot_large():
     "Plot the green, red, and blue curves."
+    ngreen=Audio.gcom2.ngreen
     graph1.delete(ALL)
     y=[]
-    ngreen=Audio.gcom2.ngreen
     if ngreen>0:
         for i in range(ngreen):             #Find ymax for green curve
             green=Audio.gcom2.green[i]
@@ -1407,6 +1408,7 @@ def plot_large():
                 ccf=Audio.gcom2.ccf[i]
                 y.append(ccf)
             ymax=max(y)
+            print 'B',ymax
             yfac=40.0
             if ymax>55.0/yfac: yfac=55.0/ymax
             xy2=[]
@@ -1436,7 +1438,7 @@ def plot_large():
                 graph1.create_line([x,0,x,125-j2],fill="red")
 
 #------------------------------------------------------ plot_small
-def plot_small():        
+def plot_small():
     graph2.delete(ALL)
     xy=[]
     xy2=[]
@@ -1446,7 +1448,7 @@ def plot_small():
         x=int(i*df*fac)
         xy.append(x)
         psavg=Audio.gcom2.psavg[i]
-        if mode.get()=="JT6M" or mode.get()=="JT6M":
+        if mode.get()=="JT6M":
             psavg=psavg + 27.959
         n=int(150.0-2*psavg)
         xy.append(n)
@@ -1535,8 +1537,8 @@ def update():
                 Audio.gcom2.ntx2=0
 
         if mode.get()[:4]=='JT65' or \
-               mode.get()[:3]=='JT4' or mode.get()[:2]=='CW' or \
-               mode.get()[:4]=='JT41':
+               (mode.get()[:3]=='JT4' and mode.get()[:4]!='JT41') \
+               or mode.get()[:2]=='CW':
             graph2.delete(ALL)
             graph2.create_text(80,13,anchor=CENTER,text="Moon",font=g2font)
             graph2.create_text(13,37,anchor=W, text="Az: %6.2f" % g.AzMoon,font=g2font)
@@ -1718,9 +1720,9 @@ def update():
             cmap0=g.cmap
 
         if mode.get()[:4]=='JT65' or \
-                mode.get()[:3]=='JT4' or mode.get()[:4]=='JT41':
+            (mode.get()[:3]=='JT4' and mode.get()[:4]!='JT41'):
             plot_large()
-        else:    
+        else:
             im.putdata(Audio.gcom2.b)
             pim=ImageTk.PhotoImage(im)          #Convert Image to PhotoImage
             graph1.delete(ALL)
@@ -1736,7 +1738,7 @@ def update():
     g.mode=mode.get()
     g.report=report.get()
     if mode.get()=='FSK441': isync441=isync
-    elif mode.get()=='JT6M' or mode.get()=="JT6M":
+    elif mode.get()=='JT6M' or mode.get()=="JT41":
         isync6m=isync
     elif mode.get()[:4]=='JT65': isync65=isync
     Audio.gcom1.txfirst=TxFirst.get()
