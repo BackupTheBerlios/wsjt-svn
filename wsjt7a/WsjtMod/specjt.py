@@ -140,7 +140,6 @@ def fdf_change(event):
         g.DFreq=df*(event.x-288.7) + fmid - 1500
         if nfr.get()==2: g.DFreq=2*df*(event.x-375.5) + fmid - 1270.5
         g.Freq=g.DFreq+1270.46
-        if g.mode=="WSPR": g.DFreq=g.DFreq+1270.46-1500.0
         t="Freq: %5d    DF: %5d  (Hz)" % (int(g.Freq),int(g.DFreq))
     else:
         g.PingTime=0.04*event.x
@@ -153,15 +152,14 @@ def fdf_change(event):
 
 #---------------------------------------------------- set_freezedf
 def set_freezedf(event):
-    if g.mode[:4]=='JT65' or g.mode[:3]=='JT2' or \
-       g.mode[:3]=='JT4' or g.mode=="WSPR" or g.mode[:4]=='JT64':
+    if g.mode[:4]=='JT65' or \
+       (g.mode[:3]=='JT4' and g.mode[:4]!='JT41'):
         n=int(df*(event.x-288.7) + fmid - 1500)
         if nfr.get()==2: n=int(2*df*(event.x-375.5) + fmid - 1270.5)
 #        if n<-600: n=-600
 #        if n>600:  n=600
         if n<-1270: n=-1270
         if n>3800: n=3800
-        if g.mode=="WSPR": n=n+1270-1500
         Audio.gcom2.mousedf=n
     else:
         decode_request(event)
@@ -185,18 +183,17 @@ def df_mark():
 # Mark sync tone and top JT65 tone (green) and shorthand tones (red)
         if(frange==2000):
             dx=288.7 + (1500-fmid)/df
-            if g.mode[:4]=="JT65" or g.mode[:3]=="JT2" or \
-               g.mode[:3]=="JT4" or g.mode=="WSPR" or g.mode[:4]=='JT64':
+            if g.mode[:4]=="JT65" or \
+               (g.mode[:3]=="JT4" and g.mode[:4]!='JT41'):
                 color='green'
                 n=1
-                if g.mode[:4]=="JT65" or g.mode[:4]=='JT64':
+                if g.mode[:4]=="JT65":
                     n=5
                     x1=(Audio.gcom2.mousedf + 6.6*fstep)/df + dx
                     c.create_line(x1-0.5,25,x1-0.5,12,fill=color)
                     c.create_line(x1+0.5,25,x1+0.5,12,fill=color)
                 for i in range(n):
                     mdf=Audio.gcom2.mousedf
-                    if g.mode=="WSPR": mdf=mdf-1270+1500
                     x1=(mdf + i*fstep)/df + dx
                     j=12
                     if i>0: j=15
@@ -205,18 +202,17 @@ def df_mark():
                     color='red'
         if(frange==4000):
             dx=375 + (1270.5-fmid)/(2*df)
-            if g.mode[:4]=="JT65" or g.mode[:3]=="JT2" or \
-               g.mode[:3]=="JT4" or g.mode=="WSPR" or g.mode[:4]=='JT64':
+            if g.mode[:4]=="JT65" or \
+               (g.mode[:3]=="JT4" and g.mode[:4]!='JT41'):
                 color='green'
                 n=1
-                if g.mode[:4]=="JT65" or g.mode[:4]=='JT64':
+                if g.mode[:4]=="JT65":
                     n=5
                     x1=(Audio.gcom2.mousedf + 6.6*fstep)/(2*df) + dx
                     c.create_line(x1-0.5,25,x1-0.5,12,fill=color)
                     c.create_line(x1+0.5,25,x1+0.5,12,fill=color)
                 for i in range(n):
                     mdf=Audio.gcom2.mousedf
-                    if g.mode=="WSPR": mdf=mdf-1270+1500
                     x1=(mdf + i*fstep)/(2*df) + dx
                     j=12
                     if i>0: j=15
@@ -278,9 +274,8 @@ def decode_request(event):
 
 #---------------------------------------------------- freeze_decode
 def freeze_decode(event):
-    if (g.mode[:4]=='JT65' or g.mode[:3]=='JT2' or
-        g.mode[:3]=='JT4' or g.mode=="WSPR" or g.mode[:4]=='JT64') \
-       and nspeed0.get()<6:
+    if g.mode[:4]=='JT65' or \
+        (g.mode[:3]=='JT4' and g.mode[:4]!='JT41') and nspeed0.get()<6:
 # If decoder is busy or we are not monitoring, ignore request
         if Audio.gcom2.ndecoding==0 or Audio.gcom2.monitoring==0:
             set_freezedf(event)
@@ -302,7 +297,7 @@ def update():
         root_geom=root.geometry()
         g.rms=Audio.gcom1.rms
         if isec==0: nscroll=0
-        if isec==59 and (g.mode!='WSPR' or utc[4]%2==1): newMinute=1
+        if isec==59: newMinute=1
 
     if g.showspecjt==1:
         showspecjt()
@@ -348,7 +343,7 @@ def update():
         if Audio.gcom2.monitoring:
             if minsep.get() and newMinute:
                 draw.line((0,0,749,0),fill=128)     #Draw the minute separator
-            if nscroll == 13 and (g.mode!='WSPR' or utc[4]%2==0):
+            if nscroll == 13:
                 draw.text((5,2),t0[0:5],fill=253)   #Insert time label
         else:
             if minsep.get():
@@ -371,8 +366,8 @@ def update():
         newMinute=0
 
     if (Audio.gcom2.mousedf != mousedf0 or Audio.gcom2.dftolerance != tol0) \
-            and (g.mode[:4]=='JT65' or g.mode[:3]=='JT2' or \
-                 g.mode[:3]=='JT4' or g.mode=="WSPR" or g.mode[:4]=='JT64'):
+            and (g.mode[:4]=='JT65' or \
+                 (g.mode[:3]=='JT4' and g.mode[:4]!='JT41')):
         df_mark()
         
 # The following int() calls are to ensure that the values copied to
@@ -386,11 +381,12 @@ def update():
         nfreeze0=int(Audio.gcom2.nfreeze)
 
     if g.mode!=mode0:
-        if (g.mode[:4]=="JT65" or g.mode[:3]=="JT2" or \
-            g.mode[:3]=="JT4" or g.mode=="WSPR" or g.mode[:4]=='JT64') \
+        if g.mode[:4]=="JT65" or \
+            (g.mode[:3]=="JT4" and g.mode[:4]=='JT41') \
            and nspeed0.get()>5: nspeed0.set(3)
         if g.mode=="FSK441" and nspeed0.get()<6: nspeed0.set(6)
         if g.mode=="JT6M" and nspeed0.get()<6: nspeed0.set(6)
+        if g.mode=="JT41" and nspeed0.get()<6: nspeed0.set(6)
         draw_axis()
         mode0=g.mode
 
@@ -418,10 +414,7 @@ def update():
 def draw_axis():
     xmid=fmid
     if naxis.get():
-        if g.mode=='WSPR':
-            xmid=xmid-1500
-        else:
-            xmid=xmid-1270.46
+        xmid=xmid-1270.46
     c.delete(ALL)
     if nspeed0.get()<6:
 # Draw the frequency or DF tick marks
@@ -449,8 +442,8 @@ def draw_axis():
                     c.create_text(x,y,text=str(ix))
                 c.create_line(i,25,i,j,fill='black')
                 
-        if g.mode[:4]=="JT65" or g.mode[:3]=="JT2" or \
-           g.mode[:3]=="JT4" or g.mode=="WSPR" or g.mode[:4]=='JT64':
+        if g.mode[:4]=="JT65" or \
+           (g.mode[:3]=="JT4" and g.mode[:4]!='JT41'):
             dx=288.7 + (1500-fmid)/df
             dff=df
             if frange==4000:
@@ -462,7 +455,6 @@ def draw_axis():
             else:
                 tol=Audio.gcom2.dftolerance
                 mdf=Audio.gcom2.mousedf
-                if g.mode=="WSPR": mdf=mdf-1270+1500
                 x1=(mdf-tol)/dff + dx
                 x2=(mdf+tol)/dff + dx
             c.create_line(x1,25,x2,25,fill='green',width=2)

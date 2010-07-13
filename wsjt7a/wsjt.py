@@ -631,11 +631,13 @@ def ModeJT65C(event=NONE):
 
 #------------------------------------------------------ ModeJT41
 def ModeJT41(event=NONE):
+    global isync
     if g.mode != "JT41":
         if lauto: toggleauto()
     ModeJT6M()
     mode.set("JT41")
     lab2.configure(text='FileID      Avg dB        DF')
+    isync=-20
     report.configure(state=NORMAL)
     report.delete(0,END)
     report.insert(0,'-15')
@@ -1193,8 +1195,9 @@ def mouse_click_g1(event):
 
 #------------------------------------------------------ double-click_g1
 def double_click_g1(event):
-    if (mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4' \
-        or mode.get()[:4]=='JT41') and Audio.gcom2.ndecoding==0:
+    if (mode.get()[:4]=='JT65' or \
+        (mode.get()[:3]=='JT4' and mode.get()[:4]!='JT41')) and \
+        Audio.gcom2.ndecoding==0:
         g.freeze_decode=1
     
 #------------------------------------------------------ mouse_up_g1
@@ -1408,7 +1411,6 @@ def plot_large():
                 ccf=Audio.gcom2.ccf[i]
                 y.append(ccf)
             ymax=max(y)
-            print 'B',ymax
             yfac=40.0
             if ymax>55.0/yfac: yfac=55.0/ymax
             xy2=[]
