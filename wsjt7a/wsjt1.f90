@@ -295,10 +295,10 @@ subroutine wsjt1(d,jz0,istart,samfacin,FileID,ndepth,              &
      goto 900
   endif
 
-  if(mode.eq.9) then                             !JT41 mode
+  if(mode.eq.9) then                             !ISCAT_2 mode
 !     write(74) jz,cfile6,(dat(j),j=1,jz)
      call spec2d(dat,jz,nstep,s2,nchan,nz,psavg,sigma)
-     call jt41(dat,jz,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
+     call iscat(dat,jz,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
      psavg(65:)=0.
      go to 800
   endif

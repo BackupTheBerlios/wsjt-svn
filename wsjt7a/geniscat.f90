@@ -1,4 +1,4 @@
-subroutine gen41(msg,nmsg,iwave,nwave,sendingsh,msgsent)
+subroutine geniscat(msg,nmsg,iwave,nwave,sendingsh,msgsent)
 
   parameter (NMAX=30*11025,NSZ=1291,NSPS=256)
   character msg*28,msgsent*22
@@ -7,13 +7,13 @@ subroutine gen41(msg,nmsg,iwave,nwave,sendingsh,msgsent)
   logical first
   integer imsg(30)
   integer itone(NSZ)
-  character c*41
+  character c*42
   real*8 twopi,dt,f0,f,df,pha,dpha
   integer icos(4)
   integer irpt(31)
   data icos/0,1,3,2/
   data nsync/4/,nlen/2/,ndat/18/,jz/645/
-  data c/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ /.?@'/
+  data c/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ /.?@-'/
   data irpt/1,2,3,4,6,7,8,9,11,12,13,14,15,16,17,18,19,21,22,23,24,     &
        25,26,27,28,29,31,32,33,34,35/
 
@@ -56,7 +56,7 @@ subroutine gen41(msg,nmsg,iwave,nwave,sendingsh,msgsent)
   imsg(1)=40
   do i=1,nmsg
      imsg(i+1)=36
-     do j=1,41
+     do j=1,42
         if(msg(i:i).eq.c(j:j)) imsg(i+1)=j-1
      enddo
   enddo
@@ -69,7 +69,7 @@ subroutine gen41(msg,nmsg,iwave,nwave,sendingsh,msgsent)
         itone(i)=msglen
         if(j.ge.nsync+2) then
            n=msglen + 5*(j-nsync-1)
-           if(n.gt.40) n=n-41
+           if(n.gt.41) n=n-42
            itone(i)=n
         endif
      else
@@ -95,4 +95,4 @@ subroutine gen41(msg,nmsg,iwave,nwave,sendingsh,msgsent)
   msgsent=msg
 
   return
-end subroutine gen41
+end subroutine geniscat

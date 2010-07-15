@@ -1,18 +1,18 @@
-subroutine jt41(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
+subroutine iscat(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
 
-! Decoder for JT41 
+! Decoder for ISCAT_2
 
   parameter (NMAX=512*1024)
   parameter (NSZ=4*1292)
   real dat(NMAX)                          !Raw signal, 30 s at 11025 sps
   character cfile6*6                      !File time
-  character c41*41
+  character c42*42
   character msg*28,msg1*28
   real x(NSZ),x2(NSZ)
   complex c(0:512)
   real s0(128,NSZ)
   real fs0(128,108)                       !108 = 96 + 3*4
-  real fs1(0:40,30)
+  real fs1(0:41,30)
   real savg(128)
   real savg2(128)
   real b(128)
@@ -25,7 +25,7 @@ subroutine jt41(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
   equivalence (x,c)
   data icos/0,1,3,2/
   data nsps/256/,nsync/4/,nlen/2/,ndat/18/
-  data c41/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ /.?@'/
+  data c42/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ /.?@-'/
   
   nsym=npts/nsps
   nblk=nsync+nlen+ndat
@@ -177,7 +177,7 @@ subroutine jt41(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
      if(mod(k-1,nblk)+1.gt.6) then
         n=n+1
         m=mod(n-1,msglen)+1
-        do i=0,40
+        do i=0,41
            fs1(i,m)=fs1(i,m) + s0(ipk+2*i,j)
         enddo
      endif
@@ -191,20 +191,20 @@ subroutine jt41(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
   do m=1,msglen
      smax=0.
      smax2=0.
-     do i=0,40
+     do i=0,41
         if(fs1(i,m).gt.smax) then
            smax=fs1(i,m)
            ipk3=i
         endif
      enddo
-     do i=0,40
+     do i=0,41
         if(fs1(i,m).gt.smax2 .and. i.ne.ipk3) smax2=fs1(i,m)
      enddo
      rr=smax/smax2
      sum=sum + rr
      if(rr.lt.worst) worst=rr
      if(ipk3.eq.40) mpk=m
-     msg1(m:m)=c41(ipk3+1:ipk3+1)
+     msg1(m:m)=c42(ipk3+1:ipk3+1)
   enddo
 
   avg=sum/msglen
@@ -238,4 +238,4 @@ subroutine jt41(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
   call flush(21)
 
 900 return
-end subroutine jt41
+end subroutine iscat

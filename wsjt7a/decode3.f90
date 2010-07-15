@@ -22,11 +22,8 @@ subroutine decode3(d2,jz,istart,filename)
   if(mode(1:4).eq.'Echo') nmode=3
   if(mode(1:4).eq.'JT6M') nmode=4
   if(mode(1:2).eq.'CW') nmode=5
-  if(mode(1:4).eq.'JT41') then
-     nmode=9
-  else if(mode(1:3).eq.'JT4') then
-     nmode=7
-  endif
+  if(mode(1:3).eq.'JT4') nmode=7
+  if(mode(1:5).eq.'ISCAT') nmode=9
   sum=0.
   do i=1,jz
      sum=sum+d2(i)
@@ -83,9 +80,9 @@ subroutine decode3(d2,jz,istart,filename)
   nagain=0
   if(mode(1:4).eq.'JT65') then
      call pix2d65(d2d,jz)
-  else if(mode.eq.'FSK441' .or. mode(1:4).eq.'JT41') then
+  else if(mode.eq.'FSK441' .or. mode(1:5).eq.'ISCAT') then
      nz=s2(1,1)
-     if(mode(1:4).eq.'JT41') nz=498                       !### temporary! ###
+     if(mode(1:5).eq.'ISCAT') nz=498                       !### temporary! ###
      call pix2d(d2d,jz,mousebutton,MouseDF,NFreeze,mode,s2,64,nz,b)
   else if(mode(1:4).eq.'JT6M' .and. mousebutton.eq.0) then
      nz=s2(1,1)

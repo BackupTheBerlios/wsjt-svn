@@ -1,6 +1,6 @@
 program t74
 
-! Tests experimental JT41 decoder
+! Tests experimental ISCAT_2 decoder
 
   parameter (NMAX=512*1024)
   real dat(NMAX)                          !Raw signal, 30 s at 11025 sps
@@ -30,7 +30,7 @@ program t74
      read(74,end=999) jz,cfile6,(dat(j),j=1,jz)
      if(irec.ne.nrec .and. nrec.ne.999) go to 900
 
-     call jt41(dat,jz,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
+     call iscat(dat,jz,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
 900  continue
   enddo
 
