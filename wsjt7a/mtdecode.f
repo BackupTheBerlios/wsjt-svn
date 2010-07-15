@@ -116,7 +116,7 @@ C  Assemble a signal report:
          nrpt=10*nwidth + nstrength
          t2=tstart + dt*(istart-1)
 
-         if(np441.eq.1) call pp441(dat,jz,cfile6,tstart,t2,width,
+         if(n441pp.eq.1) call pp441(dat,jz,cfile6,tstart,t2,width,
      +       npeak,nrpt,dftolerance,frag,0)
 
          if(msglen.eq.0) go to 100
