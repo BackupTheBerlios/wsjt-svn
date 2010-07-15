@@ -1,5 +1,5 @@
       subroutine mtdecode(dat,jz,nz,MinSigdB,MinWidth,
-     +    NQRN,DFTolerance,istart,pick,cfile6,ps0)
+     +    NQRN,DFTolerance,istart,pick,cfile6,n441pp,ps0)
 
 C  Decode Multi-Tone FSK441 mesages.
 
@@ -116,8 +116,8 @@ C  Assemble a signal report:
          nrpt=10*nwidth + nstrength
          t2=tstart + dt*(istart-1)
 
-         call pp441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,
-     +              dftolerance,frag,0)
+         if(np441.eq.1) call pp441(dat,jz,cfile6,tstart,t2,width,
+     +       npeak,nrpt,dftolerance,frag,0)
 
          if(msglen.eq.0) go to 100
 

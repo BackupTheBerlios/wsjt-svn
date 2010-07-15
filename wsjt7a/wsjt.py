@@ -56,6 +56,7 @@ g.appdir=appdir
 isync=0
 isync441=2
 isync6m=-10
+isync_iscat=-20
 isync65=1
 isync_save=0
 iclip=0
@@ -95,6 +96,7 @@ nhotaz=0
 nhotabetter=0
 nopen=0
 nosh441=IntVar()
+n441pp=IntVar()
 noshjt65=IntVar()
 noshjt65all=IntVar()
 qdecode=IntVar()
@@ -631,13 +633,16 @@ def ModeJT65C(event=NONE):
 
 #------------------------------------------------------ ModeISCAT
 def ModeISCAT(event=NONE):
-    global isync
+    global isync,isync_iscat
     if g.mode != "ISCAT":
         if lauto: toggleauto()
     ModeJT6M()
     mode.set("ISCAT")
     lab2.configure(text='FileID      Avg dB        DF')
-    isync=-18
+    isync=isync_iscat
+    lsync.configure(text=slabel+str(isync))
+    shmsg.configure(state=NORMAL)
+    nfreeze.set(0)
     report.configure(state=NORMAL)
     report.delete(0,END)
     report.insert(0,'-15')
@@ -1100,6 +1105,7 @@ def defaults():
     ltol.configure(text='Tol    '+str(ntol[itol]))
     if g.mode=="JT6M" or g.mode=="ISCAT":
         isync=-10
+        if g.mode=="ISCAT": isync=-20
         itol=4
         ltol.configure(text='Tol    '+str(ntol[itol]))
     lsync.configure(text=slabel+str(isync))
@@ -1492,8 +1498,8 @@ def plot_yellow():
 #------------------------------------------------------ update
 def update():
     global root_geom,isec0,naz,nel,ndmiles,ndkm,nhotaz,nhotabetter,nopen, \
-           im,pim,cmap0,isync,isync441,isync6m,isync65,isync_save,idsec, \
-           first,itol,txsnrdb,tx6alt
+           im,pim,cmap0,isync,isync441,isync6m,isync_iscat,isync65,       \
+           isync_save,idsec,first,itol,txsnrdb,tx6alt
     
     utc=time.gmtime(time.time()+0.1*idsec)
     isec=utc[5]
@@ -1735,8 +1741,8 @@ def update():
     g.mode=mode.get()
     g.report=report.get()
     if mode.get()=='FSK441': isync441=isync
-    elif mode.get()=='JT6M' or mode.get()=="ISCAT":
-        isync6m=isync
+    elif mode.get()=='JT6M': isync6m=isync
+    elif mode.get()=="ISCAT": isync_iscat=isync
     elif mode.get()[:4]=='JT65': isync65=isync
     Audio.gcom1.txfirst=TxFirst.get()
     try:
@@ -1785,6 +1791,7 @@ def update():
 #    Audio.gcom1.txdelay=float('0'+options.TxDelay.get())
     Audio.gcom2.nslim2=isync-4
     if nosh441.get()==1 and mode.get()=='FSK441': Audio.gcom2.nslim2=99
+    Audio.gcom2.n441pp=n441pp.get()
     try:
         Audio.gcom2.nport=int(options.PttPort.get())
     except:
@@ -1929,6 +1936,7 @@ else:
     decodemenu = Menu(mbar, tearoff=use_tearoff)
 decodemenu.FSK441=Menu(decodemenu,tearoff=0)
 decodemenu.FSK441.add_checkbutton(label='No shorthands',variable=nosh441)
+decodemenu.FSK441.add_checkbutton(label='Enable FSK441++',variable=n441pp)
 decodemenu.JT65=Menu(decodemenu,tearoff=0)
 decodemenu.JT65.add_checkbutton(label='Only EME calls in Deep Search',variable=neme)
 decodemenu.JT65.add_checkbutton(label='No Shorthand decodes',variable=noshjt65all)
@@ -2482,12 +2490,14 @@ try:
         elif key == 'Band': nfreq.set(value)
         elif key == 'S441': isync441=int(value)
         elif key == 'S6m': isync6m=int(value)
+        elif key == 'Siscat': isync_iscat=int(value)
         elif key == 'Sync': isync65=int(value)
         elif key == 'Clip': iclip=int(value)
         elif key == 'Zap': nzap.set(value)
         elif key == 'NB': nblank.set(value)
         elif key == 'NAFC': nafc.set(value)
         elif key == 'NoSh441': nosh441.set(value)
+        elif key == 'N441pp': n441pp.set(value)
         elif key == 'NoShJT65all': noshjt65all.set(value)
         elif key == 'NoShJT65': noshjt65.set(value)
         elif key == 'QDecode': qdecode.set(value)
@@ -2511,7 +2521,8 @@ except:
 
 g.mode=mode.get()
 if mode.get()=='FSK441': isync=isync441
-elif mode.get()=='JT6M' or mode.get()=="JT6M": isync=isync6m
+elif mode.get()=='JT6M': isync=isync6m
+elif mode.get()=="ISCAT": isync=isync_iscat
 elif mode.get()[:4]=='JT65': isync=isync65
 elif mode.get()[:3]=='JT4':
     if mode.get()[3:4]=='A': Audio.gcom2.mode4=1
@@ -2589,12 +2600,14 @@ f.write("Nsave " + str(nsave.get()) + "\n")
 f.write("Band " + str(nfreq.get()) + "\n")
 f.write("S441 " + str(isync441) + "\n")
 f.write("S6m " + str(isync6m) + "\n")
+f.write("Siscat " + str(isync_iscat) + "\n")
 f.write("Sync " + str(isync65) + "\n")
 f.write("Clip " + str(iclip) + "\n")
 f.write("Zap " + str(nzap.get()) + "\n")
 f.write("NB " + str(nblank.get()) + "\n")
 f.write("NAFC " + str(nafc.get()) + "\n")
 f.write("NoSh441 " + str(nosh441.get()) + "\n")
+f.write("N441pp " + str(n441pp.get()) + "\n")
 f.write("NoShJT65all " + str(noshjt65all.get()) + "\n")
 f.write("NoShJT65 " + str(noshjt65.get()) + "\n")
 f.write("QDecode " + str(qdecode.get()) + "\n")

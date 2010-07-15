@@ -117,7 +117,7 @@ subroutine wsjtgen
         call gen65(msg,mode65,samfacout,ntxdf,ndebug,iwave,nwave,sendingsh,   &
              msgsent,nmsg0)
      else if(mode(1:5).eq.'ISCAT') then
-        call geniscat(msg,nmsg,iwave,nwave,sendingsh,msgsent)
+        call geniscat(msg,nmsg,shok,iwave,nwave,sendingsh,msgsent)
      else if(mode(1:3).eq.'JT4' ) then
         call gen24(msg,mode,mode4,samfacout,ntxdf,ndebug,iwave,nwave,      &
              sendingsh,msgsent,nmsg0)
@@ -216,6 +216,7 @@ subroutine wsjtgen
   
 900 sending=txmsg
   if(mode(1:4).eq.'JT65' .and. sendingsh.ne.1) sending=msgsent
+  if(mode(1:5).eq.'ISCAT') sending=msgsent
   do i=NMSGMAX,1,-1
      if(sending(i:i).ne.' '.and. ichar(sending(i:i)).ne.0) go to 910
   enddo
