@@ -1,4 +1,4 @@
-subroutine genms(msg,snr,iwave,nwave,jwave,imsg,msglen)
+subroutine genms(msg,txsnrdb,iwave,nwave)
 
 ! Generate a JTMS_2 wave file
 
@@ -10,7 +10,7 @@ subroutine genms(msg,snr,iwave,nwave,jwave,imsg,msglen)
   integer*2 jwave(NZ)
   integer icw(0:63)
   logical first
-  real*8 t
+  real*8 txsnrdb,t
   complex cw
   common/mscom/cw(63,0:63)
   data idum/-1/,first/.true./
@@ -54,7 +54,7 @@ subroutine genms(msg,snr,iwave,nwave,jwave,imsg,msglen)
      first=.false.
   endif
 
-  sig=sqrt(10.0**(0.1*snr))
+  sig=sqrt(10.0**(0.1*txsnrdb))
   do i=28,1,-1                                 !Find user's message length
      if(msg(i:i).ne.' ') go to 1
   enddo
@@ -93,30 +93,27 @@ subroutine genms(msg,snr,iwave,nwave,jwave,imsg,msglen)
   enddo
   nwave=k
 
-  print*,msg,msglen,nchar,nwave,snr,sig
-
-  if(snr.lt.40.0) then
+  if(txsnrdb.lt.40.0) then
 ! ###  Make some pings (for tests only) ###
-     fac=1.0
-     amp=1.0
      do i=1,nwave
-!        iping=i/(3*12000)
-!        if(iping.ne.iping0) then
-!           ip=mod(iping,3)
-!           w=0.05*(ip+1)
-!           ig=(iping-1)/3
-!           amp=sqrt((3.0-ig)/3.0)
-!           t0=dt*(iping+0.5)*(3*12000)
-!           iping0=iping
-!        endif
-!        t=(i*dt-t0)/w
-!        if(t.lt.0.d0 .and. t.lt.10.d0) then
-!           fac=0.
-!        else
-!           fac=2.718*t*dexp(-t)
-!        endif
-        x=sig*fac*amp*iwave(i)/32767.0 + gran(idum)
-        jwave(i)=nint(1000.0*x)
+        iping=i/(3*12000)
+        if(iping.ne.iping0) then
+           ip=mod(iping,3)
+           w=0.05*(ip+1)
+           ig=(iping-1)/3
+           amp=sqrt((3.0-ig)/3.0)
+           t0=dt*(iping+0.5)*(3*12000)
+           iping0=iping
+        endif
+        t=(i*dt-t0)/w
+        if(t.lt.0.d0 .and. t.lt.10.d0) then
+           fac=0.
+        else
+           fac=2.718*t*dexp(-t)
+        endif
+!        x=sig*fac*amp*iwave(i)/32767.0 + gran(idum)
+!        jwave(i)=nint(1000.0*x)
+        iwave(i)=nint(fac*amp*iwave(i))
      enddo
   endif
 

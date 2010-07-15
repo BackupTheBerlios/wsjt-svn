@@ -107,8 +107,7 @@ subroutine wsjtgen
   LTone=2
 
   if(mode(1:4).eq.'JT65' .or. mode(1:3).eq.'JT4' .or.                &
-       mode(1:5).eq. 'ISCAT') then
-
+       mode(1:5).eq. 'ISCAT' .or. mode(1:4).eq.'JTMS') then
      if(mode(1:4).eq.'JT65') then
 !  We're in JT65 mode.
         if(mode(5:5).eq.'A') mode65=1
@@ -118,6 +117,10 @@ subroutine wsjtgen
              msgsent,nmsg0)
      else if(mode(1:5).eq.'ISCAT') then
         call geniscat(msg,nmsg,shok,iwave,nwave,sendingsh,msgsent)
+     else if(mode(1:4).eq.'JTMS') then
+        call genms(msg,txsnrdb,iwave,nwave)
+        sendingsh=0
+        msgsent=msg
      else if(mode(1:3).eq.'JT4' ) then
         call gen24(msg,mode,mode4,samfacout,ntxdf,ndebug,iwave,nwave,      &
              sendingsh,msgsent,nmsg0)

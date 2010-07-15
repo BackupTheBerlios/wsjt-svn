@@ -631,6 +631,13 @@ def ModeJT65C(event=NONE):
         mode.set("JT65C")
         ModeJT65()
 
+#------------------------------------------------------ ModeMTMS
+def ModeJTMS(event=NONE):
+    if g.mode != "JTMS":
+        if lauto: toggleauto()
+    ModeFSK441()
+    mode.set("JTMS")
+    
 #------------------------------------------------------ ModeISCAT
 def ModeISCAT(event=NONE):
     global isync,isync_iscat
@@ -777,7 +784,8 @@ these operating modes:
   3. JT65   - for HF, EME, and troposcatter
   4. CW     - 15 WPM Morse code, messages structured for EME
   5. JT4    - for HF and EME
-  6. ISCAT   - for meteor and ionospheric scatter on 50 MHz
+  6. ISCAT  - for meteor and ionospheric scatter on 50 MHz
+  7. JTMS   - fast mode for meteor scatter
 
 Copyright (c) 2001-2010 by Joseph H. Taylor, Jr., K1JT, with
 contributions from additional authors.  WSJT is Open Source 
@@ -1230,7 +1238,8 @@ def GenStdMsgs(event=NONE):
     Audio.gcom2.hiscall=(ToRadio.get()+(' '*12))[:12]
     for m in (tx1, tx2, tx3, tx4, tx5, tx6):
         m.delete(0,99)
-    if mode.get()=="FSK441" or mode.get()=="JT6M" or mode.get()=="ISCAT":
+    if mode.get()=="FSK441" or mode.get()=="JT6M" or \
+       mode.get()=="ISCAT" or mode.get()=='JTMS':
         r=report.get()
         tx1.insert(0,setmsg(options.tx1.get(),r))
         tx2.insert(0,setmsg(options.tx2.get(),r))
@@ -1591,6 +1600,8 @@ def update():
             msg2.configure(bg='#00FF00')
         elif mode.get()[:5]=="ISCAT":
             msg2.configure(bg='#CCFFFF')
+        elif mode.get()[:4]=="JTMS":
+            msg2.configure(bg='#CC4444')
         elif mode.get()[:3]=="JT4":
             msg2.configure(bg='#88FF88')
 #        elif mode.get()=="Echo":
@@ -1618,6 +1629,7 @@ def update():
     msg1.configure(text="%6.4f %6.4f" % (samfac_in,samfac_out))
     t=mode.get()
     if t=='ISCAT': t='ISCAT_2'
+    elif t=='JTMS': t='JTMS_2'
     msg2.configure(text=t)
     t="Freeze DF:%4d" % (int(Audio.gcom2.mousedf),)
     if abs(int(Audio.gcom2.mousedf))>600:
@@ -1920,6 +1932,7 @@ modemenu.add_radiobutton(label = 'JT4E', variable=mode, command = ModeJT4E)
 modemenu.add_radiobutton(label = 'JT4F', variable=mode, command = ModeJT4F)
 modemenu.add_radiobutton(label = 'JT4G', variable=mode, command = ModeJT4G)
 modemenu.add_radiobutton(label = 'ISCAT_2', variable=mode, command = ModeISCAT)
+modemenu.add_radiobutton(label = 'JTMS_2', variable=mode, command = ModeJTMS)
 #modemenu.add_radiobutton(label = 'Echo', variable=mode, command = ModeEcho,
 #                         state=DISABLED)
 
