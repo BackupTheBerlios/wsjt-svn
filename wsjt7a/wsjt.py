@@ -1106,7 +1106,7 @@ def clear_avg(event=NONE):
 def defaults():
     global slabel,isync,iclip,itol,idsec
     isync=1
-    if g.mode=="FSK441": isync=2
+    if g.mode=="FSK441" or g.mode=="JTMS": isync=2
     iclip=0
     lclip.configure(text='Clip   '+str(iclip))
     itol=5
@@ -1465,7 +1465,7 @@ def plot_small():
             psavg=psavg + 27.959
         n=int(150.0-2*psavg)
         xy.append(n)
-        if mode.get()=='FSK441':    
+        if mode.get()=='FSK441' or mode.get()=="JTMS":
             ps0=Audio.gcom2.ps0[i]
             n=int(150.0-2*ps0)
             xy2.append(x)
@@ -1473,7 +1473,7 @@ def plot_small():
     graph2.create_line(xy,fill="magenta")
     if mode.get()=='JT6M':
         plot_yellow()
-    elif mode.get()=='FSK441':
+    elif mode.get()=='FSK441' or mode.get()=="JTMS":
         graph2.create_line(xy2,fill="red")
         for i in range(4):
             x=(i+2)*441*fac
@@ -1752,7 +1752,7 @@ def update():
 # Save some parameters
     g.mode=mode.get()
     g.report=report.get()
-    if mode.get()=='FSK441': isync441=isync
+    if mode.get()=='FSK441' or mode.get()=='JTMS': isync441=isync
     elif mode.get()=='JT6M': isync6m=isync
     elif mode.get()=="ISCAT": isync_iscat=isync
     elif mode.get()[:4]=='JT65': isync65=isync
@@ -1802,7 +1802,8 @@ def update():
 #    Audio.gcom1.rxdelay=float('0'+options.RxDelay.get())
 #    Audio.gcom1.txdelay=float('0'+options.TxDelay.get())
     Audio.gcom2.nslim2=isync-4
-    if nosh441.get()==1 and mode.get()=='FSK441': Audio.gcom2.nslim2=99
+    if nosh441.get()==1 and (mode.get()=='FSK441' or mode.get()=='JTMS'):
+            Audio.gcom2.nslim2=99
     Audio.gcom2.n441pp=n441pp.get()
     try:
         Audio.gcom2.nport=int(options.PttPort.get())
@@ -2419,6 +2420,8 @@ try:
                 ModeCW()
             elif value=='ISCAT':
                 ModeISCAT()
+            elif value=='JTMS':
+                ModeJTMS()
             elif value[:3]=='JT4':
                 ModeJT4()
         elif key == 'MyCall': options.MyCall.set(value)
@@ -2533,7 +2536,7 @@ except:
     print key,value
 
 g.mode=mode.get()
-if mode.get()=='FSK441': isync=isync441
+if mode.get()=='FSK441' or mode.get()=='JTMS': isync=isync441
 elif mode.get()=='JT6M': isync=isync6m
 elif mode.get()=="ISCAT": isync=isync_iscat
 elif mode.get()[:4]=='JT65': isync=isync65

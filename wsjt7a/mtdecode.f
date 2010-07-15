@@ -1,5 +1,5 @@
       subroutine mtdecode(dat,jz,nz,MinSigdB,MinWidth,
-     +    NQRN,DFTolerance,istart,pick,cfile6,n441pp,ps0)
+     +    NQRN,DFTolerance,istart,pick,cfile6,n441pp,mode,ps0)
 
 C  Decode Multi-Tone FSK441 mesages.
 
@@ -116,8 +116,8 @@ C  Assemble a signal report:
          nrpt=10*nwidth + nstrength
          t2=tstart + dt*(istart-1)
 
-         if(n441pp.eq.1) call pp441(dat,jz,cfile6,tstart,t2,width,
-     +       npeak,nrpt,dftolerance,frag,0)
+         if(n441pp.eq.1 .and.mode.eq.1) call pp441(dat,jz,cfile6,    
+     +         tstart,t2,width,npeak,nrpt,dftolerance,frag,0)
 
          if(msglen.eq.0) go to 100
 
@@ -154,6 +154,10 @@ C  If it's the best ping yet, save the spectrum:
             endif
          enddo
 
+         if(mode.eq.8) then
+            msg3=' '
+            msg=' '
+         endif
          write(line(nline),1050) cfile6,t2,mswidth,int(peak),
      +        nrpt,noffset,msg3,msg
  1050    format(a6,f5.1,i5,i3,1x,i2.2,i5,1x,a3,1x,a40)

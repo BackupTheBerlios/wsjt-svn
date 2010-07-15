@@ -17,6 +17,7 @@ subroutine audio_init(ndin,ndout)
   if(mode(1:4).eq.'JT6M') nmode=4
   if(mode(1:2).eq.'CW') nmode=5
   if(mode(1:3).eq.'JT4') nmode=7
+  if(mode(1:4).eq.'JTMS') nmode=8
   if(mode(1:5).eq.'ISCAT') nmode=9
 
   ndevin=ndin

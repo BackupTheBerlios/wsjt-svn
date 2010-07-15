@@ -303,7 +303,7 @@ subroutine wsjt1(d,jz0,istart,samfacin,FileID,ndepth,              &
      go to 800
   endif
 
-! We're in FSK441 mode. Compute the 2D spectrum.
+! We're in FSK441 or JTMS mode. Compute the 2D spectrum.
   df=11025.0/256.0            !FFT resolution ~43 Hz
   dtbuf=nstep/11025.0
   stlim=nslim2                !Single-tone threshold
@@ -324,7 +324,7 @@ subroutine wsjt1(d,jz0,istart,samfacin,FileID,ndepth,              &
 ! Now the multi-tone decoding
 !        write(72) jz,nz,cfile6,(dat(j),j=1,jz)
   call mtdecode(dat,jz,nz,MinSigdB,MinWidth,                           &
-       NQRN,DFTolerance,istart,pick,cfile6,n441pp,ps0)
+       NQRN,DFTolerance,istart,pick,cfile6,n441pp,mode,ps0)
 
   npkept=nline             !Number of pings that were kept
   smax=0.
