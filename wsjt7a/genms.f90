@@ -1,4 +1,4 @@
-subroutine genms(msg,txsnrdb,iwave,nwave)
+subroutine genms(msg,iwave,nwave)
 
 ! Generate a JTMS wavefile.
 
@@ -6,7 +6,6 @@ subroutine genms(msg,txsnrdb,iwave,nwave)
   character*28 msg              !Message to be generated
   character cc*64
   integer sent(168)
-  real*8 txsnrdb,t
   real*8 dt,phi,f,f0,dfgen,dphi,twopi
   integer*2 iwave(NMAX)         !Generated wave file
   complex cw
@@ -68,28 +67,6 @@ subroutine genms(msg,txsnrdb,iwave,nwave)
 
 900 iwave(k+1:)=0
   nwave=k
-
-  if(txsnrdb.lt.40.d0) then
-! ###  Make some pings (for tests only) ###
-     do i=1,nwave
-        iping=i/(3*11025)
-        if(iping.ne.iping0) then
-           ip=mod(iping,3)
-           w=0.05*(ip+1)
-           ig=(iping-1)/3
-           amp=sqrt((3.0-ig)/3.0)
-           t0=dt*(iping+0.5)*(3*11025)
-           iping0=iping
-        endif
-        t=(i*dt-t0)/w
-        if(t.lt.0.d0 .and. t.lt.10.d0) then
-           fac=0.
-        else
-           fac=2.718*t*dexp(-t)
-        endif
-        iwave(i)=nint(fac*amp*iwave(i))
-     enddo
-  endif
 
   return
 end subroutine genms

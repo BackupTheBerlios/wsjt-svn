@@ -118,8 +118,10 @@ subroutine wsjtgen
              msgsent,nmsg0)
      else if(mode(1:5).eq.'ISCAT') then
         call geniscat(msg,nmsg,shok,iwave,nwave,sendingsh,msgsent)
+        if(txsnrdb.lt.40.d0) call makepings(iwave,nwave)
      else if(mode(1:4).eq.'JTMS') then
-        call genms(msg,txsnrdb,iwave,nwave)
+        call genms(msg,iwave,nwave)
+        if(txsnrdb.lt.40.d0) call makepings(iwave,nwave)
         sendingsh=0
         msgsent=msg
      else if(mode(1:3).eq.'JT4' ) then
@@ -221,28 +223,7 @@ subroutine wsjtgen
   enddo
   nwave=k
 
-  if(txsnrdb.lt.40.d0) then
-! ###  Make some pings (for tests only) ###
-     iping0=-999
-     do i=1,nwave
-        iping=i/(3*11025)
-        if(iping.ne.iping0) then
-           ip=mod(iping,3)
-           w=0.05*(ip+1)
-           ig=(iping-1)/3
-           amp=sqrt((3.0-ig)/3.0)
-           t0=dt*(iping+0.5)*(3*11025)
-           iping0=iping
-        endif
-        t=(i*dt-t0)/w
-        if(t.lt.0.d0 .and. t.lt.10.0) then
-           fac=0.
-        else
-           fac=2.718*t*dexp(-t)
-        endif
-        iwave(i)=nint(fac*amp*iwave(i))
-     enddo
-  endif
+  if(txsnrdb.lt.40.d0) call makepings(iwave,nwave)
   
 900 sending=txmsg
   if(mode(1:4).eq.'JT65' .and. sendingsh.ne.1) sending=msgsent
