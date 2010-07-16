@@ -38,7 +38,7 @@ subroutine genms(msg,txsnrdb,iwave,nwave)
 
  ! Set up necessary constants
   twopi=8.d0*atan(1.d0)
-  nsps=7
+  nsps=8
   dt=1.d0/11025.d0
   f0=11025.d0/nsps                               ! 1575.0 Hz
   dfgen=11025.d0/(2*nsps)                        !  787.5 Hz
@@ -46,6 +46,9 @@ subroutine genms(msg,txsnrdb,iwave,nwave)
   k=0
   phi=0.d0
   nrpt=NMAX/(nsym*nsps)
+
+!  write(*,3001) (sent(k),k=1,nsym)
+!3001 format(10(1x,6i1))
 
   do irpt=1,nrpt
      do j=1,nsym
@@ -69,13 +72,13 @@ subroutine genms(msg,txsnrdb,iwave,nwave)
   if(txsnrdb.lt.40.d0) then
 ! ###  Make some pings (for tests only) ###
      do i=1,nwave
-        iping=i/(3*12000)
+        iping=i/(3*11025)
         if(iping.ne.iping0) then
            ip=mod(iping,3)
            w=0.05*(ip+1)
            ig=(iping-1)/3
            amp=sqrt((3.0-ig)/3.0)
-           t0=dt*(iping+0.5)*(3*12000)
+           t0=dt*(iping+0.5)*(3*11025)
            iping0=iping
         endif
         t=(i*dt-t0)/w

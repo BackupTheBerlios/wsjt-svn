@@ -216,6 +216,28 @@ subroutine wsjtgen
      enddo
   enddo
   nwave=k
+
+  if(txsnrdb.lt.40.d0) then
+! ###  Make some pings (for tests only) ###
+     do i=1,nwave
+        iping=i/(3*11025)
+        if(iping.ne.iping0) then
+           ip=mod(iping,3)
+           w=0.05*(ip+1)
+           ig=(iping-1)/3
+           amp=sqrt((3.0-ig)/3.0)
+           t0=dt*(iping+0.5)*(3*11025)
+           iping0=iping
+        endif
+        t=(i*dt-t0)/w
+        if(t.lt.0.d0 .and. t.lt.10.d0) then
+           fac=0.
+        else
+           fac=2.718*t*dexp(-t)
+        endif
+        iwave(i)=nint(fac*amp*iwave(i))
+     enddo
+  endif
   
 900 sending=txmsg
   if(mode(1:4).eq.'JT65' .and. sendingsh.ne.1) sending=msgsent

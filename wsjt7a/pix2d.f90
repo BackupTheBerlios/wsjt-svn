@@ -122,7 +122,7 @@ subroutine pix2d(d2,jz,mousebutton,mousedf,nfreeze,mode,s2,nchan,nz,b)
      endif
 
 ! Mark the best ping with a red tick
-     if(tbest.gt.0.0) then
+     if(tbest.gt.0.0 .and.tbest.lt.29.5) then
         nx=tbest/0.060 + 1
         do j=110,120
            b((j-1)*500+nx0)=0
