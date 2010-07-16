@@ -17,7 +17,7 @@ subroutine wsjtgen
 
   integer   itone(84)
   character msg*28,msgsent*22,idmsg*22
-  real*8 freq,pha,dpha,twopi,dt
+  real*8 freq,pha,dpha,twopi,dt,t
   character testfile*27,tfile2*80
   logical lcwid
   integer*2 icwid(110250),jwave(NWMAX)
