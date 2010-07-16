@@ -207,20 +207,22 @@ subroutine wsjtgen
   k=0
   df=11025.0/NSPD
   pha=0.
-  do m=1,ndits
-     freq=(LTone-1+itone(m))*df
-     dpha=twopi*freq*dt
-     do i=1,NSPD
-        k=k+1
-        pha=pha+dpha
-        iwave(k)=nint(32767.0*sin(pha))
+  nrpt=30*11025/(NSPD*ndits)
+  do irpt=1,nrpt
+     do m=1,ndits
+        freq=(LTone-1+itone(m))*df
+        dpha=twopi*freq*dt
+        do i=1,NSPD
+           k=k+1
+           pha=pha+dpha
+           iwave(k)=nint(32767.0*sin(pha))
+        enddo
      enddo
   enddo
   nwave=k
 
   if(txsnrdb.lt.40.d0) then
 ! ###  Make some pings (for tests only) ###
-     print*,txsnrdb,nwave,fsample_out
      iping0=-999
      do i=1,nwave
         iping=i/(3*11025)
