@@ -9,7 +9,7 @@ subroutine makepings(iwave,nwave)
      iping=i/(3*11025)
      if(iping.ne.iping0) then
         ip=mod(iping,3)
-        w=0.05*(4-ip)
+        w=0.015*(4-ip)
         ig=(iping-1)/3
         amp=sqrt((3.0-ig)/3.0)
         t0=dt*(iping+0.5)*(3*11025)

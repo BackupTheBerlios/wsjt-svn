@@ -118,7 +118,7 @@ subroutine wsjtgen
              msgsent,nmsg0)
      else if(mode(1:5).eq.'ISCAT') then
         call geniscat(msg,nmsg,shok,iwave,nwave,sendingsh,msgsent)
-        if(txsnrdb.lt.40.d0) call makepings(iwave,nwave)
+        if(txsnrdb.gt.0.d0 .and. txsnrdb.lt.40.d0) call makepings(iwave,nwave)
      else if(mode(1:4).eq.'JTMS') then
         call genms(msg,iwave,nwave)
         if(txsnrdb.lt.40.d0) call makepings(iwave,nwave)
