@@ -5,7 +5,6 @@ subroutine genms(msg,txsnrdb,iwave,nwave)
   parameter (NMAX=30*11025)     !Max length of wave file
   character*28 msg              !Message to be generated
   character cc*64
-  integer imsg(28)
   integer sent(168)
   real*8 txsnrdb,t
   real*8 dt,phi,f,f0,dfgen,dphi,twopi
@@ -17,7 +16,6 @@ subroutine genms(msg,txsnrdb,iwave,nwave)
   data cc/' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ./?-                      @'/
   save idum
 
-  sig=sqrt(10.0**(0.1*txsnrdb))
   do i=28,1,-1                                 !Find user's message length
      if(msg(i:i).ne.' ') go to 1
   enddo
@@ -29,18 +27,17 @@ subroutine genms(msg,txsnrdb,iwave,nwave)
   sent=0
   do j=1,msglen
      do i=1,64
-        if(msg(j:j).eq.cc(i:i)) then
-           imsg(j)=i-1
-           go to 5
-        endif
+        if(msg(j:j).eq.cc(i:i)) go to 5
      enddo
-5    do n=5,0,1                            !Each has 6 bits, 6*nsps samples
+5    do n=5,0,-1                            !Each has 6 bits, 6*nsps samples
         k=k+1
         sent(k)=iand(1,ishft(i,-n))
      enddo
   enddo
   nsym=k
-  print*,nsym
+  print*,msglen,nsym,txsnrdb
+  write(*,3001) (sent(k),k=1,nsym)
+3001 format(10(1x,6i1))
 
  ! Set up necessary constants
   nsps=8
@@ -50,7 +47,7 @@ subroutine genms(msg,txsnrdb,iwave,nwave)
   t=0.d0
   k=0
   phi=0.d0
-  nrpt=30.0*12000.0/(nsym*nsps)
+  nrpt=NMAX/(nsym*nsps)
   do irpt=1,nrpt
      do j=1,nsym
         if(sent(j).eq.1) then
