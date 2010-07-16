@@ -29,25 +29,28 @@ subroutine genms(msg,txsnrdb,iwave,nwave)
      do i=1,64
         if(msg(j:j).eq.cc(i:i)) go to 5
      enddo
-5    do n=5,0,-1                            !Each has 6 bits, 6*nsps samples
+5    do n=5,0,-1                            !Each character gets 6 bits
         k=k+1
-        sent(k)=iand(1,ishft(i,-n))
+        sent(k)=iand(1,ishft(i-1,-n))
      enddo
   enddo
   nsym=k
-  print*,msglen,nsym,txsnrdb
-  write(*,3001) (sent(k),k=1,nsym)
-3001 format(10(1x,6i1))
 
  ! Set up necessary constants
-  nsps=8
+  twopi=8.d0*atan(1.d0)
+  nsps=7
   dt=1.d0/11025.d0
-  f0=1500.d0
-  dfgen=750.d0
+  f0=11025.d0/nsps                               ! 1575.0 Hz
+  dfgen=11025.d0/(2*nsps)                        !  787.5 Hz
   t=0.d0
   k=0
   phi=0.d0
   nrpt=NMAX/(nsym*nsps)
+
+  print*,msglen,nsym,nsps,nrpt,txsnrdb,dfgen
+  write(*,3001) (sent(k),k=1,nsym)
+3001 format(10(1x,6i1))
+
   do irpt=1,nrpt
      do j=1,nsym
         if(sent(j).eq.1) then
@@ -88,6 +91,9 @@ subroutine genms(msg,txsnrdb,iwave,nwave)
         iwave(i)=nint(fac*amp*iwave(i))
      enddo
   endif
+
+  print*,nwave
+  print*,(iwave(i),i=1,100)
 
   return
 end subroutine genms
