@@ -116,7 +116,12 @@ C  Assemble a signal report:
          nrpt=10*nwidth + nstrength
          t2=tstart + dt*(istart-1)
 
-         write(*,1050) cfile6,t2,mswidth,int(peak),nrpt,noffset
+         if(mode.eq.8) then
+            nfreeze=0
+            call decodems(dat(jj),jjz,cfile6,t2,mswidth,int(peak),
+     +           nrpt,nfreeze,DFTolerance)
+            go to 100
+         endif
 
          if(n441pp.eq.1 .and.mode.eq.1) call pp441(dat,jz,cfile6,    
      +         tstart,t2,width,npeak,nrpt,dftolerance,frag,0)
