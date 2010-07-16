@@ -47,10 +47,6 @@ subroutine genms(msg,txsnrdb,iwave,nwave)
   phi=0.d0
   nrpt=NMAX/(nsym*nsps)
 
-  print*,msglen,nsym,nsps,nrpt,txsnrdb,dfgen
-  write(*,3001) (sent(k),k=1,nsym)
-3001 format(10(1x,6i1))
-
   do irpt=1,nrpt
      do j=1,nsym
         if(sent(j).eq.1) then
@@ -91,9 +87,6 @@ subroutine genms(msg,txsnrdb,iwave,nwave)
         iwave(i)=nint(fac*amp*iwave(i))
      enddo
   endif
-
-  print*,nwave
-  print*,(iwave(i),i=1,100)
 
   return
 end subroutine genms
