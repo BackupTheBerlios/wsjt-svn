@@ -35,6 +35,7 @@ subroutine wsjtgen
 
   call cs_lock('wsjtgen')
   fsample_out=11025.d0*samfacout
+  if(abs(samfacout-1.d0).gt.0.02d0) fsample_out=1.d0
   lcwid=.false.
   if(idinterval.gt.0) then
      n=(mod(int(tsec/60.d0),idinterval))
@@ -219,6 +220,8 @@ subroutine wsjtgen
 
   if(txsnrdb.lt.40.d0) then
 ! ###  Make some pings (for tests only) ###
+     print*,txsnrdb,nwave,fsample_out
+     iping0=-999
      do i=1,nwave
         iping=i/(3*11025)
         if(iping.ne.iping0) then
@@ -230,7 +233,7 @@ subroutine wsjtgen
            iping0=iping
         endif
         t=(i*dt-t0)/w
-        if(t.lt.0.d0 .and. t.lt.10.d0) then
+        if(t.lt.0.d0 .and. t.lt.10.0) then
            fac=0.
         else
            fac=2.718*t*dexp(-t)
