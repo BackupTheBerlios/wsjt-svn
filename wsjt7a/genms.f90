@@ -5,33 +5,43 @@ subroutine genms(msg,iwave,nwave)
   parameter (NMAX=30*11025)     !Max length of wave file
   character*28 msg              !Message to be generated
   character cc*64
-  integer sent(168)
-  real*8 dt,phi,f,f0,dfgen,dphi,twopi
+  integer sent(196)
+  real*8 dt,phi,f,f0,dfgen,dphi,twopi,foffset
   integer*2 iwave(NMAX)         !Generated wave file
   complex cw
   common/mscom/cw(48,0:63)
   data idum/-1/
-!           1234567890123456789012345678901234567890123456789012345678901234
-  data cc/' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ./?-                      @'/
+!                   1         2         3         4         5         6
+!          0123456789012345678901234567890123456789012345678901234567890123
+  data cc/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ./?-                 _     @'/
   save idum
 
   do i=28,1,-1                                 !Find user's message length
      if(msg(i:i).ne.' ') go to 1
   enddo
-1 msglen=i
+1 msglen=i+1                                   !Add one for space at EOM
+  if(msglen.gt.28) msglen=28
 
-! Convert message to a bit sequence, 6 bits per character
-! Start with two blank characters (all 0's)
-  k=12
+! Convert message to a bit sequence, 7 bits per character (6 + even parity)
   sent=0
+  k=0
   do j=1,msglen
-     do i=1,64
-        if(msg(j:j).eq.cc(i:i)) go to 5
-     enddo
-5    do n=5,0,-1                            !Each character gets 6 bits
+     if(msg(j:j).eq.' ') then
+        i=58
+        go to 5
+     else
+        do i=1,64
+           if(msg(j:j).eq.cc(i:i)) go to 5
+        enddo
+     endif
+5    m=0
+     do n=5,0,-1                            !Each character gets 6 bits
         k=k+1
         sent(k)=iand(1,ishft(i-1,-n))
+        m=m+sent(k)
      enddo
+     k=k+1
+     sent(k)=iand(m,1)                      !Insert parity bit
   enddo
   nsym=k
 
@@ -40,21 +50,19 @@ subroutine genms(msg,iwave,nwave)
   nsps=8
   dt=1.d0/11025.d0
   f0=11025.d0/nsps                               ! 1575.0 Hz
-  dfgen=11025.d0/(2*nsps)                        !  787.5 Hz
+  dfgen=0.5d0*f0                                 !  787.5 Hz
+  foffset=1500.d0 - f0
   t=0.d0
   k=0
   phi=0.d0
   nrpt=NMAX/(nsym*nsps)
 
-!  write(*,3001) (sent(k),k=1,nsym)
-!3001 format(10(1x,6i1))
-
   do irpt=1,nrpt
      do j=1,nsym
         if(sent(j).eq.1) then
-           f=f0 + 0.5d0*dfgen
+           f=f0 + 0.5d0*dfgen + foffset
         else
-           f=f0 - 0.5d0*dfgen
+           f=f0 - 0.5d0*dfgen + foffset
         endif
         dphi=twopi*f*dt
         do i=1,nsps

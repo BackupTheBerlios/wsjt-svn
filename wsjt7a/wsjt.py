@@ -1933,7 +1933,7 @@ modemenu.add_radiobutton(label = 'JT4E', variable=mode, command = ModeJT4E)
 modemenu.add_radiobutton(label = 'JT4F', variable=mode, command = ModeJT4F)
 modemenu.add_radiobutton(label = 'JT4G', variable=mode, command = ModeJT4G)
 modemenu.add_radiobutton(label = 'ISCAT_2', variable=mode, command = ModeISCAT)
-#modemenu.add_radiobutton(label = 'JTMS_2', variable=mode, command = ModeJTMS)
+modemenu.add_radiobutton(label = 'JTMS_2', variable=mode, command = ModeJTMS)
 #modemenu.add_radiobutton(label = 'Echo', variable=mode, command = ModeEcho,
 #                         state=DISABLED)
 
