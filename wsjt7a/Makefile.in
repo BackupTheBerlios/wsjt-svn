@@ -17,7 +17,7 @@ CPPFLAGS += ${DEFS} -I.
 # WSJT specific Fortran flags
 #FFLAGS += -Wall -Wno-precision-loss -fbounds-check -fno-second-underscore -fPIC
 
-Audio:	WsjtMod/Audio.so t74
+Audio:	WsjtMod/Audio.so t75
 
 # Default rules
 %.o: %.c
@@ -50,16 +50,16 @@ OBJS1 = JT65code.o nchar.o grid2deg.o packmsg.o packtext.o \
 	igray.o init_rs_int.o encode_rs_int.o decode_rs_int.o \
 	wrapkarn.o cutil.o
 
-OBJS4	= t74.o analytic.o four2a.o iscat.o db.o pctile.o \
-	sort.o ssort.o
+OBJS4	= t75.o analytic.o four2a.o decodems.o db.o pctile.o \
+	sort.o ssort.o setupms.o
 
 #smooth.o pctile.o db.o \
 #	thnix_stub.o  gen441.o abc441.o ping441.o \
 #	indexx.o ping.o smo.o tweak1.o enc441.o pp441.o dec441.o \
 #	token.o msgtrim.o 
 
-t74:	$(OBJS4)
-	$(FC) -o t74 $(OBJS4) -lfftw3f
+t75:	$(OBJS4)
+	$(FC) -o t75 $(OBJS4) -lfftw3f
 
 
 OBJS5 = t72.o analytic.o four2a.o smooth.o pctile.o db.o \
@@ -79,7 +79,7 @@ SRCS2F90 = abc441.f90 astro0.f90 audio_init.f90 azdist0.f90 \
 	ftn_quit.f90 get_fname.f90 getfile.f90 horizspec.f90 hscroll.f90 \
 	pix2d.f90 pix2d65.f90 rfile.f90 savedata.f90 spec.f90 \
 	wsjtgen.f90 fivehz.f90 chkt0.f90 gran.f90 makepings.f90 \
-	packpfx.f90 unpackpfx.f90 genms.f90 decodems.f90 \
+	packpfx.f90 unpackpfx.f90 genms.f90 decodems.f90 setupms.f90 \
 	thnix.f90 enc441.f90 pp441.f90 tweak1.f90 smo.f90 analytic.f90 \
 	gen441.f90 dec441.f90 token.f90 msgtrim.f90 geniscat.f90 iscat.f90
 
@@ -175,10 +175,10 @@ deb: wsjt.py WsjtMod/Audio.so WsjtMod/g.py WsjtMod/__init__.py \
 
 	cp wsjt.py wsjtrc CALL3.TXT dmet_10_-1_3.dat \
 	dmet_20_-2_2.dat kvasd.dat KVASD_g95 TSKY.DAT \
-	wsjt.ico WSJT_Quick_Reference.pdf WSJT_User_600.pdf DEB/WSJT
+	wsjt.ico WSJT_Quick_Reference.pdf WSJT_User_600.pdf DEB/WSJT7a
 
-	cp WsjtMod/Audio.so DEB/WSJT/WsjtMod
-	cp WsjtMod/*.py DEB/WSJT/WsjtMod
+	cp WsjtMod/Audio.so DEB/WSJT7a/WsjtMod
+	cp WsjtMod/*.py DEB/WSJT7a/WsjtMod
 	dpkg-deb --build DEB wsjt_ver_rev_i386.deb
 
 .PHONY : clean

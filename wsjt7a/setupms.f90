@@ -1,42 +1,51 @@
-subroutine setupms(f0,f1,csync,c0,c1)
+subroutine setupms(cw,cwb)
 
-  complex csync(256)                   !Complex sync waveform
-  complex c0(8)                        !Complex waveform for bit=0
-  complex c1(8)                        !Complex waveform for bit=1
+  complex cw(56,0:63)
+  complex cwb(56)
+  integer nb(7)
   real*8 twopi,fs,dt,f0,f1
-  integer is32(32)                     !Sync vector in one-bit format
-  data is32/0,0,0,1,1,0,1,0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,0,1/ 
+  character cc*64
+!                   1         2         3         4         5         6
+!          0123456789012345678901234567890123456789012345678901234567890123
+  data cc/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ./?-                 _     @'/
 
   nsps=8
   nsync=32
   twopi=8*atan(1.d0)
-  dt=1.d0/12000.d0                     !Sample interval
-
-! Generate sync waveform
-  k=0
-  phi=0.
+  dt=1.d0/11025.d0                     !Sample interval
+  f0=1155.46875d0
+  f1=1844.53125d0
   dphi0=twopi*dt*f0
   dphi1=twopi*dt*f1
-  do j=1,nsync
-     if(is32(j).eq.0) then
-        dphi=dphi0
-     else
-        dphi=dphi1
-     endif
-     do i=1,nsps
+
+  do i=0,63
+     k=0
+     m=0
+     do n=5,0,-1                            !Each character gets 6+1 bits
         k=k+1
-        phi=phi+dphi
-        csync(k)=cmplx(cos(phi),sin(phi))
+        nb(k)=iand(1,ishft(i-1,-n))
+        m=m+nb(k)
+     enddo
+     k=k+1
+     nb(k)=iand(m,1)                      !Insert parity bit
+
+! Generate the character waveform
+     phi=0.
+     j=0
+     do k=1,7
+        if(nb(k).eq.0) then
+           dphi=dphi0
+        else
+           dphi=dphi1
+        endif
+        do ii=1,nsps
+           j=j+1
+           phi=phi+dphi
+           cw(j,i)=cmplx(cos(phi),sin(phi))
+        enddo
      enddo
   enddo
+  cwb=cw(1:56,57)
 
-  phi0=0.d0
-  phi1=0.d0
-  do i=1,8                        !Generate signal templates for 0 and 1
-     phi0=phi0+dphi0
-     phi1=phi1+dphi1
-     c0(i)=cmplx(cos(phi0),sin(phi0))
-     c1(i)=cmplx(cos(phi1),sin(phi1))
-  enddo
-
+  return
 end subroutine setupms

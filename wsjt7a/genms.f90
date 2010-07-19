@@ -8,13 +8,9 @@ subroutine genms(msg,iwave,nwave)
   integer sent(196)
   real*8 dt,phi,f,f0,dfgen,dphi,twopi,foffset
   integer*2 iwave(NMAX)         !Generated wave file
-  complex cw
-  common/mscom/cw(48,0:63)
-  data idum/-1/
 !                   1         2         3         4         5         6
 !          0123456789012345678901234567890123456789012345678901234567890123
   data cc/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ./?-                 _     @'/
-  save idum
 
   do i=28,1,-1                                 !Find user's message length
      if(msg(i:i).ne.' ') go to 1
