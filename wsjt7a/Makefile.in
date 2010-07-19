@@ -171,12 +171,11 @@ deb: wsjt.py WsjtMod/Audio.so WsjtMod/g.py WsjtMod/__init__.py \
 	WsjtMod/options.py WsjtMod/palettes.py WsjtMod/PmwBlt.py \
 	WsjtMod/PmwColor.py WsjtMod/Pmw.py WsjtMod/smeter.py \
 	WsjtMod/specjt.py WsjtMod/astro.py DEB/DEBIAN/control \
-	wsjtrc DEB/WSJT/wsjt
+	wsjtrc
 
 	cp wsjt.py wsjtrc CALL3.TXT dmet_10_-1_3.dat \
 	dmet_20_-2_2.dat kvasd.dat KVASD_g95 TSKY.DAT \
-	UpdateHistory.txt wsjt.ico WSJT_Quick_Reference.pdf \
-	WSJT_User_600.pdf WSPR_mode.pdf DEB/WSJT
+	wsjt.ico WSJT_Quick_Reference.pdf WSJT_User_600.pdf DEB/WSJT
 
 	cp WsjtMod/Audio.so DEB/WSJT/WsjtMod
 	cp WsjtMod/*.py DEB/WSJT/WsjtMod
