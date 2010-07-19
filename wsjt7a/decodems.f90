@@ -40,11 +40,6 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,DFTolerance)
 
   call analytic(dat,npts,nfft1,s,cdat)        !Convert to analytic signal
 
-!  do i=1,nh1
-!     write(13,3002) (i-1)*df1,s(i),db(s(i))
-!3002 format(3f12.3)
-!  enddo
-
   fac=1.0/(nfft1**2)
   do i=1,npts
      c(i)=fac*cdat(i)**2
@@ -117,7 +112,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,DFTolerance)
   msg28=msg(ia:ib)
   ndf=nint(dfx)
 
-  write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
+!  write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
   if(nline.le.99) nline=nline+1
   tping(nline)=t2
   write(line(nline),1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
