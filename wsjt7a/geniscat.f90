@@ -1,5 +1,7 @@
 subroutine geniscat(msg,nmsg,shok,iwave,nwave,sendingsh,msgsent)
 
+! Generate an ISCAT_2 waveform.
+
   parameter (NMAX=30*11025,NSZ=1291,NSPS=256)
   character msg*28,msgsent*22
   integer*2 iwave(NMAX)
@@ -25,9 +27,8 @@ subroutine geniscat(msg,nmsg,shok,iwave,nwave,sendingsh,msgsent)
   nsym=NMAX/NSPS
   sendingsh=0
 
-! Check for shorthand message
   if(shok.eq.1 .and. nmsg.le.4 .and.                                   &
-       (msg(1:1).eq.'R' .or. msg(1:1).eq.'7')) then
+       (msg(1:1).eq.'R' .or. msg(1:1).eq.'7')) then        !Check for shorthand
      n=0
      m=0
      if(nmsg.eq.2 .and. msg(1:3).eq.'RO') n=5
@@ -53,20 +54,21 @@ subroutine geniscat(msg,nmsg,shok,iwave,nwave,sendingsh,msgsent)
         enddo
         sendingsh=1
      endif
+
   else
-10   nblk=nsync+nlen+ndat
+10   nblk=nsync+nlen+ndat           !Normal message (NOT shorthand)
      msglen=nmsg+1
      k=0
      kk=1
      imsg(1)=40
-     do i=1,nmsg
+     do i=1,nmsg                                 !Define the tone sequence
         imsg(i+1)=36
         do j=1,42
            if(msg(i:i).eq.c(j:j)) imsg(i+1)=j-1
         enddo
      enddo
 
-     do i=1,nsym
+     do i=1,nsym                                 !Total symbols in 30 s 
         j=mod(i-1,nblk)+1
         if(j.le.nsync) then
            itone(i)=icos(j)
@@ -86,10 +88,9 @@ subroutine geniscat(msg,nmsg,shok,iwave,nwave,sendingsh,msgsent)
      msgsent=msg
   endif
 
-! Generate iwave
   k=0
   pha=0.
-  do m=1,nsym
+  do m=1,nsym                                    !Generate iwave
      f=f0 + itone(m)*df
      dpha=twopi*f*dt
      do i=1,NSPS

@@ -1,15 +1,18 @@
-subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,DFTolerance)
+subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
+     DFTolerance,MouseDF)
+
+! Decode a JTMS ping
 
   parameter (NZ=30*11025)
-  real dat(npts)
+  real dat(npts)                        !Raw data
   integer DFTolerance
   character*6 cfile6
   complex cdat(NZ)                      !Analytic form of signal
   real s(NZ)
   real fs(56)
   complex c(NZ)
-  complex cw(56,0:63)                   !Codewords
-  complex cwb(56)                       !Codeword for space
+  complex cw(56,0:63)                   !Complex waveforms for codewords
+  complex cwb(56)                       !Complex waveform for 'space'
   complex z
   logical first
   character msg*400,msg28*28
@@ -22,7 +25,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,DFTolerance)
   save first,smax,cw,cwb           !Why is this needed for save?  But it is!
   common/ccom/nline,tping(100),line(100)
 
-  if(first) call setupms(cw,cwb)
+  if(first) call setupms(cw,cwb)        !Calculate waveforms for codewords
   first=.false.
 
   nsps=8
@@ -47,11 +50,16 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,DFTolerance)
   c(npts+1:nfft1)=0.
   call four2a(c,nfft1,1,-1,1)
 
-! In the doubled frequencies spectrum:
-  fa=2.0*(f0-dftolerance)
-  fb=2.0*(f0+dftolerance)
+! In the "doubled-frequencies" spectrum of squared cdat:
+  fa=2.0*(f0-400)
+  fb=2.0*(f0+400)
+  if(NFreeze.gt.0) then
+     fa=2.0*(f0+MouseDF-DFtolerance)
+     fb=2.0*(f0+MouseDF+DFtolerance)
+  endif  
   ja=nint(fa/df1)
   jb=nint(fb/df1)
+  jd=nint(1378.125/df1)
 
   smax=0.
   do j=ja,jb
@@ -62,6 +70,8 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,DFTolerance)
      endif
   enddo
   dfx=0.5*fpk-f0
+
+! Should have a test here to reject non-JTMS signals
 
 ! We know DF, now find character sync.
   fs=0.
@@ -84,8 +94,10 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,DFTolerance)
      endif
   enddo
 
+!  rewind 51
   msg=' '
   nchar=(npts-55-i1)/56
+  if(nchar.gt.400) nchar=400
   do j=1,nchar
      ia=i1 + (j-1)*56
      smax=0.
@@ -97,6 +109,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,DFTolerance)
         ss=abs(z)
         if(ss.gt.smax) then
            smax=ss
+!           phapk=atan2(aimag(z),real(z))
            kpk=k
         endif
      enddo
@@ -105,14 +118,16 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,DFTolerance)
      endif
      msg(j:j)=cc(kpk:kpk)
      if(kpk.eq.58) msg(j:j)=' '
+!     write(51,3007) j,smax,phapk,phapk+6.283185307
+!3007 format(i5,3f12.3)
   enddo
+  call flush(51)
 
   ia=max(1,nchar/3)
   ib=min(ia+27,nchar)
   msg28=msg(ia:ib)
   ndf=nint(dfx)
 
-!  write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
   if(nline.le.99) nline=nline+1
   tping(nline)=t2
   write(line(nline),1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28

@@ -1,6 +1,6 @@
 subroutine iscat(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
 
-! Decoder for ISCAT_2
+! Decode an ISCAT_2 signal
 
   parameter (NMAX=512*1024)
   parameter (NSZ=4*1292)
@@ -63,14 +63,6 @@ subroutine iscat(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
      psavg(i)=2*db(savg(2*i)) + 10.0
   enddo
 
-!  rewind 53
-!  do i=1,nq
-!     savg2(i)=savg(i)/b(i)
-!     write(53,3001) i*df,savg(i),b(i),savg2(i)
-!3001 format(4f10.3)
-!  enddo
-!  call flush(53)
-
   do j=1,jsym
      s0(1:nq,j)=s0(1:nq,j)/b(1:nq)
   enddo
@@ -121,7 +113,6 @@ subroutine iscat(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
   ref=ref/3.0
 
   kk=0
-!  rewind 54
   do j=0,4*nblk-1
      ss=0.
      do n=1,4
@@ -131,10 +122,7 @@ subroutine iscat(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
      enddo
      kk=kk+1
      ccf(kk)=ss/ref
-!     write(54,3101) kk,ss/ref
-!3101 format(i5,f12.3)
   enddo
-!  call flush(54)
 
   tping=jpk*kstep/11025.0
   xsync=smax/ref
@@ -162,11 +150,6 @@ subroutine iscat(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
 
   msglen=(ipk2-ipk)/2
   if(msglen.lt.1 .or. msglen.gt.28) msglen=2         !### tests only ###
-!  if(msglen.lt.1 .or. msglen.gt.28) then
-!     print*,'msglen:',msglen
-!     go to 900
-!  endif
-
   fs1=0.
   jb=(jsym-4*nblk+1)/4
   jb=4*jb
@@ -230,7 +213,6 @@ subroutine iscat(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
   isync=xsync
   if(navg.le.0) msg=' '
 
-!  write(*,1020)  cfile6,isync,width,nsig,ndf0,msg,msglen,nworst,navg
   write(11,1020) cfile6,nsig,ndf0,msg,msglen,nworst,navg
   write(21,1020) cfile6,nsig,ndf0,msg,msglen,nworst,navg
 1020 format(a6,i5,i5,6x,a28,i4,2i3)

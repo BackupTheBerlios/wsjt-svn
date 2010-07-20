@@ -42,24 +42,21 @@ subroutine pp441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,     &
   save frag0,cfrag,ct0,ct1,ct2,ct3,ndits
 
   if(frag.ne.frag0) then
-! Generate waveform for message fragment
-     do i=28,1,-1                          !Get length of fragment
+     do i=28,1,-1                          !Get length of message fragment
         if(frag(i:i).ne.' ') go to 10
      enddo
 10   nfrag=1000+i
      call abc441(frag,nfrag,itone,ndits)
-     call gen441(itone,ndits,cfrag)
+     call gen441(itone,ndits,cfrag)        !Generate complex waveform
 
-! Generate symbol (single-dit) waveforms
-     call gen441(1,1,ct0)
+     call gen441(1,1,ct0)                  !Generate complex symbol waveforms
      call gen441(2,1,ct1)
      call gen441(3,1,ct2)
      call gen441(4,1,ct3)
      frag0=frag
   endif
 
-! Initialize variables
-  nsps=25
+  nsps=25                                  !Initialize variables
   nsam=nsps*ndits
   mswidth=10*nint(100.0*width)
   dt=1.0/11025.0
@@ -75,10 +72,9 @@ subroutine pp441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,     &
 
   call analytic(dat(i0),npts,nfft1,s,cdat)    !Convert to analytic signal
 
-! Get DF by looking for the four FSK441 tones
   ia=dftolerance/df1
   ccfmax=0.
-  do i=-ia,ia
+  do i=-ia,ia                                 !Find DF
      ccf(i)=s(i+nint(882.0/df1)) + s(i+nint(1323.0/df1)) +           &
           s(i+nint(1764.0/df1)) + s(i+nint(2205.0/df1))
   enddo
@@ -107,12 +103,9 @@ subroutine pp441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,     &
   fac=1.e-6/base
   do i=1,npts-nsam
      z=0.
-!     sq=0.
      do j=1,nsam
         z=z + cdat(j+i-1)*cfrag(j)
-!        sq=sq + real(cdat(j+i-1))**2 + aimag(cdat(j+i-1))**2
      enddo
-!     ss=(real(z)**2 + aimag(z)**2)/sq         !??? Is this right ???
      ss=(real(z)**2 + aimag(z)**2)*fac
      if(ss.gt.sbest) then
         sbest=ss

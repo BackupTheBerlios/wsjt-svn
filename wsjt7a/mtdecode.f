@@ -1,5 +1,5 @@
-      subroutine mtdecode(dat,jz,nz,MinSigdB,MinWidth,
-     +    NQRN,DFTolerance,istart,pick,cfile6,n441pp,mode,ps0)
+      subroutine mtdecode(dat,jz,nz,MinSigdB,MinWidth,NQRN,NFreeze,
+     +    DFTolerance,MouseDF,istart,pick,cfile6,n441pp,mode,ps0)
 
 C  Decode Multi-Tone FSK441 mesages.
 
@@ -117,9 +117,8 @@ C  Assemble a signal report:
          t2=tstart + dt*(istart-1)
 
          if(mode.eq.8) then
-            nfreeze=0
             call decodems(dat(jj),jjz,cfile6,t2,mswidth,int(peak),
-     +           nrpt,nfreeze,DFTolerance)
+     +           nrpt,nfreeze,DFTolerance,MouseDF)
             go to 100
          endif
 

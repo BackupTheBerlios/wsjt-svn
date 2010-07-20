@@ -631,11 +631,12 @@ def ModeJT65C(event=NONE):
         mode.set("JT65C")
         ModeJT65()
 
-#------------------------------------------------------ ModeMTMS
+#------------------------------------------------------ ModeJTMS
 def ModeJTMS(event=NONE):
     if g.mode != "JTMS":
         if lauto: toggleauto()
     ModeFSK441()
+    cbfreeze.configure(state=NORMAL)
     mode.set("JTMS")
     
 #------------------------------------------------------ ModeISCAT
