@@ -10,6 +10,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   complex cdat(NZ)                      !Analytic form of signal
   real s(NZ)
   real fs(56)
+  real sm(0:63)
   complex c(NZ)
   complex cw(56,0:63)                   !Complex waveforms for codewords
   complex cwb(56)                       !Complex waveform for 'space'
@@ -95,6 +96,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   enddo
 
 !  rewind 51
+
   msg=' '
   nchar=(npts-55-i1)/56
   if(nchar.gt.400) nchar=400
@@ -107,21 +109,28 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
            z=z + cdat(ia+i)*conjg(cw(i,k))
         enddo
         ss=abs(z)
+        sm(k)=ss
         if(ss.gt.smax) then
            smax=ss
-!           phapk=atan2(aimag(z),real(z))
+           phapk=atan2(aimag(z),real(z))
            kpk=k
         endif
+     enddo
+     sm(kpk)=0.
+     smax2=0.
+     do k=0,63
+        smax2=max(smax2,sm(k))
      enddo
      if(kpk.lt.1) then
         kpk=64
      endif
      msg(j:j)=cc(kpk:kpk)
      if(kpk.eq.58) msg(j:j)=' '
+     if(smax/smax2.lt.1.05) msg(j:j)=' '               !Threshold test
 !     write(51,3007) j,smax,phapk,phapk+6.283185307
 !3007 format(i5,3f12.3)
   enddo
-  call flush(51)
+!  call flush(51)
 
   ia=max(1,nchar/3)
   ib=min(ia+27,nchar)
