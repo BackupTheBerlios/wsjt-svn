@@ -117,6 +117,8 @@ C  Assemble a signal report:
          t2=tstart + dt*(istart-1)
 
          if(mode.eq.8) then
+!            write(75) cfile6,t2,mswidth,int(peak),nrpt,jjz,
+!     +      (dat(jj+j),j=1,jjz)
             call decodems(dat(jj),jjz,cfile6,t2,mswidth,int(peak),
      +           nrpt,nfreeze,DFTolerance,MouseDF)
             go to 100

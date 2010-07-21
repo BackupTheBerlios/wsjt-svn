@@ -11,6 +11,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   real s(NZ)
   real fs(56)
   real sm(0:63)
+  real r(40000)
   complex c(NZ)
   complex cw(56,0:63)                   !Complex waveforms for codewords
   complex cwb(56)                       !Complex waveform for 'space'
@@ -75,27 +76,43 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 ! Should have a test here to reject non-JTMS signals
 
 ! We know DF, now find character sync.
-  fs=0.
+  r=0.
+  rmax=0.
   do i1=1,npts-55
      z=0.
+     ss=0.
      do i=1,56
+        ss=ss + abs(cdat(i+i1-1))
         z=z + cdat(i+i1-1)*conjg(cwb(i))
      enddo
-     z=0.001*z
-     j=mod(i1-1,56)+1
-     ss=abs(z)
-     fs(j)=fs(j)+ss
-  enddo
-
-  smax=0.
-  do j=1,56
-     if(fs(j).gt.smax) then
-        smax=fs(j)
-        i1=j
+     r(i1)=abs(z)/ss
+     if(r(i1).gt.0.85) then
+        j=mod(i1-1,56)+1
+        if(r(i1).gt.rmax) then
+           rmax=r(i1)
+           jpk=j
+        endif
+!        write(51,3009) i1,j,r(i1)
+!3009    format(2i5,f12.3)
      endif
   enddo
 
-!  rewind 51
+  i1=jpk-1
+  if(i1.lt.1) i1=i1+56
+
+  acfmax=0.
+  acf0=dot_product(r(1:npts),r(1:npts))
+  do k=8,28*56
+     fac=float(npts)/(npts-k)
+     acf=fac*dot_product(r(1:npts),r(1+k:npts+k))/acf0
+     if(acf.gt.acfmax) then
+        acfmax=acf
+        kpk=k
+     endif
+!     write(52,3008) k/56.0,acf
+!3008 format(2f12.3)
+  enddo
+!  print*,jpk,kpk,kpk/56.0
 
   msg=' '
   nchar=(npts-55-i1)/56
@@ -126,7 +143,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
      endif
      msg(j:j)=cc(kpk:kpk)
      if(kpk.eq.58) msg(j:j)=' '
-     if(smax/smax2.lt.1.05) msg(j:j)=' '               !Threshold test
+!     if(smax/smax2.lt.1.05) msg(j:j)=' '               !Threshold test
 !     write(51,3007) j,smax,phapk,phapk+6.283185307
 !3007 format(i5,3f12.3)
   enddo
@@ -139,6 +156,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 
   if(nline.le.99) nline=nline+1
   tping(nline)=t2
+!  write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
   write(line(nline),1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
 1110 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,f8.1,f6.2,i3,a2)
 

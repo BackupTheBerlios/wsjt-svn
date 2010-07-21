@@ -45,7 +45,7 @@ subroutine setupms(cw,cwb)
         enddo
      enddo
   enddo
-  cwb=cw(1:56,57)
+  cwb=cw(1:56,58)
 
   return
 end subroutine setupms
