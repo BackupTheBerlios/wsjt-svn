@@ -84,8 +84,6 @@ subroutine decode3(d2,jz,istart,filename)
   else if(mode.eq.'FSK441' .or. mode(1:5).eq.'ISCAT' .or.              &
        mode(1:4).eq.'JTMS') then
      nz=s2(1,1)
-!     if(mode(1:5).eq.'ISCAT' .or. mode(1:4).eq.'JTMS') nz=498  !### temporary!
-     if(mode(1:5).eq.'ISCAT') nz=498  !### temporary!
      call pix2d(d2d,jz,mousebutton,MouseDF,NFreeze,mode,s2,64,nz,b)
   else if(mode(1:4).eq.'JT6M' .and. mousebutton.eq.0) then
      nz=s2(1,1)
