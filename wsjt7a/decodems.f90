@@ -165,10 +165,12 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   ndf=nint(dfx)
 
   if(msglen.eq.0 .or. nchar.lt.max(20,2*msglen)) then
-     !  write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,nmatch,nsum
+     call cs_lock('decodems')
+!  write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,nmatch,nsum
      write(11,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
      write(21,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
 1110 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,2i5)
+     call cs_unlock
   else if(msglen.gt.0) then
      fs2=0.
      nfs2=0
@@ -208,11 +210,13 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
         i3=index(msg,' ')
         if(i3.gt.0 .and. i3.lt.msglen) msg28=msg(i3:msglen)//msg(1:msglen)
      endif
+     call cs_lock('decodems')
      write(11,1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
      write(21,1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
 1120 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,4x,'*',i5)
 !     write(*,1130) nrec,cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
 !1130 format(i3,1x,a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,4x,'*',i5)
+     call cs_unlock
   endif
 
 900 return

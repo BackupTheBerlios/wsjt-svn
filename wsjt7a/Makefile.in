@@ -51,10 +51,10 @@ OBJS1 = JT65code.o nchar.o grid2deg.o packmsg.o packtext.o \
 	wrapkarn.o cutil.o
 
 OBJS4	= t75.o analytic.o four2a.o decodems.o db.o pctile.o \
-	sort.o ssort.o setupms.o match.o
+	sort.o ssort.o setupms.o match.o thnix_stub.o 
 
 #smooth.o pctile.o db.o \
-#	thnix_stub.o  gen441.o abc441.o ping441.o \
+# 	thnix_stub.o gen441.o abc441.o ping441.o \
 #	indexx.o ping.o smo.o tweak1.o enc441.o pp441.o dec441.o \
 #	token.o msgtrim.o 
 
