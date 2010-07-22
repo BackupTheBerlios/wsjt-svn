@@ -14,10 +14,7 @@ subroutine iscat(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
   real fs0(128,108)                       !108 = 96 + 3*4
   real fs1(0:41,30)
   real savg(128)
-  real savg2(128)
   real b(128)
-  real ccfred(-10:10)
-  real ccfblue(0:95)
   real ccf(-5:540)
   real psavg(450)         !Average spectrum of the whole file
   integer dftolerance

@@ -67,7 +67,7 @@ C  Find the best frequency channel for CCF
 
       call zero(ccfred,901)
       do i=ia,ib
-         call xcor24(s2,i,nsteps,nsym,lag1,lag2,mode,mode4,
+         call xcor24(s2,i,nsteps,nsym,lag1,lag2,mode4,
      +        ccfblue,ccf0,lagpk0,flip)
          j=i-i0
          if(mode.eq.7) j=j + 3*mode4
@@ -111,7 +111,7 @@ C  Peak up in frequency to fraction of channel
       if(mode.eq.7) dfx=dfx + 3*mode4*df
 
 C  Peak up in time, at best whole-channel frequency
-      call xcor24(s2,ipk,nsteps,nsym,lag1,lag2,mode,mode4,
+      call xcor24(s2,ipk,nsteps,nsym,lag1,lag2,mode4,
      +  ccfblue,ccfmax,lagpk,flip)
       xlag=lagpk
       if(lagpk.gt.lag1 .and. lagpk.lt.lag2) then

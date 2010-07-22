@@ -104,7 +104,7 @@ C  Compute soft symbols using differential BPSK demodulation
          if(j.ge.1) symbol(j)=i4
       enddo
 
- 50   nbits=72+31
+      nbits=72+31
       delta=100
       limit=100000
       ncycles=0

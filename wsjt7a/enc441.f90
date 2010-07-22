@@ -2,7 +2,7 @@ subroutine enc441(msg0,msg2,len2)
 
 ! Encode an FSK441++ message
 
-  character*28 msg,msg0,msg1,msg2
+  character*28 msg,msg0,msg2
   character*4 tok(12)
   character*12 ctok
   integer ntok(12)

@@ -69,7 +69,7 @@ subroutine genms(msg,iwave,nwave)
      enddo
   enddo
 
-900 iwave(k+1:)=0
+  iwave(k+1:)=0
   nwave=k
 
   return

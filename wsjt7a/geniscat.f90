@@ -6,7 +6,6 @@ subroutine geniscat(msg,nmsg,shok,iwave,nwave,sendingsh,msgsent)
   character msg*28,msgsent*22
   integer*2 iwave(NMAX)
   integer sendingsh
-  logical first
   integer shok
   integer imsg(30)
   integer itone(NSZ)

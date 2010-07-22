@@ -54,10 +54,9 @@ subroutine getfile(fname,len)
   ndiskdat=1
   mousebutton=0
   close(10)
+  call cs_unlock
 
-999 call cs_unlock
   return
-
 end subroutine getfile
 
 subroutine check_endian

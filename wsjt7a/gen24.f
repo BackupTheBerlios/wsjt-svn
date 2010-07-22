@@ -1,4 +1,4 @@
-      subroutine gen24(message,mode,mode4,samfac,ntxdf,ndebug,
+      subroutine gen24(message,mode4,samfac,ntxdf,ndebug,
      +    iwave,nwave,sendingsh,msgsent,nmsg)
 
 C  Encode a JT4 message into a wavefile.

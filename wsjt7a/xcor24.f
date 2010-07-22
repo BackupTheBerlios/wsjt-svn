@@ -1,4 +1,4 @@
-      subroutine xcor24(s2,ipk,nsteps,nsym,lag1,lag2,mode,mode4,
+      subroutine xcor24(s2,ipk,nsteps,nsym,lag1,lag2,mode4,
      +  ccf,ccf0,lagpk,flip)
 
 C  Computes ccf of a row of s2 and the pseudo-random array pr2.  Returns

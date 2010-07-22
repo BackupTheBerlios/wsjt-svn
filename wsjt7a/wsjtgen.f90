@@ -17,7 +17,7 @@ subroutine wsjtgen
 
   integer   itone(84)
   character msg*28,msgsent*22,idmsg*22
-  real*8 freq,pha,dpha,twopi,dt,t
+  real*8 freq,pha,dpha,twopi,dt
   character testfile*27,tfile2*80
   logical lcwid
   integer*2 icwid(110250),jwave(NWMAX)
@@ -125,7 +125,7 @@ subroutine wsjtgen
         sendingsh=0
         msgsent=msg
      else if(mode(1:3).eq.'JT4' ) then
-        call gen24(msg,mode,mode4,samfacout,ntxdf,ndebug,iwave,nwave,      &
+        call gen24(msg,mode4,samfacout,ntxdf,ndebug,iwave,nwave,      &
              sendingsh,msgsent,nmsg0)
      else
         stop 'Unknown Tx mode requested.'

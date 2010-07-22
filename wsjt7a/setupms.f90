@@ -3,7 +3,7 @@ subroutine setupms(cw,cwb)
   complex cw(56,0:63)
   complex cwb(56)
   integer nb(7)
-  real*8 twopi,fs,dt,f0,f1
+  real*8 twopi,dt,f0,f1
   character cc*64
 !                   1         2         3         4         5         6
 !          0123456789012345678901234567890123456789012345678901234567890123
