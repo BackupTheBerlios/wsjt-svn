@@ -1228,7 +1228,7 @@ def left_arrow(event=NONE):
     n=5*int(Audio.gcom2.mousedf/5)
     if n==Audio.gcom2.mousedf: n=n-5
     Audio.gcom2.mousedf=n
-    
+
 #------------------------------------------------------ GenStdMsgs
 def GenStdMsgs(event=NONE):
     global altmsg,MyCall0,addpfx0,ToRadio0
@@ -1322,6 +1322,11 @@ def setmsg(template,r):
     MySuffix=t[n-3:]
     if MySuffix[0:1].isdigit()or MySuffix[1:2].isdigit():
         MySuffix=MySuffix[1:]
+    t=ToRadio.get()
+    n=len(t)
+    HisSuffix=t[n-3:]
+    if HisSuffix[0:1].isdigit()or HisSuffix[1:2].isdigit():
+        HisSuffix=HisSuffix[1:]
     npct=0
     for i in range(len(template)):
         if npct:
@@ -1331,6 +1336,7 @@ def setmsg(template,r):
             if template[i]=="G": msg=msg+options.MyGrid.get()[:4]
             if template[i]=="L": msg=msg+options.MyGrid.get()
             if template[i]=="S": msg=msg+MySuffix
+            if template[i]=="H": msg=msg+HisSuffix
             npct=0
         else:
             npct=0

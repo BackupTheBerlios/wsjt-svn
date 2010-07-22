@@ -164,12 +164,12 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   msg28=msg(ia:ib)
   ndf=nint(dfx)
 
-  if(msglen.eq.0) then
+  if(msglen.eq.0 .or. nchar.lt.max(20,2*msglen)) then
      !  write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,nmatch,nsum
      write(11,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
      write(21,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
 1110 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,2i5)
-  else
+  else if(msglen.gt.0) then
      fs2=0.
      nfs2=0
      do j=1,nchar                           !Fold s2 into fs2, modulo msglen
