@@ -5,11 +5,10 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 
   parameter (NZ=30*11025)
   real dat(npts)                        !Raw data
-  integer DFTolerance
-  character*6 cfile6
   complex cdat(NZ)                      !Analytic form of signal
-  real s(NZ)
-  real fs(56)
+  character*6 cfile6                    !FileID
+  integer DFTolerance
+  real s(NZ)                            !Power spectrum
   real sm(0:63)
   real r(40000)
   complex c(NZ)
@@ -30,18 +29,13 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   if(first) call setupms(cw,cwb)        !Calculate waveforms for codewords
   first=.false.
 
-  nsps=8
-  f0=1155.46875
+  nsps=8                                !Samples per symbol
+  f0=1155.46875                         !Nominal frequency for bit=0
   xn=log(float(npts))/log(2.0)
   n=xn
   if(xn-n .gt.0.001) n=n+1
   nfft1=2**n
-  nh1=nfft1/2
-  nq1=nfft1/4
   df1=11025.0/nfft1
-  ia=nint(11025.0/(3.0*nsps*df1))
-  ib=nint(dftolerance/df1)
-  i0=nint(f0/df1)
 
   call analytic(dat,npts,nfft1,s,cdat)        !Convert to analytic signal
 
@@ -61,7 +55,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   endif  
   ja=nint(fa/df1)
   jb=nint(fb/df1)
-  jd=nint(1378.125/df1)
+  jd=nfft1/nsps
 
   smax=0.
   do j=ja,jb
@@ -75,7 +69,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 
 ! Should have a test here to reject non-JTMS signals
 
-! We know DF, now find character sync.
+! DF is known, now find character sync.
   r=0.
   rmax=0.
   do i1=1,npts-55
@@ -156,7 +150,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 
   if(nline.le.99) nline=nline+1
   tping(nline)=t2
-!  write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
+  write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
   write(line(nline),1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
 1110 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,f8.1,f6.2,i3,a2)
 
