@@ -1,5 +1,5 @@
 subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
-     DFTolerance,MouseDF)
+     DFTolerance,MouseDF,mycall)
 
 ! Decode a JTMS ping
 
@@ -8,24 +8,31 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   complex cdat(NZ)                      !Analytic form of signal
   character*6 cfile6                    !FileID
   integer DFTolerance
+  character*12 mycall
   real s(NZ)                            !Power spectrum
+  real sq(NZ)                           !Double-frequency spectrum
   real sm(0:63)
-  real r(40000)
+  real s2(0:63,400)
+  real fs2(0:63,28)
+  integer nfs2(28)
+  real r(60000)
+  real acf(1568)
   complex c(NZ)
   complex cw(56,0:63)                   !Complex waveforms for codewords
   complex cwb(56)                       !Complex waveform for 'space'
-  complex z
+  complex z,zmax,zmax0
   logical first
   character msg*400,msg28*28
-  character*90 line
   character cc*64
 !                    1         2         3         4         5         6
 !          0123456789012345678901234567890123456789012345678901234567890123
   data cc/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ./?-                 _     @'/
   data first/.true./
-  save first,smax,cw,cwb           !Why is this needed for save?  But it is!
-  common/ccom/nline,tping(100),line(100)
+  data nsum/0/,nrec/0/
+  save nsum,nrec
+  save first,smax,cw,cwb              !Why is this needed for save?  But it is!
 
+  nrec=nrec+1
   if(first) call setupms(cw,cwb)        !Calculate waveforms for codewords
   first=.false.
 
@@ -60,14 +67,15 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   smax=0.
   do j=ja,jb
      ss=real(c(j))**2 + aimag(c(j))**2 + real(c(j+jd))**2 + aimag(c(j+jd))**2
+     sq(j)=ss
      if(ss.gt.smax) then
         smax=ss
         fpk=(j-1)*df1
      endif
   enddo
+  call pctile (sq(ja),r,jb-ja+1,50,base2)
+  if(smax/base2 .lt. 6.0) go to 900             !Reject non-JTMS signals
   dfx=0.5*fpk-f0
-
-! Should have a test here to reject non-JTMS signals
 
 ! DF is known, now find character sync.
   r=0.
@@ -80,35 +88,41 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
         z=z + cdat(i+i1-1)*conjg(cwb(i))
      enddo
      r(i1)=abs(z)/ss
-     if(r(i1).gt.0.85) then
-        j=mod(i1-1,56)+1
-        if(r(i1).gt.rmax) then
-           rmax=r(i1)
-           jpk=j
-        endif
-!        write(51,3009) i1,j,r(i1)
-!3009    format(2i5,f12.3)
+     if(r(i1).gt.rmax) then
+        rmax=r(i1)
+        jpk=mod(i1-1,56)+1
      endif
   enddo
 
-  i1=jpk-1
+  i1=jpk-3                                 !### Why is -3 best???  ###
   if(i1.lt.1) i1=i1+56
 
-  acfmax=0.
-  acf0=dot_product(r(1:npts),r(1:npts))
-  do k=8,28*56
-     fac=float(npts)/(npts-k)
-     acf=fac*dot_product(r(1:npts),r(1+k:npts+k))/acf0
-     if(acf.gt.acfmax) then
-        acfmax=acf
-        kpk=k
+  msglen=0                                 !Use ACF to find msg length
+  if(npts.ge.8*56) then
+     r=r-sum(r(1:npts))/npts
+     acfmax=0.
+     acf0=dot_product(r(1:npts),r(1:npts))
+     kz=min(npts/2,28*56)
+     do k=8,kz
+        fac=float(npts)/(npts-k)
+           acf(k)=fac*dot_product(r(1:npts),r(1+k:npts+k))/acf0
+        if(acf(k).gt.acfmax) then
+           acfmax=acf(k)
+           kpk=k
+        endif
+     enddo
+     if(acfmax.ge.0.45) then
+        msglen=nint(kpk/56.0)
+        dkpk=kpk/56.0-msglen
+        if(abs(dkpk).gt.0.03) go to 10
+        kh=kpk/2
+        if(mod(msglen,2).eq.0 .and. acf(kh).ge.0.8*acfmax) msglen=msglen/2
      endif
-!     write(52,3008) k/56.0,acf
-!3008 format(2f12.3)
-  enddo
-!  print*,jpk,kpk,kpk/56.0
+  endif
 
-  msg=' '
+10 msg=' '                                !Decode the message
+  zmax0=1.0
+  s2=0.
   nchar=(npts-55-i1)/56
   if(nchar.gt.400) nchar=400
   do j=1,nchar
@@ -120,10 +134,11 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
            z=z + cdat(ia+i)*conjg(cw(i,k))
         enddo
         ss=abs(z)
+        s2(k,j)=ss
         sm(k)=ss
         if(ss.gt.smax) then
            smax=ss
-           phapk=atan2(aimag(z),real(z))
+           zmax=z
            kpk=k
         endif
      enddo
@@ -132,14 +147,15 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
      do k=0,63
         smax2=max(smax2,sm(k))
      enddo
-     if(kpk.lt.1) then
-        kpk=64
-     endif
+     if(kpk.lt.1) kpk=58
      msg(j:j)=cc(kpk:kpk)
      if(kpk.eq.58) msg(j:j)=' '
-!     if(smax/smax2.lt.1.05) msg(j:j)=' '               !Threshold test
-!     write(51,3007) j,smax,phapk,phapk+6.283185307
+!     if(smax/smax2.lt.1.025) msg(j:j)=' '               !Threshold test
+     phapk=atan2(aimag(zmax),real(zmax))
+     dphapk=atan2(aimag(zmax/zmax0),real(zmax/zmax0))
+!     write(51,3007) j,smax,phapk,dphapk
 !3007 format(i5,3f12.3)
+     zmax0=zmax
   enddo
 !  call flush(51)
 
@@ -148,11 +164,56 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   msg28=msg(ia:ib)
   ndf=nint(dfx)
 
-  if(nline.le.99) nline=nline+1
-  tping(nline)=t2
-  write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
-  write(line(nline),1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
-1110 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,f8.1,f6.2,i3,a2)
+  if(msglen.eq.0) then
+     !  write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,nmatch,nsum
+     write(11,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
+     write(21,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
+1110 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,2i5)
+  else
+     fs2=0.
+     nfs2=0
+     do j=1,nchar                           !Fold s2 into fs2, modulo msglen
+        jj=mod(j-1,msglen)+1
+        nfs2(jj)=nfs2(jj)+1
+        do i=0,63
+           fs2(i,jj)=fs2(i,jj) + s2(i,j)
+        enddo
+     enddo
 
-  return
+     msg=' '
+     do j=1,msglen
+        smax=0.
+        do k=0,63
+           if(fs2(k,j).gt.smax) then
+              smax=fs2(k,j)
+              kpk=k
+           endif
+        enddo
+        sm(kpk)=0.
+        smax2=0.
+        do k=0,63
+           smax2=max(smax2,sm(k))
+        enddo
+        if(kpk.lt.1) kpk=58
+        msg(j:j)=cc(kpk:kpk)
+        if(kpk.eq.58) msg(j:j)=' '
+     enddo
+     msg28=msg(1:msglen)
+     call match(mycall,msg28(1:msglen),nstart,nmatch)
+     if(nmatch.ge.3 .and.nstart.gt.1) then
+        msg28=msg(nstart:msglen)//msg(1:nstart-1)
+     else if(nmatch.ge.3 .and.nstart.eq.1) then
+        msg28=msg(1:msglen)
+     else
+        i3=index(msg,' ')
+        if(i3.gt.0 .and. i3.lt.msglen) msg28=msg(i3:msglen)//msg(1:msglen)
+     endif
+     write(11,1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
+     write(21,1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
+1120 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,4x,'*',i5)
+!     write(*,1130) nrec,cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
+!1130 format(i3,1x,a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,4x,'*',i5)
+  endif
+
+900 return
 end subroutine decodems

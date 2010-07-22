@@ -1,5 +1,5 @@
       subroutine mtdecode(dat,jz,nz,MinSigdB,MinWidth,NQRN,NFreeze,
-     +    DFTolerance,MouseDF,istart,pick,cfile6,n441pp,mode,ps0)
+     +   DFTolerance,MouseDF,istart,pick,cfile6,mycall,n441pp,mode,ps0)
 
 C  Decode Multi-Tone FSK441 mesages.
 
@@ -8,6 +8,7 @@ C  Decode Multi-Tone FSK441 mesages.
       integer DFTolerance
       logical pick
       character*6 cfile6
+      character*12 mycall
 
       real sigdb(3100)             !Detected signal in dB, sampled at 20 ms
       real work(3100)
@@ -120,7 +121,7 @@ C  Assemble a signal report:
 !            write(75) cfile6,t2,mswidth,int(peak),nrpt,jjz,
 !     +      (dat(jj+j),j=1,jjz)
             call decodems(dat(jj),jjz,cfile6,t2,mswidth,int(peak),
-     +           nrpt,nfreeze,DFTolerance,MouseDF)
+     +           nrpt,nfreeze,DFTolerance,MouseDF,mycall)
             go to 100
          endif
 

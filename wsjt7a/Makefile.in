@@ -51,7 +51,7 @@ OBJS1 = JT65code.o nchar.o grid2deg.o packmsg.o packtext.o \
 	wrapkarn.o cutil.o
 
 OBJS4	= t75.o analytic.o four2a.o decodems.o db.o pctile.o \
-	sort.o ssort.o setupms.o
+	sort.o ssort.o setupms.o match.o
 
 #smooth.o pctile.o db.o \
 #	thnix_stub.o  gen441.o abc441.o ping441.o \
@@ -77,7 +77,7 @@ F2PYONLY = ftn_init ftn_quit audio_init spec getfile azdist0 astro0 chkt0
 SRCS2F90 = abc441.f90 astro0.f90 audio_init.f90 azdist0.f90 \
 	blanker.f90 decode1.f90 decode2.f90 decode3.f90 ftn_init.f90 \
 	ftn_quit.f90 get_fname.f90 getfile.f90 horizspec.f90 hscroll.f90 \
-	pix2d.f90 pix2d65.f90 rfile.f90 savedata.f90 spec.f90 \
+	pix2d.f90 pix2d65.f90 rfile.f90 savedata.f90 spec.f90 match.f90 \
 	wsjtgen.f90 fivehz.f90 chkt0.f90 gran.f90 makepings.f90 \
 	packpfx.f90 unpackpfx.f90 genms.f90 decodems.f90 setupms.f90 \
 	thnix.f90 enc441.f90 pp441.f90 tweak1.f90 smo.f90 analytic.f90 \
