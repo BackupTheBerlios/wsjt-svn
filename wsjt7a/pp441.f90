@@ -216,6 +216,7 @@ subroutine pp441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,     &
         if(i4.gt.4) msg2=msg2(:i4-2)
         call msgtrim(msg2,junk)
         if(msg2.ne.msg0) then
+           call cs_lock('pp441')
            if(ncon.ne.0) write(*,1110) cfile6,tbest,mswidth,npeak,     &
                 nrpt,nint(dfx),msg2,ccfmax,sbest/ccfmax,n2,'+ '
 1110       format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,f8.1,f6.2,i3,a2)
@@ -223,6 +224,7 @@ subroutine pp441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,     &
            tping(nline)=t2
            write(line(nline),1110) cfile6,t2,mswidth,npeak,        &
                 nrpt,nint(dfx),msg2,ccfmax,sbest/ccfmax,n2,'+ '
+           call cs_unlock
            msg0=msg2
         endif
      endif

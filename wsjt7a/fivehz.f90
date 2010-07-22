@@ -157,24 +157,6 @@ subroutine fivehz
      ibuf00=ibuf0
   endif
 
-! Diagnostic timing information:
-!  t60=mod(tsec,60.d0)
-!  if(TxOK.ne.TxOKz) then
-!     if(TxOK.eq.1) write(*,1101) 'D2:',t
-!1101 format(a3,f8.1,i8)
-!     if(TxOK.eq.0) then
-!        tstop=tsec
-!        write(*,1101) 'D3:',t,nc0a
-!     endif
-!  endif
-!  if(iptt.ne.iptt0) then
-!     if(iptt.eq.1) then
-!        tstart=tsec
-!        write(*,1101) 'D1:',t,nc1a
-!     endif
-!     if(iptt.eq.0) write(*,1101) 'D4:',t
-!  endif
-
   iptt0=iptt
   TxOKz=TxOK
   ntr0=ntr

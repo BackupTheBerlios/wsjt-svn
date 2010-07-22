@@ -213,11 +213,11 @@ subroutine iscat(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
   isync=xsync
   if(navg.le.0) msg=' '
 
+  call cs_lock('iscat')
   write(11,1020) cfile6,nsig,ndf0,msg,msglen,nworst,navg
   write(21,1020) cfile6,nsig,ndf0,msg,msglen,nworst,navg
 1020 format(a6,i5,i5,6x,a28,i4,2i3)
-  call flush(11)
-  call flush(21)
+  call cs_unlock
 
 900 return
 end subroutine iscat
