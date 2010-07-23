@@ -22,6 +22,8 @@ from WsjtMod.palettes import colormapblue, colormapgray0, colormapHot, \
      colormapAFMHot, colormapgray1, colormapLinrad, Colormap2Palette
 from types import *
 import array
+import thread
+import webbrowser
 
 root = Tk()
 Version="7.1 r" + "$Rev$"[6:-1]
@@ -940,6 +942,16 @@ VK7ABC K1JT RRR
 """
     Label(screenf5s,text=t,justify=LEFT).pack(padx=20)
     screenf5s.focus_set()
+
+#------------------------------------------------------ usersguide
+def usersguide(event=NONE):
+    url='http://physics.princeton.edu/pulsar/K1JT/wsjt7a.txt'
+    thread.start_new_thread(browser,(url,))
+
+#------------------------------------------------------- browser
+def browser(url):
+    webbrowser.open(url)
+
 #------------------------------------------------------ prefixes
 def prefixes(event=NONE):
     pfx=Toplevel(root)
@@ -2040,6 +2052,7 @@ else:
    helpmenu = Menu(mbar, tearoff=0)
 helpmenu.add('command', label = 'Keyboard shortcuts', command = shortcuts, \
              accelerator='F1')
+helpmenu.add('command',label="Online User's Guide",command=usersguide)
 helpmenu.add('command', label = 'Special mouse commands', \
              command = mouse_commands, accelerator='Shift+F1')
 helpmenu.add('command', label = 'What message to send?', \

@@ -39,10 +39,8 @@ subroutine geniscat(msg,nmsg,shok,iwave,nwave,sendingsh,msgsent)
         read(msg(2:4),*,err=10) m
         if(m.lt.-20) m=-20
         if(m.gt.10) m=10
-        call cs_lock('geniscat')
         write(msgsent,1002) m
 1002    format('R',i3)
-        call cs_unlock
         if(msgsent(2:2).eq.' ') msgsent=msgsent(1:1)//msgsent(3:)
         if(msgsent(2:2).eq.' ') msgsent=msgsent(1:1)//msgsent(3:)
         n=irpt(m+21)
