@@ -325,7 +325,7 @@ subroutine wsjt1(d,jz0,istart,samfacin,FileID,ndepth,              &
 !        write(72) jz,nz,cfile6,(dat(j),j=1,jz)
   call mtdecode(dat,jz,nz,MinSigdB,MinWidth,NQRN,NFreeze,              &
        DFTolerance,MouseDF,istart,pick,cfile6,mycall,n441pp,mode,ps0)
-  if(mode.eq.8) go to 800
+!  if(mode.eq.8) go to 800
 
   npkept=nline             !Number of pings that were kept
   smax=0.

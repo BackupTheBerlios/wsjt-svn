@@ -25,6 +25,8 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   character msg*400,msg28*28
   character cc*64
   integer np(8)
+  character*90 line
+  common/ccom/nline,tping(100),line(100)
   data np/5,7,11,13,17,19,23,29/        !Permissible message lengths
 !                    1         2         3         4         5         6
 !          0123456789012345678901234567890123456789012345678901234567890123
@@ -176,10 +178,13 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   ndf=nint(dfx)
 
   if(msglen.eq.0 .or. nchar.lt.max(20,2*msglen)) then
+
+     if(nline.le.99) nline=nline+1
+     tping(nline)=t2
      call cs_lock('decodems')
 !  write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,nmatch,nsum
-     write(11,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
-     write(21,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
+     write(line(nline),1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
+!     write(21,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
 1110 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,2i5)
      call cs_unlock
   else if(msglen.gt.0) then
@@ -226,9 +231,11 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
            if(i3.gt.0 .and. i3.lt.msglen) msg28=msg(i3:msglen)//msg(1:msglen)
         endif
      endif
+     if(nline.le.99) nline=nline+1
+     tping(nline)=t2
      call cs_lock('decodems')
-     write(11,1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
-     write(21,1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
+     write(line(nline),1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
+!     write(21,1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
 1120 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,4x,'*',i5)
 !     write(*,1130) nrec,cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
 !1130 format(i3,1x,a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,4x,'*',i5)
