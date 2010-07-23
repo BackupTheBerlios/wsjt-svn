@@ -17,7 +17,7 @@ CFLAGS = -I. -fbounds-check
 %.o: %.F90
 	${FC} ${FFLAGS} -c $<
 
-all:    WSJT7.EXE t74
+all:    WSJT7.EXE
 
 OBJS1 = JT65code.o nchar.o grid2deg.o packmsg.o packtext.o \
 	packcall.o packgrid.o unpackmsg.o unpacktext.o \

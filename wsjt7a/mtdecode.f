@@ -120,7 +120,8 @@ C  Assemble a signal report:
          if(mode.eq.8) then
 !            write(75) cfile6,t2,mswidth,int(peak),nrpt,jjz,
 !     +      (dat(jj+j),j=1,jjz)
-            call decodems(dat(jj),jjz,cfile6,t2,mswidth,int(peak),
+            jjzz=min(jjz,2*11025)       !Max data size 2 s 
+            call decodems(dat(jj),jjzz,cfile6,t2,mswidth,int(peak),
      +           nrpt,nfreeze,DFTolerance,MouseDF,mycall)
             go to 100
          endif

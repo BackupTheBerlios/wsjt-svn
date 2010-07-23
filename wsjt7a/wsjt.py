@@ -242,6 +242,7 @@ def dbl_click3_text(event):
         n=t1.rfind("\n")
         rpt=t1[n+12:n+15]
         if rpt[0:1] == " ": rpt=rpt[1:]
+        if rpt[:1]=='-' and len(rpt)==2: rpt=rpt[0:1]+'0'+rpt[1:2]
         dbl_click_call(t,t1,rpt,event)
 
 #------------------------------------------------------ dbl_click_ave
