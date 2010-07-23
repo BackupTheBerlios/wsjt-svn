@@ -3,11 +3,13 @@ subroutine genms(msg,iwave,nwave)
 ! Generate a JTMS wavefile.
 
   parameter (NMAX=30*11025)     !Max length of wave file
+  integer*2 iwave(NMAX)         !Generated wave file
   character*28 msg              !Message to be generated
   character cc*64
   integer sent(196)
   real*8 dt,phi,f,f0,dfgen,dphi,twopi,foffset
-  integer*2 iwave(NMAX)         !Generated wave file
+  integer np(8)
+  data np/5,7,11,13,17,19,23,29/  !Permissible message lengths
 !                   1         2         3         4         5         6
 !          0123456789012345678901234567890123456789012345678901234567890123
   data cc/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ./?-                 _     @'/
@@ -15,8 +17,13 @@ subroutine genms(msg,iwave,nwave)
   do i=28,1,-1                                 !Find user's message length
      if(msg(i:i).ne.' ') go to 1
   enddo
-1 msglen=i+1                                   !Add one for space at EOM
-  if(msglen.gt.28) msglen=28
+1 iz=i+1                                       !Add one for space at EOM
+  do i=1,8
+     if(np(i).ge.iz) go to 2
+  enddo
+  i=8
+2 msglen=np(i)
+  print*,msglen,' ',msg
 
 ! Convert message to a bit sequence, 7 bits per character (6 + even parity)
   sent=0
