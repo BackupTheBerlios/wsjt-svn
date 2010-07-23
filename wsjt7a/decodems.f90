@@ -16,7 +16,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   real fs2(0:63,28)
   integer nfs2(28)
   real r(60000)
-  real acf(1568)
+  real acf(1624)
   complex c(NZ)
   complex cw(56,0:63)                   !Complex waveforms for codewords
   complex cwb(56)                       !Complex waveform for 'space'
@@ -24,6 +24,8 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   logical first
   character msg*400,msg28*28
   character cc*64
+  integer np(8)
+  data np/5,7,11,13,17,19,23,29/        !Permissible message lengths
 !                    1         2         3         4         5         6
 !          0123456789012345678901234567890123456789012345678901234567890123
   data cc/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ./?-                 _     @'/
@@ -111,13 +113,21 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
            kpk=k
         endif
      enddo
-     if(acfmax.ge.0.45) then
-        msglen=nint(kpk/56.0)
-        dkpk=kpk/56.0-msglen
-        if(abs(dkpk).gt.0.03) go to 10
-        kh=kpk/2
-        if(mod(msglen,2).eq.0 .and. acf(kh).ge.0.8*acfmax) msglen=msglen/2
-     endif
+!     if(acfmax.ge.0.45) then
+!        msglen=nint(kpk/56.0)
+!        dkpk=kpk/56.0-msglen
+!        if(abs(dkpk).gt.0.03) go to 10
+!        kh=kpk/2
+!        if(mod(msglen,2).eq.0 .and. acf(kh).ge.0.8*acfmax) msglen=msglen/2
+!     endif
+     amax2=0
+     do i=1,8
+        k=56*np(i)
+        if(acf(k).gt.0.45 .and. acf(k).gt.amax2) then
+           amax2=acf(k)
+           msglen=np(i)
+        endif
+     enddo
   endif
 
 10 msg=' '                                !Decode the message
@@ -128,10 +138,12 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   do j=1,nchar
      ia=i1 + (j-1)*56
      smax=0.
-     do k=0,63
+     do k=0,40
+        kk=k
+        if(k.eq.40) kk=57
         z=0.
         do i=1,56
-           z=z + cdat(ia+i)*conjg(cw(i,k))
+           z=z + cdat(ia+i)*conjg(cw(i,kk))
         enddo
         ss=abs(z)
         s2(k,j)=ss
@@ -139,17 +151,16 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
         if(ss.gt.smax) then
            smax=ss
            zmax=z
-           kpk=k
+           kpk=kk
         endif
      enddo
      sm(kpk)=0.
      smax2=0.
-     do k=0,63
+     do k=0,40
         smax2=max(smax2,sm(k))
      enddo
-     if(kpk.lt.1) kpk=58
-     msg(j:j)=cc(kpk:kpk)
-     if(kpk.eq.58) msg(j:j)=' '
+     msg(j:j)=cc(kpk+1:kpk+1)
+     if(kpk.eq.57) msg(j:j)=' '
 !     if(smax/smax2.lt.1.025) msg(j:j)=' '               !Threshold test
      phapk=atan2(aimag(zmax),real(zmax))
      dphapk=atan2(aimag(zmax/zmax0),real(zmax/zmax0))
@@ -177,7 +188,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
      do j=1,nchar                           !Fold s2 into fs2, modulo msglen
         jj=mod(j-1,msglen)+1
         nfs2(jj)=nfs2(jj)+1
-        do i=0,63
+        do i=0,40
            fs2(i,jj)=fs2(i,jj) + s2(i,j)
         enddo
      enddo
@@ -185,7 +196,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
      msg=' '
      do j=1,msglen
         smax=0.
-        do k=0,63
+        do k=0,40
            if(fs2(k,j).gt.smax) then
               smax=fs2(k,j)
               kpk=k
@@ -193,12 +204,12 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
         enddo
         sm(kpk)=0.
         smax2=0.
-        do k=0,63
+        do k=0,40
            smax2=max(smax2,sm(k))
         enddo
-        if(kpk.lt.1) kpk=58
-        msg(j:j)=cc(kpk:kpk)
-        if(kpk.eq.58) msg(j:j)=' '
+        if(kpk.eq.40) kpk=57
+        msg(j:j)=cc(kpk+1:kpk+1)
+        if(kpk.eq.57) msg(j:j)=' '
      enddo
      msg28=msg(1:msglen)
      call match(mycall,msg28(1:msglen),nstart,nmatch)
@@ -207,8 +218,13 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
      else if(nmatch.ge.3 .and.nstart.eq.1) then
         msg28=msg(1:msglen)
      else
-        i3=index(msg,' ')
-        if(i3.gt.0 .and. i3.lt.msglen) msg28=msg(i3:msglen)//msg(1:msglen)
+        i3=index(msg,'  ')
+        if(i3.gt.0 .and. i3.le.msglen-2) then
+           msg28=msg(i3+2:msglen)//msg(1:msglen)
+        else
+           i3=index(msg,' ')
+           if(i3.gt.0 .and. i3.lt.msglen) msg28=msg(i3:msglen)//msg(1:msglen)
+        endif
      endif
      call cs_lock('decodems')
      write(11,1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen

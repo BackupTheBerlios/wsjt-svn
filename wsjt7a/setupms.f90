@@ -23,7 +23,7 @@ subroutine setupms(cw,cwb)
      m=0
      do n=5,0,-1                            !Each character gets 6+1 bits
         k=k+1
-        nb(k)=iand(1,ishft(i-1,-n))
+        nb(k)=iand(1,ishft(i,-n))
         m=m+nb(k)
      enddo
      k=k+1
@@ -45,7 +45,7 @@ subroutine setupms(cw,cwb)
         enddo
      enddo
   enddo
-  cwb=cw(1:56,58)
+  cwb=cw(1:56,57)
 
   return
 end subroutine setupms
