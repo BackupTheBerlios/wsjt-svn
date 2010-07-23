@@ -74,11 +74,16 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
      sq(j)=ss
      if(ss.gt.smax) then
         smax=ss
+        jpk=j
         fpk=(j-1)*df1
      endif
   enddo
   call pctile (sq(ja),r,jb-ja+1,50,base2)
-  if(smax/base2 .lt. 6.0) go to 900             !Reject non-JTMS signals
+  ss1=real(c(jpk))**2 + aimag(c(jpk))**2
+  ss2=real(c(jpk+jd))**2 + aimag(c(jpk+jd))**2
+  if(smax/base2 .lt. 6.0) go to 900                   !Reject non-JTMS signals
+  if(ss1.lt.0.1*smax .or. ss2.lt.0.1*smax) go to 900
+  if(ss1/base2.lt.1.0 .or. ss2/base2.lt.1.0) go to 900
   dfx=0.5*fpk-f0
 
 ! DF is known, now find character sync.
