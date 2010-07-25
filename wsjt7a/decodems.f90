@@ -35,6 +35,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   data nsum/0/,nrec/0/
   save nsum,nrec
   save first,smax,cw,cwb              !Why is this needed for save?  But it is!
+  save c,cdat
 
   nrec=nrec+1
   if(first) call setupms(cw,cwb)        !Calculate waveforms for codewords
