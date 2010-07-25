@@ -33,7 +33,7 @@ subroutine four2a(a,nfft,ndim,isign,iform)
      if(nfft.eq.nn(i) .and. isign.eq.ns(i) .and.                     &
           iform.eq.nf(i) .and. nloc.eq.nl(i)) go to 10
   enddo
-  if(nplan.ge.NPMAX) stop 'Too many FFTW plans requested.'
+  if(nplan.ge.NPMAX) go to 999
   nplan=nplan+1
   i=nplan
   nn(i)=nfft
@@ -87,6 +87,16 @@ subroutine four2a(a,nfft,ndim,isign,iform)
 999 do i=1,nplan
      call sfftw_destroy_plan(plan(i))
   enddo
+  if(ndim.lt.0 .or. nplan.ge.NPMAX) then
+     open(24,file='FFT_plans.txt',status='unknown')
+     do i=1,nplan
+        write(24,1999) i,nn(i),ns(i),nf(i),nl(i)
+1999    format(5i10)
+     enddo
+     call flush(24)
+     if(nplan.ge.NPMAX) stop 'Too many FFTW plans requested.'
+  endif
+  print*,nplan,' FFT plans'
 
   return
 end subroutine four2a

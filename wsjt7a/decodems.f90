@@ -241,7 +241,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
      call cs_lock('decodems')
      write(line(nline),1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
 !     write(21,1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
-1120 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,4x,'*',i5)
+1120 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,10x,i5,'*')
 !     write(*,1130) nrec,cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
 !1130 format(i3,1x,a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,4x,'*',i5)
      call cs_unlock
