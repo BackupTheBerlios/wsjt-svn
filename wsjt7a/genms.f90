@@ -1,14 +1,15 @@
-subroutine genms(msg28,iwave,nwave)
+subroutine genms(msg28,samfac,iwave,cwave,isrch,dfx,nwave)
 
 ! Generate a JTMS wavefile.
 
   parameter (NMAX=30*11025)     !Max length of wave file
   integer*2 iwave(NMAX)         !Generated wave file
+  complex cwave(NMAX)           !Alternative for searchms
   character*28 msg28            !User message
   character*29 msg
   character cc*64
   integer sent(196)
-  real*8 dt,phi,f,f0,dfgen,dphi,twopi,foffset
+  real*8 dt,phi,f,f0,dfgen,dphi,twopi,foffset,samfac
   integer np(8)
   data np/5,7,11,13,17,19,23,29/  !Permissible message lengths
 !                   1         2         3         4         5         6
@@ -20,6 +21,8 @@ subroutine genms(msg28,iwave,nwave)
      if(msg(i:i).ne.' ') go to 1
   enddo
 1 iz=i+1                                       !Add one for space at EOM
+  msglen=iz
+  if(isrch.ne.0) go to 3
   do i=1,8
      if(np(i).ge.iz) go to 2
   enddo
@@ -27,7 +30,7 @@ subroutine genms(msg28,iwave,nwave)
 2 msglen=np(i)
 
 ! Convert message to a bit sequence, 7 bits per character (6 + even parity)
-  sent=0
+3  sent=0
   k=0
   do j=1,msglen
      if(msg(j:j).eq.' ') then
@@ -52,14 +55,15 @@ subroutine genms(msg28,iwave,nwave)
  ! Set up necessary constants
   twopi=8.d0*atan(1.d0)
   nsps=8
-  dt=1.d0/11025.d0
+  dt=1.d0/(samfac*11025.d0)
   f0=11025.d0/nsps                               ! 1575.0 Hz
   dfgen=0.5d0*f0                                 !  787.5 Hz
-  foffset=1500.d0 - f0
+  foffset=1500.d0 - f0 + dfx
   t=0.d0
   k=0
   phi=0.d0
   nrpt=NMAX/(nsym*nsps)
+  if(isrch.ne.0) nrpt=1
 
   do irpt=1,nrpt
      do j=1,nsym
@@ -72,12 +76,16 @@ subroutine genms(msg28,iwave,nwave)
         do i=1,nsps
            k=k+1
            phi=phi+dphi
-           iwave(k)=nint(32767.0*sin(phi))
+           if(isrch.eq.0) then
+              iwave(k)=nint(32767.0*sin(phi))
+           else
+              cwave(k)=cmplx(cos(phi),sin(phi))
+           endif
         enddo
      enddo
   enddo
 
-  iwave(k+1:)=0
+  if(isrch.eq.0) iwave(k+1:)=0
   nwave=k
 
   return

@@ -16,6 +16,8 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   real fs2(0:63,28)
   integer nfs2(28)
   real r(60000)
+  real fr(56)
+  integer nfr(56)
   real acf(1624)
   complex c(NZ)
   complex cw(56,0:63)                   !Complex waveforms for codewords
@@ -58,6 +60,13 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   c(npts+1:nfft1)=0.
   call four2a(c,nfft1,1,-1,1)
 
+  rewind 52
+  do i=1,nfft1/2+1
+     ss=real(c(i))**2 + aimag(c(i))**2
+     write(52,5001) df1*(i-1),ss
+5001 format(f10.3,f12.3)
+  enddo
+
 ! In the "doubled-frequencies" spectrum of squared cdat:
   fa=2.0*(f0-400)
   fb=2.0*(f0+400)
@@ -82,6 +91,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   call pctile (sq(ja),r,jb-ja+1,50,base2)
   ss1=real(c(jpk))**2 + aimag(c(jpk))**2
   ss2=real(c(jpk+jd))**2 + aimag(c(jpk+jd))**2
+  print*,nrec,smax/base2,ss1,ss2,smax
   if(smax/base2 .lt. 6.0) go to 900                   !Reject non-JTMS signals
   if(ss1.lt.0.1*smax .or. ss2.lt.0.1*smax) go to 900
   if(ss1/base2.lt.1.0 .or. ss2/base2.lt.1.0) go to 900
@@ -89,6 +99,8 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 
 ! DF is known, now find character sync.
   r=0.
+  fr=0.
+  nfr=0
   rmax=0.
   do i1=1,npts-55
      z=0.
@@ -97,15 +109,34 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
         ss=ss + abs(cdat(i+i1-1))
         z=z + cdat(i+i1-1)*conjg(cwb(i))
      enddo
-     r(i1)=abs(z)/ss
+!     r(i1)=abs(z)/ss
+     r(i1)=abs(z)
+     k=mod(i1-1,56)+1
+     fr(k)=fr(k)+r(i1)
+     nfr(k)=nfr(k)+1
+!     write(52,5001) i1,abs(z),ss,r(i1)
+!5001 format(i6,3f12.3)
      if(r(i1).gt.rmax) then
         rmax=r(i1)
-        jpk=mod(i1-1,56)+1
+        jpk=i1
      endif
   enddo
 
-  i1=jpk-3                                 !### Why is -3 best???  ###
-  if(i1.lt.1) i1=i1+56
+  rmax=0.
+  do i=1,56
+     fr(i)=fr(i)/nfr(i)
+     if(fr(i).gt.rmax) then
+        rmax=fr(i)
+        ipk=i
+     endif
+!     write(52,5002) i,fr(i),nfr(i)
+!5002 format(i6,f12.3,i6)
+  enddo
+
+!  i1=mod(jpk-1,56)+1-3                     !### Better solution needed?  ###
+!  if(i1.lt.1) i1=i1+56
+!  print*,'A',jpk,i1,ipk
+  i1=ipk-3
 
   msglen=0                                 !Use ACF to find msg length
   if(npts.ge.8*56) then
@@ -121,13 +152,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
            kpk=k
         endif
      enddo
-!     if(acfmax.ge.0.45) then
-!        msglen=nint(kpk/56.0)
-!        dkpk=kpk/56.0-msglen
-!        if(abs(dkpk).gt.0.03) go to 10
-!        kh=kpk/2
-!        if(mod(msglen,2).eq.0 .and. acf(kh).ge.0.8*acfmax) msglen=msglen/2
-!     endif
+
      amax2=0
      do i=1,8
         k=56*np(i)
@@ -138,11 +163,12 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
      enddo
   endif
 
-10 msg=' '                                !Decode the message
+  msg=' '                                !Decode the message
   zmax0=1.0
   s2=0.
   nchar=(npts-55-i1)/56
   if(nchar.gt.400) nchar=400
+!  call searchms(cdat(i1),npts,nchar,dfx)
   do j=1,nchar
      ia=i1 + (j-1)*56
      smax=0.
@@ -176,7 +202,6 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 !3007 format(i5,3f12.3)
      zmax0=zmax
   enddo
-!  call flush(51)
 
   ia=max(1,nchar/3)
   ib=min(ia+27,nchar)
@@ -188,12 +213,13 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
      if(nline.le.99) nline=nline+1
      tping(nline)=t2
      call cs_lock('decodems')
-!  write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,nmatch,nsum
+!     write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,nmatch,nsum
      write(line(nline),1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
 !     write(21,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
 1110 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,2i5)
      call cs_unlock
   else if(msglen.gt.0) then
+!   if(msglen.gt.0) then
      fs2=0.
      nfs2=0
      do j=1,nchar                           !Fold s2 into fs2, modulo msglen
@@ -244,9 +270,12 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 !     write(21,1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
 1120 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,10x,i5,'*')
 !     write(*,1130) nrec,cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
-!1130 format(i3,1x,a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,4x,'*',i5)
+1130 format(i3,1x,a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,10x,i5'*')
      call cs_unlock
-  endif
+   endif
 
-900 return
+900 continue
+  call flush(52)
+
+  return
 end subroutine decodems

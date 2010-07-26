@@ -1,4 +1,4 @@
-subroutine geniscat(msg,nmsg,shok,iwave,nwave,sendingsh,msgsent)
+subroutine geniscat(msg,nmsg,samfac,shok,iwave,nwave,sendingsh,msgsent)
 
 ! Generate an ISCAT_2 waveform.
 
@@ -10,7 +10,7 @@ subroutine geniscat(msg,nmsg,shok,iwave,nwave,sendingsh,msgsent)
   integer imsg(30)
   integer itone(NSZ)
   character c*42
-  real*8 twopi,dt,f0,f,df,pha,dpha
+  real*8 twopi,dt,f0,f,df,pha,dpha,samfac
   integer icos(4)
   integer irpt(31)
   data icos/0,1,3,2/
@@ -21,7 +21,7 @@ subroutine geniscat(msg,nmsg,shok,iwave,nwave,sendingsh,msgsent)
 
   twopi=8.d0*atan(1.d0)
   df=11025.d0/NSPS
-  dt=1.d0/11025.d0
+  dt=1.0/(samfac*11025.0)
   f0=13*df
   nsym=NMAX/NSPS
   sendingsh=0
