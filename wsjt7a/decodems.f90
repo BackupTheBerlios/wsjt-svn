@@ -91,7 +91,6 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   call pctile (sq(ja),r,jb-ja+1,50,base2)
   ss1=real(c(jpk))**2 + aimag(c(jpk))**2
   ss2=real(c(jpk+jd))**2 + aimag(c(jpk+jd))**2
-  print*,nrec,smax/base2,ss1,ss2,smax
   if(smax/base2 .lt. 6.0) go to 900                   !Reject non-JTMS signals
   if(ss1.lt.0.1*smax .or. ss2.lt.0.1*smax) go to 900
   if(ss1/base2.lt.1.0 .or. ss2/base2.lt.1.0) go to 900
@@ -137,6 +136,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 !  if(i1.lt.1) i1=i1+56
 !  print*,'A',jpk,i1,ipk
   i1=ipk-3
+  if(i1.lt.1) i1=i1+56
 
   msglen=0                                 !Use ACF to find msg length
   if(npts.ge.8*56) then

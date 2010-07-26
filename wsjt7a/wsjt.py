@@ -237,8 +237,7 @@ def dbl_click_text(event):
 
 #------------------------------------------------------ dbl_click3_text
 def dbl_click3_text(event):
-    if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4' \
-           or mode.get()[:5]=='ISCAT':
+    if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4':
         t=text.get('1.0',END)           #Entire contents of text box
         t1=text.get('1.0',CURRENT)      #Contents from start to mouse pointer
         n=t1.rfind("\n")
@@ -246,6 +245,17 @@ def dbl_click3_text(event):
         if rpt[0:1] == " ": rpt=rpt[1:]
         if rpt[:1]=='-' and len(rpt)==2: rpt=rpt[0:1]+'0'+rpt[1:2]
         dbl_click_call(t,t1,rpt,event)
+
+    if mode.get()[:5]=='ISCAT':
+        t=text.get('1.0',END)           #Entire contents of text box
+        t1=text.get('1.0',CURRENT)      #Contents from start to mouse pointer
+        n=t1.rfind("\n")
+        rpt=t1[n+9:n+15]
+        if rpt[0:1] == " ": rpt=rpt[1:]
+        if rpt[:1]=='-' and len(rpt)==2: rpt=rpt[0:1]+'0'+rpt[1:2]
+        report.delete(0,END)
+        report.insert(0,rpt)
+        GenStdMsgs()
 
 #------------------------------------------------------ dbl_click_ave
 def dbl_click_ave(event):
