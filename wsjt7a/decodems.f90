@@ -60,13 +60,6 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   c(npts+1:nfft1)=0.
   call four2a(c,nfft1,1,-1,1)
 
-  rewind 52
-  do i=1,nfft1/2+1
-     ss=real(c(i))**2 + aimag(c(i))**2
-     write(52,5001) df1*(i-1),ss
-5001 format(f10.3,f12.3)
-  enddo
-
 ! In the "doubled-frequencies" spectrum of squared cdat:
   fa=2.0*(f0-400)
   fb=2.0*(f0+400)
@@ -78,23 +71,47 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   jb=nint(fb/df1)
   jd=nfft1/nsps
 
+  do j=1,nfft1/2+1
+     sq(j)=real(c(j))**2 + aimag(c(j))**2
+  enddo
+
   smax=0.
+  smax1=0.
   do j=ja,jb
-     ss=real(c(j))**2 + aimag(c(j))**2 + real(c(j+jd))**2 + aimag(c(j+jd))**2
-     sq(j)=ss
-     if(ss.gt.smax) then
-        smax=ss
+     if(sq(j)+sq(j+jd).gt.smax) then
+        smax=sq(j)+sq(j+jd)
         jpk=j
-        fpk=(j-1)*df1
+     endif
+     if(sq(j).gt.smax1) then
+        smax1=sq(j)
+        jpk1=j
      endif
   enddo
-  call pctile (sq(ja),r,jb-ja+1,50,base2)
-  ss1=real(c(jpk))**2 + aimag(c(jpk))**2
-  ss2=real(c(jpk+jd))**2 + aimag(c(jpk+jd))**2
-  if(smax/base2 .lt. 6.0) go to 900                   !Reject non-JTMS signals
-  if(ss1.lt.0.1*smax .or. ss2.lt.0.1*smax) go to 900
-  if(ss1/base2.lt.1.0 .or. ss2/base2.lt.1.0) go to 900
+
+  smax2=0.
+  do j=jpk1+jd,jb+jd
+     if(sq(j).gt.smax2) then
+        smax2=sq(j)
+        jpk2=j
+     endif
+  enddo
+
+  fpk=(jpk-1)*df1  
+  fpk1=(jpk1-1)*df1
+  fpk2=(jpk2-1)*df1
+
+!  call pctile (sq(ja),r,jb-ja+1,50,base2)
+!  ss1=real(c(jpk))**2 + aimag(c(jpk))**2
+!  ss2=real(c(jpk+jd))**2 + aimag(c(jpk+jd))**2
+!  if(smax/base2 .lt. 6.0) go to 900                   !Reject non-JTMS signals
+!  if(ss1.lt.0.1*smax .or. ss2.lt.0.1*smax) go to 900
+!  if(ss1/base2.lt.1.0 .or. ss2/base2.lt.1.0) go to 900
+
+  ferr=(fpk2-fpk1)/1378.125 - 1.0
   dfx=0.5*fpk-f0
+!  write(*,2001) t2,dfx,fpk,fpk1,fpk2,ferr
+!2001 format(f7.2,f7.0,3f8.1,f9.4)
+  if(abs(ferr).gt.0.002) go to 900
 
 ! DF is known, now find character sync.
   r=0.
