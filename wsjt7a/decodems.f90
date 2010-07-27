@@ -100,8 +100,9 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   fpk1=(jpk1-1)*df1
   fpk2=(jpk2-1)*df1
   ferr=(fpk2-fpk1)/1378.125 - 1.0
-  dfx=0.5*fpk-f0
   if(abs(ferr).gt.0.002) go to 900           !Reject non-JTMS signals
+  dfx=0.5*fpk-f0
+  call tweak1(cdat,npts,-dfx,cdat)           !Mix to standard frequency
 
 ! DF is known, now find character sync.
   r=0.
