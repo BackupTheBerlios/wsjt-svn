@@ -1,5 +1,5 @@
 subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
-     DFTolerance,MouseDF,mycall)
+     DFTolerance,MouseDF,mycall,hiscall)
 
 ! Decode a JTMS ping
 
@@ -8,7 +8,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   complex cdat(NZ)                      !Analytic form of signal
   character*6 cfile6                    !FileID
   integer DFTolerance
-  character*12 mycall
+  character*12 mycall,hiscall
   real s(NZ)                            !Power spectrum
   real sq(NZ)                           !Double-frequency spectrum
   real sm(0:63)
@@ -24,7 +24,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   complex cwb(56)                       !Complex waveform for 'space'
   complex z,zmax,zmax0
   logical first
-  character msg*400,msg28*28
+  character msg*400,msg28*28,frag*28
   character cc*64
   integer np(8)
   character*90 line
@@ -99,19 +99,9 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   fpk=(jpk-1)*df1  
   fpk1=(jpk1-1)*df1
   fpk2=(jpk2-1)*df1
-
-!  call pctile (sq(ja),r,jb-ja+1,50,base2)
-!  ss1=real(c(jpk))**2 + aimag(c(jpk))**2
-!  ss2=real(c(jpk+jd))**2 + aimag(c(jpk+jd))**2
-!  if(smax/base2 .lt. 6.0) go to 900                   !Reject non-JTMS signals
-!  if(ss1.lt.0.1*smax .or. ss2.lt.0.1*smax) go to 900
-!  if(ss1/base2.lt.1.0 .or. ss2/base2.lt.1.0) go to 900
-
   ferr=(fpk2-fpk1)/1378.125 - 1.0
   dfx=0.5*fpk-f0
-!  write(*,2001) t2,dfx,fpk,fpk1,fpk2,ferr
-!2001 format(f7.2,f7.0,3f8.1,f9.4)
-  if(abs(ferr).gt.0.002) go to 900
+  if(abs(ferr).gt.0.002) go to 900           !Reject non-JTMS signals
 
 ! DF is known, now find character sync.
   r=0.
@@ -152,7 +142,7 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 !  i1=mod(jpk-1,56)+1-3                     !### Better solution needed?  ###
 !  if(i1.lt.1) i1=i1+56
 !  print*,'A',jpk,i1,ipk
-  i1=ipk-3
+  i1=ipk
   if(i1.lt.1) i1=i1+56
 
   msglen=0                                 !Use ACF to find msg length
@@ -185,7 +175,24 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   s2=0.
   nchar=(npts-55-i1)/56
   if(nchar.gt.400) nchar=400
-!  call searchms(cdat(i1),npts,nchar,dfx)
+
+  frag=' '//mycall
+  call searchms(cdat(i1),npts-i1,frag,nchar,dfx,ndi1,rmax1)
+  frag=' '//hiscall
+  call searchms(cdat(i1),npts-i1,frag,nchar,dfx,ndi2,rmax2)
+  frag=' CQ'
+  call searchms(cdat(i1),npts-i1,frag,nchar,dfx,ndi3,rmax3)
+
+!  write(*,2001) t2,ndi,ndi2,ndi3,rmax,rmax2,rmax3
+!2001 format(f7.1,3i5,3f10.2)
+  ndi=99
+  if(max(rmax1,rmax2,rmax3).ge.0.6) then
+     if(max(rmax1,rmax2,rmax3).eq.rmax1 .and. abs(ndi1).le.5) ndi=ndi1
+     if(max(rmax1,rmax2,rmax3).eq.rmax2 .and. abs(ndi2).le.5) ndi=ndi2
+     if(max(rmax1,rmax2,rmax3).eq.rmax3 .and. abs(ndi3).le.5) ndi=ndi3
+     if(abs(ndi).le.5) i1=i1+ndi
+  endif
+
   do j=1,nchar
      ia=i1 + (j-1)*56
      smax=0.
@@ -230,10 +237,13 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
      if(nline.le.99) nline=nline+1
      tping(nline)=t2
      call cs_lock('decodems')
-!     write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,nmatch,nsum
-     write(line(nline),1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
-!     write(21,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
-1110 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,2i5)
+!     write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
+     if(abs(ndi).le.5) then
+        write(line(nline),1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,ndi
+1110    format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,12x,i3)
+     else
+        write(line(nline),1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
+     endif
      call cs_unlock
   else if(msglen.gt.0) then
 !   if(msglen.gt.0) then
@@ -267,10 +277,15 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
      enddo
      msg28=msg(1:msglen)
      call match(mycall,msg28(1:msglen),nstart,nmatch)
+     call match(' CQ ',msg28(1:msglen),nstart2,nmatch2)
      if(nmatch.ge.3 .and.nstart.gt.1) then
         msg28=msg(nstart:msglen)//msg(1:nstart-1)
      else if(nmatch.ge.3 .and.nstart.eq.1) then
         msg28=msg(1:msglen)
+     else if(nmatch2.ge.3 .and.nstart2.gt.1) then
+        msg28=msg(nstart2:msglen)//msg(1:nstart2-1)
+     else if(nmatch2.ge.3 .and.nstart2.eq.1) then
+        msg28=msg(2:msglen)
      else
         i3=index(msg,'  ')
         if(i3.gt.0 .and. i3.le.msglen-2) then
@@ -280,14 +295,18 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
            if(i3.gt.0 .and. i3.lt.msglen) msg28=msg(i3:msglen)//msg(1:msglen)
         endif
      endif
+     if(msg28(1:1).eq.' ') msg28=msg28(2:)
      if(nline.le.99) nline=nline+1
      tping(nline)=t2
      call cs_lock('decodems')
-     write(line(nline),1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
-!     write(21,1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
-1120 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,10x,i5,'*')
+     if(abs(ndi).le.5) then
+        write(line(nline),1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen,ndi
+1120    format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,8x,i3,'*',i3)
+     else
+        write(line(nline),1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
+     endif
 !     write(*,1130) nrec,cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
-1130 format(i3,1x,a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,10x,i5'*')
+!1130 format(i3,1x,a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,10x,i5'*')
      call cs_unlock
    endif
 
