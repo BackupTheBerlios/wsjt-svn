@@ -8,7 +8,7 @@ subroutine genms(msg28,samfac,iwave,cwave,isrch,dfx,nwave)
   character*28 msg28            !User message
   character*29 msg
   character cc*64
-  integer sent(196)
+  integer sent(203)
   real*8 dt,phi,f,f0,dfgen,dphi,twopi,foffset,samfac
   integer np(8)
   data np/5,7,11,13,17,19,23,29/  !Permissible message lengths
