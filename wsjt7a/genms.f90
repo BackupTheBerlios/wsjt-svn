@@ -1,4 +1,4 @@
-subroutine genms(msg28,samfac,iwave,cwave,isrch,dfx,nwave)
+subroutine genms(msg28,samfac,iwave,cwave,isrch,nwave)
 
 ! Generate a JTMS wavefile.
 
@@ -58,7 +58,7 @@ subroutine genms(msg28,samfac,iwave,cwave,isrch,dfx,nwave)
   dt=1.d0/(samfac*11025.d0)
   f0=11025.d0/nsps                               ! 1575.0 Hz
   dfgen=0.5d0*f0                                 !  787.5 Hz
-  foffset=1500.d0 - f0 + dfx
+  foffset=1500.d0 - f0
   t=0.d0
   k=0
   phi=0.d0

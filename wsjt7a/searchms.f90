@@ -1,11 +1,11 @@
-subroutine searchms(cdat,npts,msg,nchar,dfx,ndi,rmax)
+subroutine searchms(cdat,npts,msg,nchar,ndi,rmax)
 
   parameter (NMAX=30*11025)     !Max length of wave file
   complex cdat(npts)
   complex cwave(NMAX)
   character*28 msg            !User message
 
-  call genms(msg,1.d0,iwave,cwave,1,dfx,kz)
+  call genms(msg,1.d0,iwave,cwave,1,kz)
 
   r=0.
   rmax=0.
@@ -28,7 +28,7 @@ subroutine searchms(cdat,npts,msg,nchar,dfx,ndi,rmax)
   nch=i1pk/56.0
   ndi=i1pk - 56*nch
   if(ndi.gt.8) ndi=ndi-56
-!  print*,'Z',dfx,i1pk,ndi,msg
+!  print*,'Z',i1pk,ndi,msg
 !  call flush(53)
 
   return

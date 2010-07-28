@@ -100,6 +100,8 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   fpk1=(jpk1-1)*df1
   fpk2=(jpk2-1)*df1
   ferr=(fpk2-fpk1)/1378.125 - 1.0
+!  write(*,2001) t2,fpk1,fpk2,ferr
+!2001 format(f6.1,2f10.1,f10.3)
   if(abs(ferr).gt.0.002) go to 900           !Reject non-JTMS signals
   dfx=0.5*fpk-f0
   call tweak1(cdat,npts,-dfx,cdat)           !Mix to standard frequency
@@ -155,16 +157,31 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
      do k=8,kz
         fac=float(npts)/(npts-k)
            acf(k)=fac*dot_product(r(1:npts),r(1+k:npts+k))/acf0
+     enddo
+     call hipass(acf(8),kz-7,50)
+
+     do k=8,kz
         if(acf(k).gt.acfmax) then
            acfmax=acf(k)
            kpk=k
         endif
      enddo
 
+     sumsq=0.
+     n=0
+     do k=8,kz
+        if(abs(k-kpk).gt.10) then
+           sumsq=sumsq+acf(k)**2
+           n=n+1
+        endif
+     enddo
+     rms=sqrt(sumsq/n)
+     acf=acf/rms
+
      amax2=0
      do i=1,8
         k=56*np(i)
-        if(acf(k).gt.0.45 .and. acf(k).gt.amax2) then
+        if(acf(k).gt.3.5 .and. acf(k).gt.amax2) then
            amax2=acf(k)
            msglen=np(i)
         endif
@@ -178,14 +195,14 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   if(nchar.gt.400) nchar=400
 
   frag=' '//mycall
-  call searchms(cdat(i1),npts-i1,frag,nchar,dfx,ndi1,rmax1)
+  call searchms(cdat(i1),npts-i1,frag,nchar,ndi1,rmax1)
   frag=' '//hiscall
-  call searchms(cdat(i1),npts-i1,frag,nchar,dfx,ndi2,rmax2)
+  call searchms(cdat(i1),npts-i1,frag,nchar,ndi2,rmax2)
   frag=' CQ'
-  call searchms(cdat(i1),npts-i1,frag,nchar,dfx,ndi3,rmax3)
+  call searchms(cdat(i1),npts-i1,frag,nchar,ndi3,rmax3)
 
-!  write(*,2001) t2,ndi,ndi2,ndi3,rmax,rmax2,rmax3
-!2001 format(f7.1,3i5,3f10.2)
+!  write(*,2002) t2,ndi1,ndi2,ndi3,rmax1,rmax2,rmax3
+!2002 format(f7.1,3i8,3f10.2)
   ndi=99
   if(max(rmax1,rmax2,rmax3).ge.0.6) then
      if(max(rmax1,rmax2,rmax3).eq.rmax1 .and. abs(ndi1).le.5) ndi=ndi1
