@@ -20,12 +20,9 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   character*90 line
   common/ccom/nline,tping(100),line(100)
   data first/.true./
-  data nsum/0/,nrec/0/
-  save nsum,nrec
   save first,cw,cwb
-  save cdat
+  save cdat                             !Fix its address, for four2
 
-  nrec=nrec+1
   if(first) call setupms(cw,cwb)        !Calculate waveforms for codewords
   first=.false.
 
@@ -39,7 +36,7 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 
   call analytic(dat,npts,nfft1,s,cdat)        !Convert to analytic signal
 
-  call msdf(cdat,npts,nfft1,f0,mousedf,dftolerance,dfx,ferr)    !Get DF
+  call msdf(cdat,npts,nfft1,f0,nfreeze,mousedf,dftolerance,dfx,ferr)  !Get DF
 
   if(abs(ferr).gt.0.002) go to 900           !Reject non-JTMS signals
   call tweak1(cdat,npts,-dfx,cdat)           !Mix to standard frequency
@@ -101,8 +98,6 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
      else
         write(line(nline),1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg29,msglen
      endif
-!     write(*,1130) nrec,cfile6,t2,mswidth,ndb,nrpt,ndf,msg29,msglen
-!1130 format(i3,1x,a6,f5.1,i5,i3,1x,i2.2,i5,5x,a29,10x,i5'*')
      call cs_unlock
    endif
 
