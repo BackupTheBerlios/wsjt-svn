@@ -1,4 +1,4 @@
-subroutine searchms(cdat,npts,msg,nchar,ndi,rmax)
+subroutine searchms(cdat,npts,msg,ndi,rmax)
 
   parameter (NMAX=30*11025)     !Max length of wave file
   complex cdat(npts)

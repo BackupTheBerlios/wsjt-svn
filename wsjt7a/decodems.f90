@@ -10,33 +10,26 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   integer DFTolerance
   character*12 mycall,hiscall
   real s(NZ)                            !Power spectrum
-  real sq(NZ)                           !Double-frequency spectrum
   real sm(0:63)
   real s2(0:63,400)
-  real fs2(0:63,28)
-  integer nfs2(28)
+  real fs2(0:63,29)
+  integer nfs2(29)
   real r(60000)
-  real fr(56)
-  integer nfr(56)
-  real acf(1624)
-  complex c(NZ)
   complex cw(56,0:63)                   !Complex waveforms for codewords
   complex cwb(56)                       !Complex waveform for 'space'
   complex z,zmax,zmax0
   logical first
   character msg*400,msg28*28,frag*28
   character cc*64
-  integer np(8)
   character*90 line
   common/ccom/nline,tping(100),line(100)
-  data np/5,7,11,13,17,19,23,29/        !Permissible message lengths
 !                    1         2         3         4         5         6
 !          0123456789012345678901234567890123456789012345678901234567890123
   data cc/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ./?-                 _     @'/
   data first/.true./
   data nsum/0/,nrec/0/
   save nsum,nrec
-  save first,smax,cw,cwb              !Why is this needed for save?  But it is!
+  save first,smax,cw,cwb
   save c,cdat
 
   nrec=nrec+1
@@ -53,140 +46,18 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 
   call analytic(dat,npts,nfft1,s,cdat)        !Convert to analytic signal
 
-  fac=1.0/(nfft1**2)
-  do i=1,npts
-     c(i)=fac*cdat(i)**2
-  enddo
-  c(npts+1:nfft1)=0.
-  call four2a(c,nfft1,1,-1,1)
+  call msdf(cdat,npts,nfft1,f0,mousedf,dftolerance,dfx,ferr)    !Get DF
 
-! In the "doubled-frequencies" spectrum of squared cdat:
-  fa=2.0*(f0-400)
-  fb=2.0*(f0+400)
-  if(NFreeze.gt.0) then
-     fa=2.0*(f0+MouseDF-DFtolerance)
-     fb=2.0*(f0+MouseDF+DFtolerance)
-  endif  
-  ja=nint(fa/df1)
-  jb=nint(fb/df1)
-  jd=nfft1/nsps
-
-  do j=1,nfft1/2+1
-     sq(j)=real(c(j))**2 + aimag(c(j))**2
-  enddo
-
-  smax=0.
-  smax1=0.
-  do j=ja,jb
-     if(sq(j)+sq(j+jd).gt.smax) then
-        smax=sq(j)+sq(j+jd)
-        jpk=j
-     endif
-     if(sq(j).gt.smax1) then
-        smax1=sq(j)
-        jpk1=j
-     endif
-  enddo
-
-  smax2=0.
-  do j=jpk1+jd,jb+jd
-     if(sq(j).gt.smax2) then
-        smax2=sq(j)
-        jpk2=j
-     endif
-  enddo
-
-  fpk=(jpk-1)*df1  
-  fpk1=(jpk1-1)*df1
-  fpk2=(jpk2-1)*df1
-  ferr=(fpk2-fpk1)/1378.125 - 1.0
 !  write(*,2001) t2,fpk1,fpk2,ferr
 !2001 format(f6.1,2f10.1,f10.3)
   if(abs(ferr).gt.0.002) go to 900           !Reject non-JTMS signals
-  dfx=0.5*fpk-f0
   call tweak1(cdat,npts,-dfx,cdat)           !Mix to standard frequency
 
-! DF is known, now find character sync.
-  r=0.
-  fr=0.
-  nfr=0
-  rmax=0.
-  do i1=1,npts-55
-     z=0.
-     ss=0.
-     do i=1,56
-        ss=ss + abs(cdat(i+i1-1))
-        z=z + cdat(i+i1-1)*conjg(cwb(i))
-     enddo
-!     r(i1)=abs(z)/ss
-     r(i1)=abs(z)
-     k=mod(i1-1,56)+1
-     fr(k)=fr(k)+r(i1)
-     nfr(k)=nfr(k)+1
-!     write(52,5001) i1,abs(z),ss,r(i1)
-!5001 format(i6,3f12.3)
-     if(r(i1).gt.rmax) then
-        rmax=r(i1)
-        jpk=i1
-     endif
-  enddo
+! DF is known, now establish character sync.
 
-  rmax=0.
-  do i=1,56
-     fr(i)=fr(i)/nfr(i)
-     if(fr(i).gt.rmax) then
-        rmax=fr(i)
-        ipk=i
-     endif
-!     write(52,5002) i,fr(i),nfr(i)
-!5002 format(i6,f12.3,i6)
-  enddo
+  call syncms(cdat,npts,cwb,r,i1)
 
-!  i1=mod(jpk-1,56)+1-3                     !### Better solution needed?  ###
-!  if(i1.lt.1) i1=i1+56
-!  print*,'A',jpk,i1,ipk
-  i1=ipk
-  if(i1.lt.1) i1=i1+56
-
-  msglen=0                                 !Use ACF to find msg length
-  if(npts.ge.8*56) then
-     r=r-sum(r(1:npts))/npts
-     acfmax=0.
-     acf0=dot_product(r(1:npts),r(1:npts))
-     kz=min(npts/2,28*56)
-     do k=8,kz
-        fac=float(npts)/(npts-k)
-           acf(k)=fac*dot_product(r(1:npts),r(1+k:npts+k))/acf0
-     enddo
-     call hipass(acf(8),kz-7,50)
-
-     do k=8,kz
-        if(acf(k).gt.acfmax) then
-           acfmax=acf(k)
-           kpk=k
-        endif
-     enddo
-
-     sumsq=0.
-     n=0
-     do k=8,kz
-        if(abs(k-kpk).gt.10) then
-           sumsq=sumsq+acf(k)**2
-           n=n+1
-        endif
-     enddo
-     rms=sqrt(sumsq/n)
-     acf=acf/rms
-
-     amax2=0
-     do i=1,8
-        k=56*np(i)
-        if(acf(k).gt.3.5 .and. acf(k).gt.amax2) then
-           amax2=acf(k)
-           msglen=np(i)
-        endif
-     enddo
-  endif
+  call lenms(r,npts,msglen)
 
   msg=' '                                !Decode the message
   zmax0=1.0
@@ -195,11 +66,11 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   if(nchar.gt.400) nchar=400
 
   frag=' '//mycall
-  call searchms(cdat(i1),npts-i1,frag,nchar,ndi1,rmax1)
+  call searchms(cdat(i1),npts-i1,frag,ndi1,rmax1)
   frag=' '//hiscall
-  call searchms(cdat(i1),npts-i1,frag,nchar,ndi2,rmax2)
+  call searchms(cdat(i1),npts-i1,frag,ndi2,rmax2)
   frag=' CQ'
-  call searchms(cdat(i1),npts-i1,frag,nchar,ndi3,rmax3)
+  call searchms(cdat(i1),npts-i1,frag,ndi3,rmax3)
 
 !  write(*,2002) t2,ndi1,ndi2,ndi3,rmax1,rmax2,rmax3
 !2002 format(f7.1,3i8,3f10.2)
@@ -333,3 +204,4 @@ subroutine decodems(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 
   return
 end subroutine decodems
+
