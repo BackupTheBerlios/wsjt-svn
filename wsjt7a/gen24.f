@@ -7,7 +7,6 @@ C  Encode a JT4 message into a wavefile.
       character*22 message          !Message to be generated
       character*22 msgsent          !Message as it will be received
       character*3 cok               !'   ' or 'OOO'
-      character*6 mode
       real*8 t,dt,phi,f,f0,dfgen,dphi,pi,twopi,samfac,tsymbol
       integer*2 iwave(NMAX)         !Generated wave file
       integer sendingsh

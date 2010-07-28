@@ -52,7 +52,8 @@ OBJS1 = JT65code.o nchar.o grid2deg.o packmsg.o packtext.o \
 
 OBJS4	= t75.o analytic.o four2a.o decodems.o db.o pctile.o \
 	sort.o ssort.o setupms.o match.o thnix_stub.o searchms.o \
-	genms.o tweak1.o hipass.o msdf.o syncms.o lenms.o
+	genms.o tweak1.o hipass.o msdf.o syncms.o lenms.o jtms.o \
+	foldms.o
 
 t75:	$(OBJS4)
 	$(FC) -o t75 $(OBJS4) -lfftw3f
@@ -79,7 +80,7 @@ SRCS2F90 = abc441.f90 astro0.f90 audio_init.f90 azdist0.f90 \
 	thnix.f90 enc441.f90 pp441.f90 tweak1.f90 smo.f90 analytic.f90 \
 	gen441.f90 dec441.f90 token.f90 msgtrim.f90 geniscat.f90 \
 	searchms.f90 iscat.f90 four2a.f90 hipass.f90 msdf.f90 \
-	syncms.f90 lenms.f90
+	syncms.f90 lenms.f90 jtms.f90 foldms.f90
 
 OBJS2F90 = ${SRCS2F90:.f90=.o}
 
