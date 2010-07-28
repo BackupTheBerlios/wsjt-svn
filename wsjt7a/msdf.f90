@@ -10,6 +10,7 @@ subroutine msdf(cdat,npts,nfft1,f0,mousedf,dftolerance,dfx,ferr)
   real sq(NZ)
   complex c(NZ)
   data nsps/8/
+  save c
 
   df1=11025.0/nfft1
   fac=1.0/(nfft1**2)

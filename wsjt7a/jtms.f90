@@ -16,7 +16,7 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   complex cw(56,0:63)                   !Complex waveforms for codewords
   complex cwb(56)                       !Complex waveform for 'space'
   logical first
-  character msg*400,msg28*28,frag*28
+  character msg*400,msg29*29,frag*29
   character*90 line
   common/ccom/nline,tping(100),line(100)
   data first/.true./
@@ -41,8 +41,6 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 
   call msdf(cdat,npts,nfft1,f0,mousedf,dftolerance,dfx,ferr)    !Get DF
 
-!  write(*,2001) t2,fpk1,fpk2,ferr
-!2001 format(f6.1,2f10.1,f10.3)
   if(abs(ferr).gt.0.002) go to 900           !Reject non-JTMS signals
   call tweak1(cdat,npts,-dfx,cdat)           !Mix to standard frequency
 
@@ -75,7 +73,7 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 
   ia=max(1,nchar/3)
   ib=min(ia+27,nchar)
-  msg28=msg(ia:ib)
+  msg29=msg(ia:ib)
   ndf=nint(dfx)
 
   if(msglen.eq.0 .or. nchar.lt.max(20,2*msglen)) then
@@ -83,29 +81,28 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
      if(nline.le.99) nline=nline+1
      tping(nline)=t2
      call cs_lock('decodems')
-!     write(*,1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
      if(abs(ndi).le.5) then
-        write(line(nline),1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,ndi
-1110    format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,12x,i3)
+        write(line(nline),1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg29,ndi
+1110    format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a29,12x,i3)
      else
-        write(line(nline),1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28
+        write(line(nline),1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg29
      endif
      call cs_unlock
   else if(msglen.gt.0) then
 
-     call foldms(s2,msglen,nchar,mycall,msg,msg28)
+     call foldms(s2,msglen,nchar,mycall,msg,msg29)
 
      if(nline.le.99) nline=nline+1
      tping(nline)=t2
      call cs_lock('decodems')
      if(abs(ndi).le.5) then
-        write(line(nline),1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen,ndi
-1120    format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,8x,i3,'*',i3)
+        write(line(nline),1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg29,msglen,ndi
+1120    format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a29,8x,i3,'*',i3)
      else
-        write(line(nline),1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
+        write(line(nline),1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg29,msglen
      endif
-!     write(*,1130) nrec,cfile6,t2,mswidth,ndb,nrpt,ndf,msg28,msglen
-!1130 format(i3,1x,a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,10x,i5'*')
+!     write(*,1130) nrec,cfile6,t2,mswidth,ndb,nrpt,ndf,msg29,msglen
+!1130 format(i3,1x,a6,f5.1,i5,i3,1x,i2.2,i5,5x,a29,10x,i5'*')
      call cs_unlock
    endif
 
