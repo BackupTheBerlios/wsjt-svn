@@ -769,9 +769,11 @@ def ModeJT4G():
     Audio.gcom2.mode4=72
 
 #------------------------------------------------------ ModeEcho
-#def ModeEcho(event=NONE):
-#    mode.set("Echo")
-#    stub()
+def ModeEcho(event=NONE):
+    ModeJT65B()
+    mode.set("Echo")
+    if lauto: toggleauto()
+    lab2.configure(text='     N      Level         Sig              DF         Width      Q')
     
 #------------------------------------------------------ msgpos
 def msgpos():
@@ -800,6 +802,7 @@ these operating modes:
   5. JT4    - for HF and EME
   6. ISCAT  - for meteor and ionospheric scatter on 50 MHz
   7. JTMS   - fast mode for meteor scatter
+  8. Echo   - EME Echo testing
 
 Copyright (c) 2001-2010 by Joseph H. Taylor, Jr., K1JT, with
 contributions from additional authors.  WSJT is Open Source 
@@ -1167,7 +1170,7 @@ def toggleauto(event=NONE):
     global lauto
     lauto=1-lauto
     Audio.gcom2.lauto=lauto
-    if lauto:
+    if lauto and mode.get()!='Echo':
         monitor()
     else:
         Audio.gcom1.txok=0
@@ -1560,6 +1563,17 @@ def update():
             options.MyGrid.get().upper(),HisGrid.get().upper(),utchours)
         azdist()
         g.nfreq=nfreq.get()
+
+        if tx1.get()[0:2]=='GO' and mode.get()=='Echo':
+            try:
+                nmin=int(tx1.get()[3:5])
+            except:
+                nmin=10
+            if isec==0 and (utc[4]%nmin)==0 and lauto==0:
+                toggleauto()
+            if isec==4 and (utc[4]%nmin)==1 and lauto==1:
+                toggleauto()
+                Audio.gcom2.nsumecho=0
         
         if Audio.gcom2.ndecoding==0:
             g.AzSun,g.ElSun,g.AzMoon,g.ElMoon,g.AzMoonB,g.ElMoonB,g.ntsky, \
@@ -1580,7 +1594,7 @@ def update():
                 Audio.gcom2.ntx2=0
 
         if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4' \
-               or mode.get()[:2]=='CW':
+               or mode.get()[:2]=='CW' or mode.get()=='Echo':
             graph2.delete(ALL)
             graph2.create_text(80,13,anchor=CENTER,text="Moon",font=g2font)
             graph2.create_text(13,37,anchor=W, text="Az: %6.2f" % g.AzMoon,font=g2font)
@@ -1634,10 +1648,10 @@ def update():
             msg2.configure(bg='#CC4444')
         elif mode.get()[:3]=="JT4":
             msg2.configure(bg='#88FF88')
-#        elif mode.get()=="Echo":
-#            msg2.configure(bg='#FF0000')
+        elif mode.get()=="Echo":
+            msg2.configure(bg='#FF0000')
         g.mode=mode.get()
-        if first: GenStdMsgs()
+        if first and mode.get()!='Echo': GenStdMsgs()
         first=0
 
     samfac_in=Audio.gcom1.mfsample/110250.0
@@ -1658,8 +1672,6 @@ def update():
 
     msg1.configure(text="%6.4f %6.4f" % (samfac_in,samfac_out))
     t=mode.get()
-    if t=='ISCAT': t='ISCAT_2'
-    elif t=='JTMS': t='JTMS_2'
     msg2.configure(text=t)
     t="Freeze DF:%4d" % (int(Audio.gcom2.mousedf),)
     if abs(int(Audio.gcom2.mousedf))>600:
@@ -1711,6 +1723,10 @@ def update():
     if Audio.gcom1.transmitting:
         nmsg=int(Audio.gcom2.nmsg)
         t=g.ftnstr(Audio.gcom2.sending)
+        if mode.get()=='Echo':
+            t='ECHO TEST'
+            nmsg=9
+            Audio.gcom2.ntxnow=0
         t="Txing:  "+t[:nmsg]
         bgcolor='yellow'
         if Audio.gcom2.sendingsh==1:  bgcolor='#66FFFF'    #Shorthand (lt blue)
@@ -1842,6 +1858,16 @@ def update():
 
     Audio.gcom2.pttport=(options.PttPort.get() + (' '*80))[:80]
 
+    try:
+        Audio.gcom2.ntc=options.ntc.get()
+        if int(options.ntc.get()<=0): Audio.gcom2.ntc=1
+        Audio.gcom2.necho=options.necho.get()
+        Audio.gcom2.nfrit=options.fRIT.get()
+        Audio.gcom2.ndither=options.dither.get()
+        Audio.gcom2.dlatency=options.dlatency.get()
+    except:
+        pass
+
     if altmsg: tx6alt=tx6.get()    
 # Queue up the next update
     ldate.after(100,update)
@@ -1962,10 +1988,9 @@ modemenu.add_radiobutton(label = 'JT4D', variable=mode, command = ModeJT4D)
 modemenu.add_radiobutton(label = 'JT4E', variable=mode, command = ModeJT4E)
 modemenu.add_radiobutton(label = 'JT4F', variable=mode, command = ModeJT4F)
 modemenu.add_radiobutton(label = 'JT4G', variable=mode, command = ModeJT4G)
-modemenu.add_radiobutton(label = 'ISCAT_2', variable=mode, command = ModeISCAT)
-modemenu.add_radiobutton(label = 'JTMS_2', variable=mode, command = ModeJTMS)
-#modemenu.add_radiobutton(label = 'Echo', variable=mode, command = ModeEcho,
-#                         state=DISABLED)
+modemenu.add_radiobutton(label = 'ISCAT', variable=mode, command = ModeISCAT)
+modemenu.add_radiobutton(label = 'JTMS', variable=mode, command = ModeJTMS)
+modemenu.add_radiobutton(label = 'Echo', variable=mode, command = ModeEcho)
 
 if (sys.platform == 'darwin'):
     mbar.add_cascade(label="Mode", menu=modemenu)
@@ -2455,6 +2480,8 @@ try:
                 ModeJTMS()
             elif value[:3]=='JT4':
                 ModeJT4()
+            elif value[:4]=='Echo':
+                ModeEcho()
         elif key == 'MyCall': options.MyCall.set(value)
         elif key == 'MyGrid': options.MyGrid.set(value)
         elif key == 'HisCall':
@@ -2523,6 +2550,11 @@ try:
 		os.stat(options.azeldir.get())
 	    except:
 		options.azeldir.set(os.getcwd())
+        elif key == 'Ntc': options.ntc.set(value)
+        elif key == 'Necho': options.necho.set(value)
+        elif key == 'fRIT': options.fRIT.set(value)
+        elif key == 'Dither': options.dither.set(value)
+        elif key == 'Dlatency': options.dlatency.set(value)
         elif key == 'MyName': options.myname.set(value)
         elif key == 'HighPri': options.HighPri.set(value)
         elif key == 'TxFirst': TxFirst.set(value)
@@ -2633,9 +2665,11 @@ if options.auxdec.get()=="": options.auxdec.set("0")
 f.write("AuxRA " + options.auxra.get() + "\n")
 f.write("AuxDEC " + options.auxdec.get() + "\n")
 f.write("AzElDir " + str(options.azeldir.get()).replace(" ","#") + "\n")
-if options.myname.get()=="":
-    options.myname.set("name")
-f.write("MyName " + options.myname.get() + "\n")
+f.write("Ntc " + str(options.ntc.get()) + "\n")
+f.write("Necho " + str(options.necho.get()) + "\n")
+f.write("fRIT " + str(options.fRIT.get()) + "\n")
+f.write("Dither " + str(options.dither.get()) + "\n")
+f.write("Dlatency " + str(options.dlatency.get()) + "\n")
 f.write("HighPri " + str(options.HighPri.get()) + "\n")
 f.write("TxFirst " + str(TxFirst.get()) + "\n")
 f.write("KB8RQ " + str(kb8rq.get()) + "\n")

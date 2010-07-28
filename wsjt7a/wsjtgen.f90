@@ -36,6 +36,13 @@ subroutine wsjtgen
   call cs_lock('wsjtgen')
   fsample_out=11025.d0*samfacout
   if(abs(samfacout-1.d0).gt.0.02d0) fsample_out=1.d0
+
+  if(mode(1:4).eq.'Echo') then
+     dither=ndither
+     call echogen(necho,dither,iwave,nwave,fecho)        !### Samfacout ???
+     goto 999
+  endif
+
   lcwid=.false.
   if(idinterval.gt.0) then
      n=(mod(int(tsec/60.d0),idinterval))

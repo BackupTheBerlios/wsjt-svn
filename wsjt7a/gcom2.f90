@@ -7,6 +7,7 @@ real ccf               !CCF in time (blue curve)                Decoder
 real green             !Data for green line                     GUI
 integer ngreen         !Length of green                         GUI
 real dgain             !Digital audio gain setting              GUI
+real dlatency          !Differential Tx/Rx letency              GUI
 integer iter           !(why is this here??)
 integer iyr            !UTC from python                         GUI
 integer imo            !UTC from python                         GUI
@@ -17,6 +18,11 @@ integer mousebutton    !Which button was clicked?               GUI
 integer nhighpri       !Run at "Above Normal" priority?         GUI
 integer ndecdone       !Is decoder finished?                 GUI,Decoder
 integer npingtime      !Time in file of mouse-selected ping  GUI,Decoder
+integer ntc            !Time constand for echo averaging (m)    GUI
+integer necho          !0 for CW, 1 for 27x27 Costas            GUI
+integer nfrit          !RIT setting for Echo mode (Hz)          GUI
+integer ndither        !Dither range for Echo mode (Hz)         GUI
+integer nsumecho       !Number of echo transmissions avgd       GUI
 integer ierr           !(why is this here?)
 integer lauto          !Are we in Auto mode?                    GUI
 integer mantx          !Manual transmission requested?       GUI,SoundIn
@@ -99,8 +105,8 @@ character*22 t0msg
 
 parameter (ND2MAX=120*11025)
 common/gcom2/ps0(431),psavg(450),s2(64,3100),ccf(-5:540),             &
-     green(500),ngreen,dgain,iter,iyr,imo,ida,                        &
-     ndecoding,ndecoding0,mousebutton,nhighpri,                       &
+     green(500),ngreen,dgain,dlatency, iter,iyr,imo,ida,              &
+     ndecoding,ndecoding0,mousebutton,ntc,necho,nfrit,ndither,nsumecho, &
      ndecdone,npingtime,ierr,lauto,mantx,n441pp,nrestart,ntr,nmsg,    &
      nsave,nadd5,dftolerance,LDecoded,rxdone,monitoring,nzap,         &
      nsavecum,minsigdb,nclearave,newdat2,nfreeze,nafc,nmode,mode65,   &

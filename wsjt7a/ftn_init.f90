@@ -15,6 +15,7 @@
 !   22  kvasd.dat
 !   23  CALL3.TXT
 !   24  FFT_plans.txt
+!   25  *.eco
 
 !------------------------------------------------ ftn_init
 subroutine ftn_init

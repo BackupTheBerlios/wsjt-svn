@@ -4,6 +4,7 @@ subroutine decode1(iarg)
 ! This routine runs in a background thread and will never return.
 
   character sending0*28,mode0*6,cshort*11
+  character fnamex*24
   integer sendingsh0
   integer*8 mtx
   
@@ -21,6 +22,19 @@ subroutine decode1(iarg)
   sendingsh0=-3
 
 10 ltrace=ndebug
+
+  if(mode(1:4).eq.'Echo' .and. ndecoding.eq.1) then
+     nt=ntime/86400
+     nt=86400*nt + tbuf(ibuf0)
+     call get_fname(mycall,iyr,imo,ida,nt,lauto,fnamex)
+     i1=index(fnamex,'.WAV')
+     fnamex=fnamex(1:i1-3)//'.eco'
+     call avecho(fnamex,ntime,y1,ibuf0,ntc,necho,nfrit,ndither,dlatency,   &
+          nsave,fecho,nsumecho)
+     ndecoding=0
+     ndecdone=1
+  endif
+
   if(mode(1:4).eq.'JT65' .or. mode(1:3).eq.'JT4'                &
        .or. mode(1:2).eq.'CW') then
      if(rxdone) then

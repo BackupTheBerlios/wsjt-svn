@@ -43,14 +43,19 @@ addpfx=StringVar()
 auxra=StringVar()
 auxdec=StringVar()
 azeldir=StringVar()
-myname=StringVar()
-hisname=StringVar()
+dlatency=DoubleVar()
+ntc=IntVar()
+necho=IntVar()
+fRIT=IntVar()
+dither=IntVar()
 wx=StringVar()
 temp=StringVar()
 wind=StringVar()
 pwr=StringVar()
 ant=StringVar()
 wxlist=("CLEAR","CLOUDY")
+
+ntc.set(1)
 
 def defaults():
 #    if g.mode=="FSK441" or g.mode=="JT6M":
@@ -212,15 +217,21 @@ aux_dec=Pmw.EntryField(g3.interior(),labelpos=W,label_text='Source DEC:',
     entry_width=9,entry_textvariable=auxdec)
 azeldir_entry=Pmw.EntryField(g3.interior(),labelpos=W,label_text='AzElDir:',
     entry_width=9,value=g.appdir,entry_textvariable=azeldir)
-myname_entry=Pmw.EntryField(g3.interior(),labelpos=W,label_text='MyName:',
-    entry_width=9,entry_textvariable=myname)
+ntc_entry=Pmw.EntryField(g3.interior(),labelpos=W,label_text='Echo Avg (m):',
+    entry_width=9,entry_textvariable=ntc)
+necho_entry=Pmw.EntryField(g3.interior(),labelpos=W,label_text='Echo waveform:',
+    entry_width=9,entry_textvariable=necho)
+fRIT_entry=Pmw.EntryField(g3.interior(),labelpos=W,label_text='RIT (Hz):',
+    entry_width=9,entry_textvariable=fRIT)
+dither_entry=Pmw.EntryField(g3.interior(),labelpos=W,label_text='Dither (Hz):',
+    entry_width=9,entry_textvariable=dither)
+dlatency_entry=Pmw.EntryField(g3.interior(),labelpos=W,label_text='Latency (s):',
+    entry_width=9,entry_textvariable=dlatency)
 
-widgets = (temp_prefix,aux_ra,aux_dec,azeldir_entry,myname_entry)
+widgets = (temp_prefix,aux_ra,aux_dec,azeldir_entry,ntc_entry,necho_entry, \
+           fRIT_entry,dither_entry,dlatency_entry)
 for widget in widgets:
     widget.pack(padx=10,pady=2)
-hipriority=Checkbutton(g3.interior(),text='High Priority',justify=RIGHT,
-                       variable=HighPri)
-hipriority.pack(padx=10,pady=2,side=BOTTOM)
 Pmw.alignlabels(widgets)
 
 
