@@ -15,7 +15,6 @@ integer ida            !UTC from python                         GUI
 integer ndecoding      !Decoder status (see decode2.f90)     GUI,Decoder
 integer ndecoding0     !Status on previous decode            GUI,Decoder
 integer mousebutton    !Which button was clicked?               GUI
-integer nhighpri       !Run at "Above Normal" priority?         GUI
 integer ndecdone       !Is decoder finished?                 GUI,Decoder
 integer npingtime      !Time in file of mouse-selected ping  GUI,Decoder
 integer ntc            !Time constand for echo averaging (m)    GUI

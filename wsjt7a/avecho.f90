@@ -11,7 +11,6 @@ subroutine avecho(fname,ntime,y1,ibuf0,ntc,necho,nfrit,ndither,      &
   integer nsum      !Number of integrations
   real dop0         !Doppler shift for initial integration (Hz)
   real doppler      !Doppler shift for current integration (Hz)
-  real data(32768)
   real s(8192)
   real x(32770)
   complex c(0:16384)
