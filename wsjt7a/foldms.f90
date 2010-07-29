@@ -3,7 +3,6 @@ subroutine foldms(s2,msglen,nchar,mycall,msg,msg29)
   real s2(0:63,400)
   real fs2(0:63,29)
   integer nfs2(29)
-  real sm(0:63)
   character mycall*12
   character msg*400,msg29*29
   character cc*64
@@ -30,33 +29,34 @@ subroutine foldms(s2,msglen,nchar,mycall,msg,msg29)
            kpk=k
         endif
      enddo
-     sm(kpk)=0.
-     smax2=0.
-     do k=0,40
-        smax2=max(smax2,sm(k))
-     enddo
      if(kpk.eq.40) kpk=57
      msg(j:j)=cc(kpk+1:kpk+1)
      if(kpk.eq.57) msg(j:j)=' '
   enddo
+
   msg29=msg(1:msglen)
   call match(mycall,msg29(1:msglen),nstart,nmatch)
   call match(' CQ ',msg29(1:msglen),nstart2,nmatch2)
+
   if(nmatch.ge.3 .and.nstart.gt.1) then
-     msg29=msg(nstart:msglen)//msg(1:nstart-1)
+     msg29=msg(nstart:msglen)//msg(1:nstart-1)     !Align on MyCall
   else if(nmatch.ge.3 .and.nstart.eq.1) then
-     msg29=msg(1:msglen)
+     msg29=msg(1:msglen)                           !Align on MyCall
   else if(nmatch2.ge.3 .and.nstart2.gt.1) then
-     msg29=msg(nstart2:msglen)//msg(1:nstart2-1)
+     msg29=msg(nstart2:msglen)//msg(1:nstart2-1)   !Align on CQ
   else if(nmatch2.ge.3 .and.nstart2.eq.1) then
-     msg29=msg(2:msglen)
+     msg29=msg(2:msglen)                           !Align on CQ
   else
      i3=index(msg,'  ')
      if(i3.gt.0 .and. i3.le.msglen-2) then
-        msg29=msg(i3+2:msglen)//msg(1:msglen)
+        msg29=msg(i3+2:msglen)//msg(1:msglen)      !Align on '  ' at EOM
+     else if(msg(1:1).eq.' ' .and. msg(msglen:msglen).eq.' ') then
+        msg29=msg(2:msglen)                        !Align on '  ' at EOM
      else
-        i3=index(msg,' ')
-        if(i3.gt.0 .and. i3.lt.msglen) msg29=msg(i3:msglen)//msg(1:msglen)
+        i3=index(msg,' ')                          !Align on start-of-word
+        if(i3.ge.1 .and. i3.lt.msglen) msg29=msg(i3+1:msglen)//msg(1:i3)
+        if(i3.eq.msglen) msg29=msg(1:msglen)
+        msg29=msg29(1:msglen)//msg29(1:msglen)
      endif
   endif
   if(msg29(1:1).eq.' ') msg29=msg29(2:)
