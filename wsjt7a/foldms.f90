@@ -1,5 +1,8 @@
 subroutine foldms(s2,msglen,nchar,mycall,msg,msg29)
 
+! Fold the 2-d "goodness of fit" array s2 modulo message length, 
+! then decode the folded message.
+
   real s2(0:63,400)
   real fs2(0:63,29)
   integer nfs2(29)
@@ -35,31 +38,15 @@ subroutine foldms(s2,msglen,nchar,mycall,msg,msg29)
   enddo
 
   msg29=msg(1:msglen)
-  call match(mycall,msg29(1:msglen),nstart,nmatch)
-  call match(' CQ ',msg29(1:msglen),nstart2,nmatch2)
 
-  if(nmatch.ge.3 .and.nstart.gt.1) then
-     msg29=msg(nstart:msglen)//msg(1:nstart-1)     !Align on MyCall
-  else if(nmatch.ge.3 .and.nstart.eq.1) then
-     msg29=msg(1:msglen)                           !Align on MyCall
-  else if(nmatch2.ge.3 .and.nstart2.gt.1) then
-     msg29=msg(nstart2:msglen)//msg(1:nstart2-1)   !Align on CQ
-  else if(nmatch2.ge.3 .and.nstart2.eq.1) then
-     msg29=msg(2:msglen)                           !Align on CQ
-  else
-     i3=index(msg,'  ')
-     if(i3.gt.0 .and. i3.le.msglen-2) then
-        msg29=msg(i3+2:msglen)//msg(1:msglen)      !Align on '  ' at EOM
-     else if(msg(1:1).eq.' ' .and. msg(msglen:msglen).eq.' ') then
-        msg29=msg(2:msglen)                        !Align on '  ' at EOM
-     else
-        i3=index(msg,' ')                          !Align on start-of-word
-        if(i3.ge.1 .and. i3.lt.msglen) msg29=msg(i3+1:msglen)//msg(1:i3)
-        if(i3.eq.msglen) msg29=msg(1:msglen)
-        msg29=msg29(1:msglen)//msg29(1:msglen)
-     endif
-  endif
-  if(msg29(1:1).eq.' ') msg29=msg29(2:)
+  call alignmsg('  ',2,msg29,msglen,idone)
+  if(idone.eq.0) call alignmsg(mycall,4,msg29,msglen,idone)
+  if(idone.eq.0) call alignmsg('CQ',  3,msg29,msglen,idone)
+  if(idone.eq.0) call alignmsg('QRZ', 3,msg29,msglen,idone)
+  if(idone.eq.0) call alignmsg('RRR', 3,msg29,msglen,idone)
+  if(idone.eq.0) call alignmsg('73',  3,msg29,msglen,idone)
+  if(idone.eq.0) call alignmsg(' ',   1,msg29,msglen,idone)
+  msg29=adjustl(msg29)
 
   return
 end subroutine foldms

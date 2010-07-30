@@ -1,6 +1,6 @@
 subroutine msdf(cdat,npts,nfft1,f0,nfreeze,mousedf,dftolerance,dfx,ferr)
 
-! Determind DF for a JTMS signal.  Also find ferr, a measure of
+! Determine DF for a JTMS signal.  Also find ferr, a measure of
 ! frequency differerence between 1st and 2nd harmonic.  
 ! (Should be 0.000)
 
@@ -57,9 +57,10 @@ subroutine msdf(cdat,npts,nfft1,f0,nfreeze,mousedf,dftolerance,dfx,ferr)
   enddo
 
   fpk=(jpk-1)*df1  
+  dfx=0.5*fpk-f0
+
   fpk1=(jpk1-1)*df1
   fpk2=(jpk2-1)*df1
-  dfx=0.5*fpk-f0
   ferr=(fpk2-fpk1)/1378.125 - 1.0
 
   return

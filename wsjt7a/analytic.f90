@@ -1,5 +1,7 @@
 subroutine analytic(d,npts,nfft1,s,c)
 
+! Convert real data to a complex ("analytic") signal
+
   parameter (NMAX=512*1024)
   real d(npts)
   real s(NMAX)
