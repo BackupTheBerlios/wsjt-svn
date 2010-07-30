@@ -98,7 +98,6 @@ nhotaz=0
 nhotabetter=0
 nopen=0
 nosh441=IntVar()
-n441pp=IntVar()
 noshjt65=IntVar()
 noshjt65all=IntVar()
 qdecode=IntVar()
@@ -1850,7 +1849,6 @@ def update():
     Audio.gcom2.nslim2=isync-4
     if nosh441.get()==1 and (mode.get()=='FSK441' or mode.get()=='JTMS'):
             Audio.gcom2.nslim2=99
-    Audio.gcom2.n441pp=n441pp.get()
     try:
         Audio.gcom2.nport=int(options.PttPort.get())
     except:
@@ -2005,7 +2003,6 @@ else:
     decodemenu = Menu(mbar, tearoff=use_tearoff)
 decodemenu.FSK441=Menu(decodemenu,tearoff=0)
 decodemenu.FSK441.add_checkbutton(label='No shorthands',variable=nosh441)
-decodemenu.FSK441.add_checkbutton(label='Enable FSK441++',variable=n441pp)
 decodemenu.JT65=Menu(decodemenu,tearoff=0)
 decodemenu.JT65.add_checkbutton(label='Only EME calls in Deep Search',variable=neme)
 decodemenu.JT65.add_checkbutton(label='No Shorthand decodes',variable=noshjt65all)
@@ -2576,7 +2573,6 @@ try:
         elif key == 'NB': nblank.set(value)
         elif key == 'NAFC': nafc.set(value)
         elif key == 'NoSh441': nosh441.set(value)
-        elif key == 'N441pp': n441pp.set(value)
         elif key == 'NoShJT65all': noshjt65all.set(value)
         elif key == 'NoShJT65': noshjt65.set(value)
         elif key == 'QDecode': qdecode.set(value)
@@ -2688,7 +2684,6 @@ f.write("Zap " + str(nzap.get()) + "\n")
 f.write("NB " + str(nblank.get()) + "\n")
 f.write("NAFC " + str(nafc.get()) + "\n")
 f.write("NoSh441 " + str(nosh441.get()) + "\n")
-f.write("N441pp " + str(n441pp.get()) + "\n")
 f.write("NoShJT65all " + str(noshjt65all.get()) + "\n")
 f.write("NoShJT65 " + str(noshjt65.get()) + "\n")
 f.write("QDecode " + str(qdecode.get()) + "\n")

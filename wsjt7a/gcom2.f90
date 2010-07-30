@@ -25,7 +25,6 @@ integer nsumecho       !Number of echo transmissions avgd       GUI
 integer ierr           !(why is this here?)
 integer lauto          !Are we in Auto mode?                    GUI
 integer mantx          !Manual transmission requested?       GUI,SoundIn
-integer n441pp         !1 enables FSK441++ mode                 GUI
 integer nrestart       !True if transmission should restart  GUI,SoundIn
 integer ntr            !Are we in 2nd sequence?                 SoundIn
 integer nmsg           !Length of Tx message                    SoundIn
@@ -105,12 +104,12 @@ character*22 t0msg
 parameter (ND2MAX=120*11025)
 common/gcom2/ps0(431),psavg(450),s2(64,3100),ccf(-5:540),             &
      green(500),ngreen,dgain,dlatency, iter,iyr,imo,ida,              &
-     ndecoding,ndecoding0,mousebutton,ntc,necho,nfrit,ndither,nsumecho, &
-     ndecdone,npingtime,ierr,lauto,mantx,n441pp,nrestart,ntr,nmsg,    &
+     ndecoding,ndecoding0,mousebutton,ntc,necho,nfrit,ndither,        &
+     nsumecho,ndecdone,npingtime,ierr,lauto,mantx,nrestart,ntr,nmsg,  &
      nsave,nadd5,dftolerance,LDecoded,rxdone,monitoring,nzap,         &
      nsavecum,minsigdb,nclearave,newdat2,nfreeze,nafc,nmode,mode65,   &
-     mode4,nclip,ndebug,nblank,nport,                                 &
-     mousedf,neme,nsked,naggressive,ntx2,nslim2,nagain,nsavelast,ntxdf, &
+     mode4,nclip,ndebug,nblank,nport,mousedf,                         &
+     neme,nsked,naggressive,ntx2,nslim2,nagain,nsavelast,ntxdf,       &
      shok,sendingsh,d2a(ND2MAX),d2b(ND2MAX),b(60000),jza,jzb,ntime,   &
      idinterval,msmax,lenappdir,idf,ndiskdat,nfsam,nlines,nflat,      &
      ntdecode,ntxreq,ntxnow,nchallenge,ndepth,nspecial,ndf,           &
