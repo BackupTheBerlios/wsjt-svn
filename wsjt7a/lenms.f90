@@ -11,7 +11,7 @@ subroutine lenms(r,npts,msglen)
      r=r-sum(r(1:npts))/npts
      acfmax=0.
      acf0=dot_product(r(1:npts),r(1:npts))
-     kz=min(npts/2,28*56)
+     kz=min(npts/2,29*56)
      do k=8,kz
         fac=float(npts)/(npts-k)
            acf(k)=fac*dot_product(r(1:npts),r(1+k:npts+k))/acf0
