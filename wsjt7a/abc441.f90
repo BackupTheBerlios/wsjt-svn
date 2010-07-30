@@ -1,4 +1,4 @@
-subroutine abc441(msg,itone,ndits)
+subroutine abc441(msg,nmsg,itone,ndits)
 
   character msg*28
   integer itone(84)

@@ -210,7 +210,7 @@ subroutine wsjtgen
      endif
   endif
 
-!  Encode the message
+! Encode the message
   call abc441(msg,nmsg,itone,ndits)
   ndata=ndits*nspd
 
