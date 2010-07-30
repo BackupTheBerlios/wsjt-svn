@@ -3,7 +3,7 @@ subroutine iscat(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
 ! Decode an ISCAT_2 signal
 
   parameter (NMAX=512*1024)
-  parameter (NSZ=4*1292)
+  parameter (NSZ=4*1400)
   real dat(NMAX)                          !Raw signal, 30 s at 11025 sps
   character cfile6*6                      !File time
   character c42*42
