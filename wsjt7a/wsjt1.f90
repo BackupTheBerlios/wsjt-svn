@@ -1,6 +1,6 @@
 subroutine wsjt1(d,jz0,istart,samfacin,FileID,ndepth,              &
      MinSigdB,NQRN,DFTolerance,MouseButton,NClearAve,nforce,       &
-     Mode,NFreeze,NAFC,NZap,mode65,mode4,idf,ntdecode0,n441pp,     &
+     Mode,NFreeze,NAFC,NZap,mode65,mode4,idf,ntdecode0,            &
      MyCall,HisCall,HisGrid,neme,ntx2,s2,                          &
      ps0,npkept,lumsg,basevb,rmspower,nslim2,psavg,ccf,Nseg,       &
      MouseDF,NAgain,LDecoded,nspecial,ndf,ss1,ss2)
@@ -324,8 +324,7 @@ subroutine wsjt1(d,jz0,istart,samfacin,FileID,ndepth,              &
 ! Now the multi-tone decoding
 !        write(72) jz,nz,cfile6,(dat(j),j=1,jz)
   call mtdecode(dat,jz,nz,MinSigdB,MinWidth,NQRN,NFreeze,              &
-       DFTolerance,MouseDF,istart,pick,cfile6,mycall,hiscall,          &
-       n441pp,mode,ps0)
+       DFTolerance,MouseDF,istart,pick,cfile6,mycall,hiscall,mode,ps0)
 
   npkept=nline             !Number of pings that were kept
   smax=0.

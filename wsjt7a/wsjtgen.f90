@@ -209,7 +209,6 @@ subroutine wsjtgen
         sendingsh = 1
      endif
   endif
-  if(nmsg.eq.2) nmsg=nmsg+1000
 
 !  Encode the message
   call abc441(msg,nmsg,itone,ndits)

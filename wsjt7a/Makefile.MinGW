@@ -36,11 +36,6 @@ OBJS2C   = init_rs.o encode_rs.o decode_rs.o jtaudio.o fano.o \
 OBJS4	= t74.o analytic.o four2b.o iscat.o db.o pctile.o \
 	sort.o ssort.o
 
-#smooth.o pctile.o db.o \
-#	thnix_stub.o  gen441.o abc441.o ping441.o \
-#	indexx.o ping.o smo.o tweak1.o enc441.o pp441.o dec441.o \
-#	token.o msgtrim.o 
-
 t74:	$(OBJS4)
 	$(FC) -o t74 $(OBJS4) libfftw3f_win.a
 
@@ -52,8 +47,7 @@ SRCS2F90 = wsjt1.f90 a2d.f90 abc441.f90 astro0.f90 audio_init.f90 azdist0.f90 \
 	pix2d.f90 pix2d65.f90 rfile.f90 savedata.f90 spec.f90 match.f90 \
 	wsjtgen.f90 fivehz.f90 chkt0.f90 deep65.f90 makepings.f90 \
 	packpfx.f90 unpackpfx.f90 genms.f90 decodems.f90 setupms.f90 gran.f90 \
-	thnix.f90 enc441.f90 pp441.f90 tweak1.f90 smo.f90 analytic.f90 \
-	gen441.f90 dec441.f90 token.f90 msgtrim.f90 geniscat.f90 \
+	thnix.f90 tweak1.f90 smo.f90 analytic.f90 geniscat.f90 \
 	iscat.f90 four2a.f90 hipass.f90 msdf.f90 syncms.f90 lenms.f90 \
 	jtms.f90 foldms.f90 avecho.f90 echogen.f90 alignmsg.f90
 

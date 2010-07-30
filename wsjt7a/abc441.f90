@@ -1,6 +1,6 @@
-subroutine abc441(msg0,nmsg0,itone,ndits)
+subroutine abc441(msg,itone,ndits)
 
-  character msg*28,msg0*28
+  character msg*28
   integer itone(84)
   integer lookup(0:91)
   character cc*43
@@ -15,13 +15,6 @@ subroutine abc441(msg0,nmsg0,itone,ndits)
               22, 23, 24, 25, 26, 27, 28, 29, 30, 31, &
               32, 33, 34, 35, 36, 37, 38, 39, 40, 41, &
               45, 63/
-
-  if(nmsg0.gt.1000) then
-     msg=msg0
-     nmsg=nmsg0-1000
-  else
-     call enc441(msg0,msg,nmsg)
-  endif
 
   do i=1,nmsg
      j=ichar(msg(i:i))

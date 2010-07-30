@@ -1,6 +1,6 @@
       subroutine mtdecode(dat,jz,nz,MinSigdB,MinWidth,NQRN,NFreeze,
      +   DFTolerance,MouseDF,istart,pick,cfile6,mycall,hiscall,
-     +   n441pp,mode,ps0)
+     +   mode,ps0)
 
 C  Decode Multi-Tone FSK441 mesages.
 
@@ -10,7 +10,6 @@ C  Decode Multi-Tone FSK441 mesages.
       logical pick
       character*6 cfile6
       character*12 mycall,hiscall
-
       real sigdb(3100)             !Detected signal in dB, sampled at 20 ms
       real work(3100)
       integer indx(3100)
@@ -18,10 +17,8 @@ C  Decode Multi-Tone FSK441 mesages.
       real ps(128)
       real ps0(128)
       character msg*40,msg3*3
-      character frag*28,tok1*4,tok2*4,c1*1
       character*90 line
       common/ccom/nline,tping(100),line(100)
-      data frag/'$!'/
 
       slim=MinSigdB
       wmin=0.001*MinWidth * (19.95/20.0)
@@ -127,9 +124,6 @@ C  Assemble a signal report:
             go to 100
          endif
 
-         if(n441pp.eq.1 .and.mode.eq.1) call pp441(dat,jz,cfile6,    
-     +         tstart,t2,width,npeak,nrpt,dftolerance,frag,0)
-
          if(msglen.eq.0) go to 100
 
 C  Discard this ping if DF outside tolerance limits or bauderr too big.
@@ -146,29 +140,15 @@ C  If it's the best ping yet, save the spectrum:
             enddo
          endif
    
+!         if(mode.eq.8) then
+!            msg3=' '
+!            msg=' '
+!         endif
+
          if(nline.le.99) nline=nline+1
          tping(nline)=t2
+
          call cs_lock('mtdecode')
-
-         do i=37,1,-1                             !Detect sync and tokens
-            if(msg(i:i+1).eq.'$!') then
-               c1=msg(i+2:i+2)
-               if(c1.eq.' ') c1='_'
-               call token(c1,i1,tok1,n1)
-               c1=msg(i+3:i+3)
-               if(c1.eq.' ') c1='_'
-               call token(c1,i2,tok2,n2)
-!               print*,'length:',n1,'   token:',tok2
-               msg3=tok2
-               if(tok2(1:1).eq.' ') msg3=tok2(2:)
-               msg=msg(:i-1)//'..'//msg(i+4:)
-            endif
-         enddo
-
-         if(mode.eq.8) then
-            msg3=' '
-            msg=' '
-         endif
          write(line(nline),1050) cfile6,t2,mswidth,int(peak),
      +        nrpt,noffset,msg3,msg
  1050    format(a6,f5.1,i5,i3,1x,i2.2,i5,1x,a3,1x,a40)
