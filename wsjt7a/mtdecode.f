@@ -140,11 +140,6 @@ C  If it's the best ping yet, save the spectrum:
             enddo
          endif
    
-!         if(mode.eq.8) then
-!            msg3=' '
-!            msg=' '
-!         endif
-
          if(nline.le.99) nline=nline+1
          tping(nline)=t2
 
