@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#------------------------------------------------------------------ WSJT
+#------------------------------------------------------------------- WSJT
 # $Date$ $Revision$
 #
 from Tkinter import *
@@ -573,7 +573,7 @@ def ModeFSK441(event=NONE):
         bexclude.configure(state=DISABLED)
         cbnb.configure(state=NORMAL)
         cbzap.configure(state=NORMAL)
-        cbfreeze.configure(state=DISABLED)
+        cbfreeze.configure(state=NORMAL)
         cbafc.configure(state=DISABLED)
         if ltxdf: toggletxdf()
         btxdf.configure(state=DISABLED)

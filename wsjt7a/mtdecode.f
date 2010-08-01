@@ -124,6 +124,9 @@ C  Assemble a signal report:
             go to 100
          endif
 
+         call new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,
+     +              nfreeze,mousedf,dftolerance,mycall,0)
+
          if(msglen.eq.0) go to 100
 
 C  Discard this ping if DF outside tolerance limits or bauderr too big.
