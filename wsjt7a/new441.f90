@@ -75,6 +75,8 @@ subroutine new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,nfreeze,     &
 
   call analytic(dat(i0),npts,nfft1,s,cdat)    !Convert to analytic signal
 
+  call len441(cdat,npts,lenacf,nacf)
+
   ia=dftolerance/df1
   ccfmax=0.
   do i=-ia,ia                                 !Find DF
@@ -113,7 +115,8 @@ subroutine new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,nfreeze,     &
         a=a + abs(cdat(j+i-1))
         z=z + cdat(j+i-1)*cfrag(j)
      enddo
-     ss=abs(z)/a
+!     ss=abs(z)/a
+     ss=abs(z)
      rr(i)=ss
      if(ss.gt.sbest) then
         sbest=ss
@@ -125,8 +128,7 @@ subroutine new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,nfreeze,     &
 
   if(sbest.lt.0.75) go to 800     !Skip if not decodable FSK441 data
 
-  lenacf=0
-  call len441(rr,npts-nsam,lenacf)
+!  call len441(cdat,npts,lenacf)
 
 ! We know DF and DT; now demodulate and decode.
   spec=0.
@@ -207,7 +209,7 @@ subroutine new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,nfreeze,     &
   ndf=nint(dfx)
   call cs_lock('new441')
   if(ncon.ne.0) write(*,1008) cfile6,t2,mswidth,npeak,nrpt,ndf,msg
-1008 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a40,5x,'@')
+1008 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a40,5x,'*')
   if(nline.le.99) nline=nline+1
   tping(nline)=t2
   write(line(nline),1008) cfile6,t2,mswidth,npeak,nrpt,ndf,msg
@@ -261,11 +263,12 @@ subroutine new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,nfreeze,     &
      msg2=adjustl(msg2)
 
      call cs_lock('new441')
-     if(ncon.ne.0) write(*,1110) cfile6,tbest,mswidth,npeak,nrpt,ndf,msg2,n2
-1110       format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,14x,i3,'*')
+     if(ncon.ne.0) write(*,1110) cfile6,tbest,mswidth,npeak,nrpt,ndf,msg2,   &
+          nacf,n2
+1110       format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a28,10x,i4,i3,'*')
         if(nline.le.99) nline=nline+1
         tping(nline)=t2
-        write(line(nline),1110) cfile6,t2,mswidth,npeak,nrpt,ndf,msg2,n2
+        write(line(nline),1110) cfile6,t2,mswidth,npeak,nrpt,ndf,msg2,nacf,n2
      call cs_unlock
   endif
 
