@@ -97,7 +97,7 @@ nfreeze=IntVar()
 nhotaz=0
 nhotabetter=0
 nopen=0
-nosh441=IntVar()
+nshrx=IntVar()
 noshjt65=IntVar()
 noshjt65all=IntVar()
 qdecode=IntVar()
@@ -1079,14 +1079,14 @@ def decdsec(event):
     Audio.gcom1.ndsec=idsec
 
 #------------------------------------------------------ toggle_shift
-def toggle_shift(event):
-    Audio.gcom2.nadd5=1-Audio.gcom2.nadd5
-    if Audio.gcom2.nadd5:
-        bg='red'
-        lshift.configure(text='Shift 5.0',bg=bg)
-    else:
-        bg='white'
-        lshift.configure(text='Shift 0.0',bg=bg)
+##def toggle_shift(event):
+##    Audio.gcom2.nadd5=1-Audio.gcom2.nadd5
+##    if Audio.gcom2.nadd5:
+##        bg='red'
+##        lshift.configure(text='Shift 5.0',bg=bg)
+##    else:
+##        bg='white'
+##        lshift.configure(text='Shift 0.0',bg=bg)
 
 #------------------------------------------------------ inctrperiod
 def inctrperiod(event):
@@ -1847,7 +1847,7 @@ def update():
 #    Audio.gcom1.rxdelay=float('0'+options.RxDelay.get())
 #    Audio.gcom1.txdelay=float('0'+options.TxDelay.get())
     Audio.gcom2.nslim2=isync-4
-    if nosh441.get()==1 and (mode.get()=='FSK441' or mode.get()=='JTMS'):
+    if nshrx.get()==0 and (mode.get()=='FSK441' or mode.get()=='JTMS'):
             Audio.gcom2.nslim2=99
     try:
         Audio.gcom2.nport=int(options.PttPort.get())
@@ -2001,8 +2001,8 @@ if (sys.platform != 'darwin'):
     decodebutton['menu'] = decodemenu
 else:    
     decodemenu = Menu(mbar, tearoff=use_tearoff)
-decodemenu.FSK441=Menu(decodemenu,tearoff=0)
-decodemenu.FSK441.add_checkbutton(label='No shorthands',variable=nosh441)
+##decodemenu.FSK441=Menu(decodemenu,tearoff=0)
+##decodemenu.FSK441.add_checkbutton(label='No shorthands',variable=nosh441)
 decodemenu.JT65=Menu(decodemenu,tearoff=0)
 decodemenu.JT65.add_checkbutton(label='Only EME calls in Deep Search',variable=neme)
 decodemenu.JT65.add_checkbutton(label='No Shorthand decodes',variable=noshjt65all)
@@ -2018,7 +2018,7 @@ decodemenu.JT65.add_radiobutton(label = 'Aggressive Deep Search',
 decodemenu.JT65.add_radiobutton(label ='Include Average in Aggressive Deep Search',
                                 variable=ndepth, value=3)
 
-decodemenu.add_cascade(label = 'FSK441',menu=decodemenu.FSK441)
+##decodemenu.add_cascade(label = 'FSK441',menu=decodemenu.FSK441)
 decodemenu.add_cascade(label = 'JT65',menu=decodemenu.JT65)
 
 if (sys.platform == 'darwin'):
@@ -2282,10 +2282,10 @@ HisGrid=Entry(f5a,width=9)
 HisGrid.grid(column=1,row=1,pady=1)
 bAdd=Button(f5a, text='Add',command=addtodb,padx=1,pady=1)
 bAdd.grid(column=2,row=1,sticky='EW',padx=4)
-labAz=Label(f5a,text='Az 257  El 15',width=11)
-labAz.grid(column=1,row=2)
 labHotAB=Label(f5a,bg='#FFCCFF',text='HotA: 247')
 labHotAB.grid(column=0,row=2,sticky='EW',padx=4,pady=3)
+labAz=Label(f5a,text='Az 257  El 15',width=11)
+labAz.grid(column=1,row=2)
 labDist=Label(f5a,text='16753 km')
 labDist.grid(column=2,row=2)
 
@@ -2293,41 +2293,49 @@ labDist.grid(column=2,row=2)
 ldate=Label(f5a, bg='black', fg='yellow', width=11, bd=4,
         text='2005 Apr 22\n01:23:45', relief=RIDGE,
         justify=CENTER, font=(font1,16))
-ldate.grid(column=0,columnspan=3,row=3,rowspan=2,pady=2)
+ldate.grid(column=0,columnspan=2,row=3,rowspan=2,padx=4,pady=2)
+
+ldsec=Label(f5a, bg='white', fg='black', text='Dsec  0.0', width=8, relief=RIDGE)
+ldsec.grid(column=2,row=3,ipadx=3,padx=10,pady=20)
+
 f5a.pack(side=LEFT,expand=1,fill=BOTH)
 
 #------------------------------------------------------ Receiving parameters
 f5b=Frame(iframe5,bd=2,relief=GROOVE)
 lsync=Label(f5b, bg='white', fg='black', text='Sync   1', width=8, relief=RIDGE)
-lsync.grid(column=0,row=0,padx=2,pady=1,sticky='EW')
+lsync.grid(column=0,row=0,padx=2,sticky='EW')
 Widget.bind(lsync,'<Button-1>',incsync)
 Widget.bind(lsync,'<Button-3>',decsync)
 nzap=IntVar()
 cbzap=Checkbutton(f5b,text='Zap',underline=0,variable=nzap)
-cbzap.grid(column=1,row=0,padx=2,pady=1,sticky='W')
+cbzap.grid(column=1,row=0,padx=2,sticky='W')
 cbnb=Checkbutton(f5b,text='NB',variable=nblank)
-cbnb.grid(column=1,row=1,padx=2,pady=1,sticky='W')
+cbnb.grid(column=1,row=1,padx=2,sticky='W')
+shrx=Checkbutton(f5b,text='Rx ST',variable=nshrx,command=restart2)
+shrx.grid(column=1,row=2,sticky='W',padx=2)
 cbfreeze=Checkbutton(f5b,text='Freeze',underline=0,variable=nfreeze)
-cbfreeze.grid(column=1,row=2,padx=2,sticky='W')
+cbfreeze.grid(column=1,row=3,padx=2,sticky='W')
 cbafc=Checkbutton(f5b,text='AFC',variable=nafc)
-cbafc.grid(column=1,row=3,padx=2,pady=1,sticky='W')
+cbafc.grid(column=1,row=4,padx=2,sticky='W')
+lspace=Label(f5b, text='')
+lspace.grid(column=0,row=5,padx=2,pady=5,sticky='W')
 lclip=Label(f5b, bg='white', fg='black', text='Clip   0', width=8, relief=RIDGE)
 lclip.grid(column=0,row=1,padx=2,sticky='EW')
 Widget.bind(lclip,'<Button-1>',incclip)
 Widget.bind(lclip,'<Button-3>',decclip)
 ltol=Label(f5b, bg='white', fg='black', text='Tol    400', width=8, relief=RIDGE)
-ltol.grid(column=0,row=2,padx=2,pady=1,sticky='EW')
+ltol.grid(column=0,row=2,padx=2,sticky='EW')
 Widget.bind(ltol,'<Button-1>',inctol)
 Widget.bind(ltol,'<Button-3>',dectol)
-Button(f5b,text='Defaults',command=defaults,padx=1,pady=1).grid(column=0,
+Button(f5b,text='Defaults',command=defaults,padx=1).grid(column=0,
                               row=3,sticky='EW')
-ldsec=Label(f5b, bg='white', fg='black', text='Dsec  0.0', width=8, relief=RIDGE)
-ldsec.grid(column=0,row=4,ipadx=3,padx=2,pady=5,sticky='EW')
-lshift=Label(f5b, bg='white', fg='black', text='Shift 0.0', width=8, relief=RIDGE)
-lshift.grid(column=1,row=4,ipadx=3,padx=2,pady=5,sticky='EW')
+##ldsec=Label(f5b, bg='white', fg='black', text='Dsec  0.0', width=8, relief=RIDGE)
+##ldsec.grid(column=0,row=4,ipadx=3,padx=2,pady=5,sticky='EW')
+##lshift=Label(f5b, bg='white', fg='black', text='Shift 0.0', width=8, relief=RIDGE)
+##lshift.grid(column=1,row=4,ipadx=3,padx=2,pady=5,sticky='EW')
 Widget.bind(ldsec,'<Button-1>',incdsec)
 Widget.bind(ldsec,'<Button-3>',decdsec)
-Widget.bind(lshift,'<Button-1>',toggle_shift)
+##Widget.bind(lshift,'<Button-1>',toggle_shift)
 
 f5b.pack(side=LEFT,expand=0,fill=BOTH)
 
@@ -2340,10 +2348,9 @@ report=Entry(f5c2, width=4)
 report.insert(0,'26')
 labreport.pack(side=RIGHT,expand=1,fill=BOTH)
 report.pack(side=RIGHT,expand=1,fill=BOTH)
-shmsg=Checkbutton(f5c,text='Sh Msg',justify=RIGHT,variable=ShOK,
+shmsg=Checkbutton(f5c,text='Tx ST',justify=RIGHT,variable=ShOK,
             command=restart2)
-btxdf=Button(f5c,text='TxDF = 0',command=toggletxdf,
-            padx=1,pady=1)
+btxdf=Button(f5c,text='TxDF = 0',command=toggletxdf,padx=1,pady=1)
 genmsg=Button(f5c,text='GenStdMsgs',underline=0,command=GenStdMsgs,
             padx=1,pady=1)
 auto=Button(f5c,text='Auto is Off',underline=0,command=toggleauto,
@@ -2351,7 +2358,7 @@ auto=Button(f5c,text='Auto is Off',underline=0,command=toggleauto,
 auto.focus_set()
 
 txfirst.grid(column=0,row=0,sticky='W',padx=4)
-f5c2.grid(column=0,row=1,sticky='W',padx=4)
+f5c2.grid(column=0,row=1,sticky='W',padx=8)
 shmsg.grid(column=0,row=2,sticky='W',padx=4)
 btxdf.grid(column=0,row=3,sticky='EW',padx=4)
 genmsg.grid(column=0,row=4,sticky='W',padx=4)
@@ -2572,7 +2579,7 @@ try:
         elif key == 'Zap': nzap.set(value)
         elif key == 'NB': nblank.set(value)
         elif key == 'NAFC': nafc.set(value)
-        elif key == 'NoSh441': nosh441.set(value)
+        elif key == 'nshrx': nshrx.set(value)
         elif key == 'NoShJT65all': noshjt65all.set(value)
         elif key == 'NoShJT65': noshjt65.set(value)
         elif key == 'QDecode': qdecode.set(value)
@@ -2683,7 +2690,7 @@ f.write("Clip " + str(iclip) + "\n")
 f.write("Zap " + str(nzap.get()) + "\n")
 f.write("NB " + str(nblank.get()) + "\n")
 f.write("NAFC " + str(nafc.get()) + "\n")
-f.write("NoSh441 " + str(nosh441.get()) + "\n")
+f.write("nshrx " + str(nshrx.get()) + "\n")
 f.write("NoShJT65all " + str(noshjt65all.get()) + "\n")
 f.write("NoShJT65 " + str(noshjt65.get()) + "\n")
 f.write("QDecode " + str(qdecode.get()) + "\n")
