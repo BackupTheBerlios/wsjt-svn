@@ -1,5 +1,5 @@
 subroutine new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,nfreeze,     &
-     mousedf,dftolerance,mycall,ncon)
+     mousedf,dftolerance,mycall,ncon,nok)
 
 ! Experimental FSK441 decoder
 
@@ -32,9 +32,9 @@ subroutine new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,nfreeze,     &
   integer dit(-3000:3000)
   real y(0:3,-3000:3000)
   complex za(0:3,-3000:3000)
-  real yf(0:3,0:86)
-  integer nf(0:86)
-  integer ditf(0:86)
+  real yf(0:3,0:83)
+  integer nf(0:83)
+  integer ditf(0:83)
   character c*48
   character*90 line
   common/ccom/nline,tping(100),line(100)
@@ -72,16 +72,19 @@ subroutine new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,nfreeze,     &
   if(xn-n .gt.0.001) n=n+1
   nfft1=2**n
   df1=11025.0/nfft1
+  nok=0
 
   call analytic(dat(i0),npts,nfft1,s,cdat)    !Convert to analytic signal
 
-  call len441(cdat,npts,lenacf,nacf)
+  call len441(cdat,npts,lenacf,nacf)          !Do ACF to find message length
 
-  ia=dftolerance/df1
+  ia=nint(dftolerance/df1)
+  i0=0
+  if(nfreeze.ne.0) i0=nint(mousedf/df1)
   ccfmax=0.
   do i=-ia,ia                                 !Find DF
-     ccf(i)=s(i+nint(882.0/df1)) + s(i+nint(1323.0/df1)) +           &
-          s(i+nint(1764.0/df1)) + s(i+nint(2205.0/df1))
+     ccf(i)=s(i0+i+nint(882.0/df1)) + s(i0+i+nint(1323.0/df1)) +        &
+          s(i0+i+nint(1764.0/df1)) + s(i0+i+nint(2205.0/df1))
   enddo
   ccf(:-ia-1)=0.
   ccf(ia+1:)=0.
@@ -91,19 +94,21 @@ subroutine new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,nfreeze,     &
   do i=-ia,ia                                 !Find max of smoothed CCF
      if(ccf(i).gt.ccfmax) then
         ccfmax=ccf(i)
-        ipk=i
-        dfx=i*df1
+        ipk=i0+i
+        dfx=ipk*df1
      endif
   enddo
 
-  ib=min(nint(220.5/df1),ia)                  !Search range +/- 220.5 Hz
-  call pctile(ccf(ipk-ib),work,2*ib+1,50,base)
+  ic=min(nint(220/df1),ia)                    !Baseline range +/- 220 Hz
+  call pctile(ccf(ipk-ic),work,2*ic+1,50,base)
   ccfmax=ccfmax/base
-  if(ccfmax.lt.4.0) go to 800                 !Is CCF search successful?
+
+  if(ccfmax.lt.4.0) go to 800                 !Reject non-FSK441 signals
 
 ! We seem to have an FSK441 ping, and we know DF; now find DT.
   call tweak1(cdat,npts,-dfx,cdat)            !Mix to standard frequency
 
+!  rewind 51
   ibest=1
 ! Look for best match to "frag", find its DT
   sbest=0.
@@ -115,19 +120,23 @@ subroutine new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,nfreeze,     &
         a=a + abs(cdat(j+i-1))
         z=z + cdat(j+i-1)*cfrag(j)
      enddo
-!     ss=abs(z)/a
-     ss=abs(z)
+     ss=abs(z)/a
+!     ss=abs(z)
      rr(i)=ss
      if(ss.gt.sbest) then
         sbest=ss
         ibest=i
         tbest=(i+i0-1)*dt
      endif
+!     write(51,3001) i,i/75.0,rr(i)
+!3001 format(i6,2f12.3)
   enddo
   rr(npts-nsam+1:)=0
+!  call flush(51)
 
   if(sbest.lt.0.75) go to 800     !Skip if not decodable FSK441 data
 
+  nok=1
 !  call len441(cdat,npts,lenacf)
 
 ! We know DF and DT; now demodulate and decode.
@@ -197,6 +206,7 @@ subroutine new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,nfreeze,     &
   msglen=min((is2-is1+1)/3,40)         !Legth of potentially decodable text
   j=is1/3                              !Set starting location
   j=3*j
+  j=j-3
 
   do i=1,msglen                        !Read off the hard-decision message
      j=j+3
@@ -205,15 +215,16 @@ subroutine new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,nfreeze,     &
      if(nc.le.47 .and. nc.ge.0) msg(i:i)=c(nc+1:nc+1)
   enddo
 
+  if(msglen.lt.2*lenacf) go to 800     !Width less than twice message length
   n2=lenacf
   ndf=nint(dfx)
-  call cs_lock('new441')
-  if(ncon.ne.0) write(*,1008) cfile6,t2,mswidth,npeak,nrpt,ndf,msg
-1008 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a40,5x,'*')
-  if(nline.le.99) nline=nline+1
-  tping(nline)=t2
-  write(line(nline),1008) cfile6,t2,mswidth,npeak,nrpt,ndf,msg
-  call cs_unlock
+!  call cs_lock('new441')
+!  if(ncon.ne.0) write(*,1008) cfile6,t2,mswidth,npeak,nrpt,ndf,msg
+!1008 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a40,5x,'*')
+!  if(nline.le.99) nline=nline+1
+!  tping(nline)=t2
+!  write(line(nline),1008) cfile6,t2,mswidth,npeak,nrpt,ndf,msg
+!  call cs_unlock
 
 
   if(n2.ge.4) then
@@ -229,6 +240,7 @@ subroutine new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,nfreeze,     &
         nf(k)=nf(k)+1
      enddo
 
+!     rewind 52
      do k=0,3*n2-1                     !Get dit values for averaged spectrum
         if(nf(k).gt.0) then
            rmax=0.
@@ -241,7 +253,10 @@ subroutine new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,nfreeze,     &
            enddo
         endif
         ditf(k)=ipk
+!        write(52,6001) k,ditf(k),rf,nf(k)
+!6001    format(2i3,4f10.3,i5)
      enddo
+!     call flush(52)
 
      j=-3
      msg=' '
@@ -258,7 +273,6 @@ subroutine new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,nfreeze,     &
      if(idone.eq.0) call align28('CQ',  3,msg2,n2,idone)
      if(idone.eq.0) call align28('QRZ', 3,msg2,n2,idone)
      if(idone.eq.0) call align28('RRR', 3,msg2,n2,idone)
-     if(idone.eq.0) call align28('73',  3,msg2,n2,idone)
      if(idone.eq.0) call align28(' ',   1,msg2,n2,idone)
      msg2=adjustl(msg2)
 

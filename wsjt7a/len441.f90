@@ -20,7 +20,7 @@ subroutine len441(cdat,npts,msglen,nacf)
      acf(j)=abs(z)/(npts-j)
   enddo
 
-!  rewind 52
+!  rewind 53
   jstep=50
   smax=0.
   do j=ja+jstep,jb-jstep
@@ -34,10 +34,10 @@ subroutine len441(cdat,npts,msglen,nacf)
         smax=acf2(j)
         jpk=j
      endif
-!     write(52,5001) j,j/75.0,acf2(j)
+!     write(53,5001) j,j/75.0,acf2(j)
 !5001 format(i8,2f12.3)
   enddo
-!  call flush(52)
+!  call flush(53)
   
   np=nint(jpk/75.0)
   chk=(jpk/75.0)/np
