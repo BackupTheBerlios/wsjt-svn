@@ -26,7 +26,7 @@ import thread
 import webbrowser
 
 root = Tk()
-Version="7.1 r" + "$Rev$"[6:-1]
+Version="9.0 r" + "$Rev$"[6:-1]
 print "******************************************************************"
 print "WSJT Version " + Version + ", by K1JT"
 print "Revision date: " + \
@@ -243,7 +243,7 @@ def dbl_click3_text(event):
         if rpt[:1]=='-' and len(rpt)==2: rpt=rpt[0:1]+'0'+rpt[1:2]
         dbl_click_call(t,t1,rpt,event)
 
-    if mode.get()[:5]=='ISCAT':
+    elif mode.get()[:5]=='ISCAT':
         t=text.get('1.0',END)           #Entire contents of text box
         t1=text.get('1.0',CURRENT)      #Contents from start to mouse pointer
         n=t1.rfind("\n")
@@ -252,7 +252,17 @@ def dbl_click3_text(event):
         if rpt[:1]=='-' and len(rpt)==2: rpt=rpt[0:1]+'0'+rpt[1:2]
         report.delete(0,END)
         report.insert(0,rpt)
-        GenStdMsgs()
+        dbl_click_call(t,t1,rpt,event)
+
+    elif mode.get()=='FSK441' or mode.get()=='JTMS':
+        t=text.get('1.0',END)           #Entire contents of text box
+        t1=text.get('1.0',CURRENT)      #Contents from start to mouse pointer
+        n=t1.rfind("\n")
+        rpt=t1[n+21:n+23]
+        report.delete(0,END)
+        report.insert(0,rpt)
+        dbl_click_call(t,t1,rpt,event)
+
 
 #------------------------------------------------------ dbl_click_ave
 def dbl_click_ave(event):
@@ -785,7 +795,7 @@ these operating modes:
   6. CW     - 15 WPM Morse code, messages structured for EME
   7. Echo   - EME Echo testing
 
-Copyright (c) 2001-2010 by Joseph H. Taylor, Jr., K1JT, with
+Copy (c) 2001-2010 by Joseph H. Taylor, Jr., K1JT, with
 contributions from additional authors.  WSJT is Open Source 
 software, licensed under the GNU General Public License (GPL).
 Source code and programming information may be found at 
@@ -2545,7 +2555,7 @@ if nmonitor.get():
 else:
     stopmon()
 if g.Win32: root.iconbitmap("wsjt.ico")
-root.title('  WSJT 7.1     by K1JT')
+root.title('  WSJT 9.0     by K1JT')
 from WsjtMod import astro
 from WsjtMod import specjt
 
