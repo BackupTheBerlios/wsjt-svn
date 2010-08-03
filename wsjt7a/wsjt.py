@@ -1312,11 +1312,15 @@ def setmsg(template,r):
     t=options.MyCall.get()
     n=len(t)
     MySuffix=t[n-3:]
+    n2=MySuffix.find('/')
+    if(n2>=0): MySuffix=t[n-5:n-2]
     if MySuffix[0:1].isdigit()or MySuffix[1:2].isdigit():
         MySuffix=MySuffix[1:]
     t=ToRadio.get()
     n=len(t)
     HisSuffix=t[n-3:]
+    n2=HisSuffix.find('/')
+    if(n2>=0): HisSuffix=t[n-5:n-2]
     if HisSuffix[0:1].isdigit()or HisSuffix[1:2].isdigit():
         HisSuffix=HisSuffix[1:]
     npct=0
