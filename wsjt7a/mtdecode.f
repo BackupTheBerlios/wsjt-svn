@@ -5,7 +5,6 @@
 C  Decode Multi-Tone FSK441 mesages.
 
       real dat(jz)                !Raw audio data
-      integer NQRN
       integer DFTolerance
       logical pick
       character*6 cfile6
@@ -99,8 +98,6 @@ C  Decode the message.
          msg=' '
          call longx(dat(jj),jjz,ps,DFTolerance,noffset,msg,
      +     msglen,bauderr)
-         qrnlimit=4.4*1.5**(5.0-NQRN)
-         if(NQRN.eq.0) qrnlimit=99.
 
 C  Assemble a signal report:
          nwidth=0
@@ -134,8 +131,8 @@ C  Assemble a signal report:
 C  Discard this ping if DF outside tolerance limits or bauderr too big.
 C  (However, if the ping was mouse-picked, proceed anyway.)
 
-         if(.not.pick .and. ((noffset.lt.nf1 .or. noffset.gt.nf2) .or.
-     +      (abs(bauderr).gt.qrnlimit))) goto 100
+         if(.not.pick .and. ((noffset.lt.nf1 .or. 
+     +       noffset.gt.nf2))) goto 100
 
 C  If it's the best ping yet, save the spectrum:
          if(peak.gt.bigpeak) then
@@ -144,7 +141,7 @@ C  If it's the best ping yet, save the spectrum:
                ps0(i)=ps(i)
             enddo
          endif
-   
+
          if(nline.le.99) nline=nline+1
          tping(nline)=t2
 

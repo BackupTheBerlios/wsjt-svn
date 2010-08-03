@@ -8,10 +8,6 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,dftolerance,nok)
   complex cdat(NMAX)                      !Analytic form of signal
   character frag*28,frag0*29              !Message fragment to be matched
   complex cfrag(2100)                     !Complex waveform of message fragment
-  complex ct0(25)
-  complex ct1(25)
-  complex ct2(25)
-  complex ct3(25)
   complex z
   real rr(60000)
   integer itone(84)                       !Generated tones for msg fragment
@@ -19,7 +15,7 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,dftolerance,nok)
   real ccf(-6000:6000)
   integer dftolerance
   common/scratch/work(NMAX)
-  save frag0,cfrag,ct0,ct1,ct2,ct3,ndits
+  save frag0,cfrag,ndits
 
   frag=' '
   if(frag.ne.frag0) then
@@ -30,10 +26,6 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,dftolerance,nok)
      if(nfrag.eq.0) nfrag=1
      call abc441(frag,nfrag,itone,ndits)
      call gen441(itone,ndits,cfrag)        !Generate complex waveform
-     call gen441(1,1,ct0)                  !Generate complex symbol waveforms
-     call gen441(2,1,ct1)
-     call gen441(3,1,ct2)
-     call gen441(4,1,ct3)
      frag0=frag
   endif
 
@@ -87,7 +79,6 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,dftolerance,nok)
 ! We seem to have an FSK441 ping, and we know DF; now find DT.
   call tweak1(cdat,npts,-dfx,cdat)            !Mix to standard frequency
 
-!  rewind 51
   ibest=1
 ! Look for best match to "frag", find its DT
   sbest=0.
@@ -107,14 +98,9 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,dftolerance,nok)
         ibest=i
         tbest=(i+i0-1)*dt
      endif
-!     write(51,3001) i,i/75.0,rr(i)
-!3001 format(i6,2f12.3)
   enddo
   rr(npts-nsam+1:)=0
-!  call flush(51)
-
   if(sbest.lt.0.75) go to 800     !Skip if not decodable FSK441 data
-
   nok=1
 
 800 continue
