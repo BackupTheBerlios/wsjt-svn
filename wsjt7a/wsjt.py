@@ -517,9 +517,9 @@ def addtodb():
             os.rename("CALL3.TXT","CALL3.OLD")
             os.rename("CALL3.TMP","CALL3.TXT")
 
-#------------------------------------------------------ clrrpt
-def clrrpt(event):
-    report.delete(0,END)
+#------------------------------------------------------ setrpt
+def setrpt(event):
+#    report.delete(0,END)
     report.focus_set()
 
 #-------------------------------------------------------- clrToRadio
@@ -830,6 +830,7 @@ F11	Decrement Freeze DF
 F12	Increment Freeze DF
 Alt+1 to Alt+6  Tx1 to Tx6
 Alt+A	Toggle Auto On/Off
+Alt+C	Clear average
 Alt+D	Decode
 Ctrl+D	Force Decode 
 Shift+Ctrl+D  Force Decode, no JT65 shorthands 
@@ -843,6 +844,7 @@ Ctrl+L	Lookup, then Generate Standard Messages
 Alt+M	Monitor
 Alt+O	Tx Stop
 Alt+Q	Log QSO
+Alt+R	Enter report
 Alt+S	Stop Monitoring or Decoding
 Alt+V	Save Last
 Alt+X	Exclude
@@ -859,11 +861,11 @@ def mouse_commands(event=NONE):
     t="""
 Click on          Action
 --------------------------------------------------------
-Waterfall        FSK441/JTMS: click to decode ping
+Waterfall        FSK441, JTMS: click to decode region
                       JT65: Click to set DF for Freeze
                        Double-click to Freeze and Decode
 
-Main screen,     FSK441/JTMS/ISCAT: click to decode ping
+Main screen,     FSK441, JTMS, ISCAT: click to decode ping
 graphics area    JT65: Click to set DF for Freeze
                            Double-click to Freeze and Decode
 
@@ -2138,6 +2140,8 @@ root.bind_all('<Alt-i>',decode_include)
 root.bind_all('<Alt-I>',decode_include)
 root.bind_all('<Alt-l>',lookup)
 root.bind_all('<Alt-L>',lookup)
+root.bind_all('<Control-l>',lookup_gen)
+root.bind_all('<Control-L>',lookup_gen)
 root.bind_all('<Alt-m>',monitor)
 root.bind_all('<Alt-M>',monitor)
 root.bind_all('<Alt-o>',txstop)
@@ -2146,8 +2150,8 @@ root.bind_all('<Control-o>',openfile)
 root.bind_all('<Control-O>',openfile)
 root.bind_all('<Alt-q>',logqso)
 root.bind_all('<Alt-Q>',logqso)
-root.bind_all('<Alt-r>',clrrpt)
-root.bind_all('<Alt-R>',clrrpt)
+root.bind_all('<Alt-r>',setrpt)
+root.bind_all('<Alt-R>',setrpt)
 root.bind_all('<Alt-s>',stopmon)
 root.bind_all('<Alt-S>',stopmon)
 root.bind_all('<Alt-v>',savelast)
@@ -2156,8 +2160,6 @@ root.bind_all('<Alt-x>',decode_exclude)
 root.bind_all('<Alt-X>',decode_exclude)
 root.bind_all('<Alt-z>',toggle_zap)
 root.bind_all('<Alt-Z>',toggle_zap)
-root.bind_all('<Control-l>',lookup_gen)
-root.bind_all('<Control-L>',lookup_gen)
 
 text.pack(side=LEFT, fill=X, padx=1)
 sb = Scrollbar(iframe4, orient=VERTICAL, command=text.yview)
