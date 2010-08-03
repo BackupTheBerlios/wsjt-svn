@@ -57,7 +57,6 @@ first=1
 g.appdir=appdir
 isync=0
 isync441=2
-isync6m=-10
 isync_iscat=-20
 isync65=1
 isync_save=0
@@ -94,6 +93,7 @@ neme=IntVar()
 nfreeze=IntVar()
 nhotaz=0
 nhotabetter=0
+nmonitor=IntVar()
 nopen=0
 nshrx=IntVar()
 noshjt65=IntVar()
@@ -291,8 +291,8 @@ def dbl_click_call(t,t1,rpt,event):
             tx4.insert(0,t2+"RRR")
             tx5.delete(0,END)
             tx5.insert(0,t2+"73")
-        i3=t[:i1].strip().rfind(' ')+1
-        if t[i3:i1].strip() == 'CQ':
+        i4=t[:i1].strip().rfind(' ')+1
+        if t[i3:i1].find(' CQ ')>=0:
             ntx.set(1)
         else:
             ntx.set(2)
@@ -654,40 +654,26 @@ def ModeISCAT(event=NONE):
     global isync,isync_iscat
     if g.mode != "ISCAT":
         if lauto: toggleauto()
-    ModeJT6M()
-    mode.set("ISCAT")
-    lab2.configure(text='FileID      Avg dB        DF')
-    isync=isync_iscat
-    lsync.configure(text=slabel+str(isync))
-    shmsg.configure(state=NORMAL)
-    nfreeze.set(0)
-    report.configure(state=NORMAL)
-    report.delete(0,END)
-    report.insert(0,'-15')
-
-#------------------------------------------------------ ModeJT6M
-def ModeJT6M(event=NONE):
-    global slabel,isync,isync6m,itol
-    if g.mode != "JT6M":
-        if lauto: toggleauto()
         cleartext()
         ModeFSK441()
-        lab2.configure(text='FileID            T      Width      dB        DF')
-        mode.set("JT6M")
-        isync=isync6m
+
+        mode.set("ISCAT")
+        lab2.configure(text='FileID      Avg dB        DF')
+        isync=isync_iscat
         lsync.configure(text=slabel+str(isync))
-        shmsg.configure(state=DISABLED)
-        cbzap.configure(state=NORMAL)
+        shmsg.configure(state=NORMAL)
         cbfreeze.configure(state=NORMAL)
         itol=3
         ltol.configure(text='Tol    '+str(ntol[itol]))
         inctol()
-        nfreeze.set(1)
+        nfreeze.set(0)
+        report.configure(state=NORMAL)
+        report.delete(0,END)
+        report.insert(0,'-15')
         ntx.set(1)
         Audio.gcom2.mousedf=0
         GenStdMsgs()
-        erase()
-        
+        erase()        
 
 #------------------------------------------------------ ModeCW
 def ModeCW(event=NONE):
@@ -792,13 +778,12 @@ WSJT is a weak signal communications program.  It supports
 these operating modes:
 
   1. FSK441 - fast mode for meteor scatter
-  2. JT6M   - for meteor and ionospheric scatter on 50 MHz
-  3. JT65   - for HF, EME, and troposcatter
-  4. CW     - 15 WPM Morse code, messages structured for EME
+  2. JTMS   - fast mode for meteor scatter
+  3. ISCAT  - for meteor and ionospheric scatter on 50 MHz
+  4. JT65   - for HF, EME, and troposcatter
   5. JT4    - for HF and EME
-  6. ISCAT  - for meteor and ionospheric scatter on 50 MHz
-  7. JTMS   - fast mode for meteor scatter
-  8. Echo   - EME Echo testing
+  6. CW     - 15 WPM Morse code, messages structured for EME
+  7. Echo   - EME Echo testing
 
 Copyright (c) 2001-2010 by Joseph H. Taylor, Jr., K1JT, with
 contributions from additional authors.  WSJT is Open Source 
@@ -829,12 +814,6 @@ F5	What message to send?
 Shift+F5	Examples of minimal JT65 QSOs
 F6	Open next file in directory
 Shift+F6	Decode all wave files in directory
-F7	Set FSK441 mode
-Shift+F7	Set JT6M mode
-F8	Set JT65A mode
-Shift+F8	Set JT65B mode
-Ctrl+F8	Set JT65C mode
-Shift+Ctrl+F8 Set CW mode
 F10	Show SpecJT
 Shift+F10  Show astronomical data
 F11	Decrement Freeze DF
@@ -870,11 +849,11 @@ def mouse_commands(event=NONE):
     t="""
 Click on          Action
 --------------------------------------------------------
-Waterfall        FSK441/JT6M: click to decode ping
+Waterfall        FSK441/JTMS: click to decode ping
                       JT65: Click to set DF for Freeze
                        Double-click to Freeze and Decode
 
-Main screen,     FSK441/JT6M: click to decode ping
+Main screen,     FSK441/JTMS/ISCAT: click to decode ping
 graphics area    JT65: Click to set DF for Freeze
                            Double-click to Freeze and Decode
 
@@ -898,7 +877,7 @@ use the following standard procedures and *do not* exchange pertinent
 information by other means (e.g., internet, telephone, ...) while the
 QSO is in progress!
 
-FSK441 or JT6M:   If you have received
+FSK441, JTMS, or ISCAT:   If you have received
     ... less than both calls from the other station, send both calls.
     ... both calls, send both calls and your signal report.
     ... both calls and signal report, send R and your report.
@@ -906,11 +885,11 @@ FSK441 or JT6M:   If you have received
     ... RRR, the QSO is complete.  However, the other station may not
 know this, so it is conventional to send 73 to signify that you are done.
 
-(Outside of North America, the customary procedures for FSK441
-and JT6M may be slightly different.)
+(Outside of North America, the customary procedures may be slightly
+different.)
 
 
-JT65:   If you have received
+JT65, JT4:   If you have received
     ... less than both calls, send both calls and your grid locator.
     ... both calls, send both calls, your grid locator, and OOO.
     ... both calls and OOO, send RO.
@@ -1243,8 +1222,7 @@ def GenStdMsgs(event=NONE):
     Audio.gcom2.hiscall=(ToRadio.get()+(' '*12))[:12]
     for m in (tx1, tx2, tx3, tx4, tx5, tx6):
         m.delete(0,99)
-    if mode.get()=="FSK441" or mode.get()=="JT6M" or \
-       mode.get()=="ISCAT" or mode.get()=='JTMS':
+    if mode.get()=="FSK441" or mode.get()=="ISCAT" or mode.get()=='JTMS':
         r=report.get()
         tx1.insert(0,setmsg(options.tx1.get(),r))
         tx2.insert(0,setmsg(options.tx2.get(),r))
@@ -1472,8 +1450,6 @@ def plot_small():
         x=int(i*df*fac)
         xy.append(x)
         psavg=Audio.gcom2.psavg[i]
-        if mode.get()=="JT6M":
-            psavg=psavg + 27.959
         n=int(150.0-2*psavg)
         xy.append(n)
         if mode.get()=='FSK441' or mode.get()=="JTMS":
@@ -1482,9 +1458,7 @@ def plot_small():
             xy2.append(x)
             xy2.append(n)
     graph2.create_line(xy,fill="magenta")
-    if mode.get()=='JT6M':
-        plot_yellow()
-    elif mode.get()=='FSK441' or mode.get()=="JTMS":
+    if mode.get()=='FSK441' or mode.get()=="JTMS":
         graph2.create_line(xy2,fill="red")
         for i in range(4):
             x=(i+2)*441*fac
@@ -1518,7 +1492,7 @@ def plot_yellow():
 #------------------------------------------------------ update
 def update():
     global root_geom,isec0,naz,nel,ndmiles,ndkm,nhotaz,nhotabetter,nopen, \
-           im,pim,cmap0,isync,isync441,isync6m,isync_iscat,isync65,       \
+           im,pim,cmap0,isync,isync441,isync_iscat,isync65,       \
            isync_save,idsec,first,itol,txsnrdb,tx6alt
     
     utc=time.gmtime(time.time()+0.1*idsec)
@@ -1616,8 +1590,6 @@ def update():
             msg2.configure(bg='#FFFF00')
         elif mode.get()[:4]=="JT65":
             msg2.configure(bg='#00FFFF')
-        elif mode.get()=="JT6M":
-            msg2.configure(bg='#FF00FF')
         elif mode.get()=="CW":
             msg2.configure(bg='#00FF00')
         elif mode.get()[:5]=="ISCAT":
@@ -1777,7 +1749,6 @@ def update():
     g.mode=mode.get()
     g.report=report.get()
     if mode.get()=='FSK441' or mode.get()=='JTMS': isync441=isync
-    elif mode.get()=='JT6M': isync6m=isync
     elif mode.get()=="ISCAT": isync_iscat=isync
     elif mode.get()[:4]=='JT65': isync65=isync
     Audio.gcom1.txfirst=TxFirst.get()
@@ -1905,8 +1876,9 @@ setupmenu.add_checkbutton(label = 'Double-click on callsign sets TxFirst',
                           variable=setseq)
 setupmenu.add_checkbutton(label = 'GenStdMsgs sets Tx1',variable=k2txb)
 setupmenu.add_separator()
+setupmenu.add_checkbutton(label = 'Monitor ON at startup',variable=nmonitor)
+setupmenu.add_separator()
 setupmenu.add_checkbutton(label = 'Enable diagnostics',variable=ndebug)
-
 if (sys.platform == 'darwin'):
     mbar.add_cascade(label="Setup", menu=setupmenu)
 
@@ -1940,22 +1912,12 @@ else:
 # Can use the following to retrieve the state:
 # state=modemenu.entrycget(0,"state")
 
-if (sys.platform=='darwin') :
-    # accelerators break radiobutton behaviour in Darwin
-    modemenu.add_radiobutton(label = 'FSK441', variable=mode,command = ModeFSK441, state=NORMAL)
-    modemenu.add_radiobutton(label = 'JT6M', variable=mode, command = ModeJT6M)
-    modemenu.add_radiobutton(label = 'JT65A', variable=mode, command = ModeJT65A)
-    modemenu.add_radiobutton(label = 'JT65B', variable=mode, command = ModeJT65B)
-    modemenu.add_radiobutton(label = 'JT65C', variable=mode, command = ModeJT65C)
-    modemenu.add_radiobutton(label = 'CW', variable=mode, command = ModeCW)
-else:
-    modemenu.add_radiobutton(label = 'FSK441', variable=mode,command = ModeFSK441, state=NORMAL, accelerator='F7')
-    modemenu.add_radiobutton(label = 'JT6M', variable=mode, command = ModeJT6M,accelerator='Shift+F7')
-    modemenu.add_radiobutton(label = 'JT65A', variable=mode, command = ModeJT65A,accelerator='F8')
-    modemenu.add_radiobutton(label = 'JT65B', variable=mode, command = ModeJT65B,accelerator='Shift+F8')
-    modemenu.add_radiobutton(label = 'JT65C', variable=mode, command = ModeJT65C,accelerator='Ctrl+F8')
-    modemenu.add_radiobutton(label = 'CW', variable=mode, command = ModeCW,accelerator='Shift+Ctrl+F8')
-
+modemenu.add_radiobutton(label = 'FSK441', variable=mode,command = ModeFSK441, state=NORMAL)
+modemenu.add_radiobutton(label = 'JTMS', variable=mode, command = ModeJTMS)
+modemenu.add_radiobutton(label = 'ISCAT', variable=mode, command = ModeISCAT)
+modemenu.add_radiobutton(label = 'JT65A', variable=mode, command = ModeJT65A)
+modemenu.add_radiobutton(label = 'JT65B', variable=mode, command = ModeJT65B)
+modemenu.add_radiobutton(label = 'JT65C', variable=mode, command = ModeJT65C)
 modemenu.add_radiobutton(label = 'JT4A', variable=mode, command = ModeJT4A)
 modemenu.add_radiobutton(label = 'JT4B', variable=mode, command = ModeJT4B)
 modemenu.add_radiobutton(label = 'JT4C', variable=mode, command = ModeJT4C)
@@ -1963,8 +1925,7 @@ modemenu.add_radiobutton(label = 'JT4D', variable=mode, command = ModeJT4D)
 modemenu.add_radiobutton(label = 'JT4E', variable=mode, command = ModeJT4E)
 modemenu.add_radiobutton(label = 'JT4F', variable=mode, command = ModeJT4F)
 modemenu.add_radiobutton(label = 'JT4G', variable=mode, command = ModeJT4G)
-modemenu.add_radiobutton(label = 'ISCAT', variable=mode, command = ModeISCAT)
-modemenu.add_radiobutton(label = 'JTMS', variable=mode, command = ModeJTMS)
+modemenu.add_radiobutton(label = 'CW', variable=mode, command = ModeCW)
 modemenu.add_radiobutton(label = 'Echo', variable=mode, command = ModeEcho)
 
 if (sys.platform == 'darwin'):
@@ -2131,18 +2092,10 @@ root.bind_all('<F5>', what2send)
 root.bind_all('<Shift-F5>', minimal_qso)
 root.bind_all('<F6>', opennext)
 root.bind_all('<Shift-F6>', decodeall)
-root.bind_all('<F7>', ModeFSK441)
-root.bind_all('<F8>', ModeJT65A)
-root.bind_all('<Shift-F8>', ModeJT65B)
-root.bind_all('<Control-F8>', ModeJT65C)
-root.bind_all('<Shift-F7>', ModeJT6M)
-root.bind_all('<Shift-Control-F8>', ModeCW)
-#root.bind_all('<F9>', ModeEcho)
 root.bind_all('<F10>', showspecjt)
 root.bind_all('<Shift-F10>', astro1)
 root.bind_all('<F11>', left_arrow)
 root.bind_all('<F12>', right_arrow)
-
 
 root.bind_all('<Alt-Key-1>',btx1)
 root.bind_all('<Alt-Key-2>',btx2)
@@ -2445,8 +2398,6 @@ try:
                 ModeJT65B()
             elif value=='JT65C':
                 ModeJT65C()
-            elif value=='JT6M':
-                ModeJT6M()
             elif value=='CW':
                 ModeCW()
             elif value=='ISCAT':
@@ -2543,7 +2494,6 @@ try:
         elif key == 'Nsave': nsave.set(value)
         elif key == 'Band': nfreq.set(value)
         elif key == 'S441': isync441=int(value)
-        elif key == 'S6m': isync6m=int(value)
         elif key == 'Siscat': isync_iscat=int(value)
         elif key == 'Sync': isync65=int(value)
         elif key == 'Zap': nzap.set(value)
@@ -2555,6 +2505,7 @@ try:
         elif key == 'NEME': neme.set(value)
         elif key == 'NDepth': ndepth.set(value)
         elif key == 'Debug': ndebug.set(value)
+        elif key == 'Monitor': nmonitor.set(value)
         elif key == 'HisCall':
             Audio.gcom2.hiscall=(value+' '*12)[:12]
             ToRadio.delete(0,99)
@@ -2572,7 +2523,6 @@ except:
 
 g.mode=mode.get()
 if mode.get()=='FSK441' or mode.get()=='JTMS': isync=isync441
-elif mode.get()=='JT6M': isync=isync6m
 elif mode.get()=="ISCAT": isync=isync_iscat
 elif mode.get()[:4]=='JT65': isync=isync65
 elif mode.get()[:3]=='JT4':
@@ -2589,7 +2539,11 @@ Audio.gcom2.azeldir=(options.azeldir.get()+' '*80)[:80]
 Audio.gcom2.ndepth=ndepth.get()
 Audio.gcom2.nhighpri=options.HighPri.get()
 Audio.gcom4.addpfx=(options.addpfx.get().lstrip()+(' '*8))[:8]
-stopmon()
+
+if nmonitor.get():
+    monitor()
+else:
+    stopmon()
 if g.Win32: root.iconbitmap("wsjt.ico")
 root.title('  WSJT 7.1     by K1JT')
 from WsjtMod import astro
@@ -2651,7 +2605,6 @@ f.write("ShOK " + str(ShOK.get()) + "\n")
 f.write("Nsave " + str(nsave.get()) + "\n")
 f.write("Band " + str(nfreq.get()) + "\n")
 f.write("S441 " + str(isync441) + "\n")
-f.write("S6m " + str(isync6m) + "\n")
 f.write("Siscat " + str(isync_iscat) + "\n")
 f.write("Sync " + str(isync65) + "\n")
 f.write("Zap " + str(nzap.get()) + "\n")
@@ -2663,6 +2616,7 @@ f.write("QDecode " + str(qdecode.get()) + "\n")
 f.write("NEME " + str(neme.get()) + "\n")
 f.write("NDepth " + str(ndepth.get()) + "\n")
 f.write("Debug " + str(ndebug.get()) + "\n")
+f.write("Monitor " + str(nmonitor.get()) + "\n")
 #f.write("TRPeriod " + str(Audio.gcom1.trperiod) + "\n")
 mrudir2=mrudir.replace(" ","#")
 f.write("MRUDir " + mrudir2 + "\n")
