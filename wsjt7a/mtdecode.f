@@ -124,8 +124,10 @@ C  Assemble a signal report:
             go to 100
          endif
 
-         call new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,
-     +              nfreeze,mousedf,dftolerance,mycall,0,nok)
+         call chk441(dat,jz,tstart,width,nfreeze,mousedf,
+     +               dftolerance,nok)
+!         call new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,
+!     +              nfreeze,mousedf,dftolerance,mycall,0,nok)
 
          if(msglen.eq.0 .or. nok.eq.0) go to 100
 
