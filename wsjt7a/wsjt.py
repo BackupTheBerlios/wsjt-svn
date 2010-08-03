@@ -774,6 +774,8 @@ def ModeEcho(event=NONE):
     mode.set("Echo")
     if lauto: toggleauto()
     lab2.configure(text='     N      Level         Sig              DF         Width      Q')
+#    tx1.delete(0,99)
+#    tx1.insert(0,"ECHO")
     
 #------------------------------------------------------ msgpos
 def msgpos():
@@ -1712,7 +1714,7 @@ def update():
         elif Audio.gcom2.ntxnow==3: tx3.configure(bg=bgcolor)
         elif Audio.gcom2.ntxnow==4: tx4.configure(bg=bgcolor)
         elif Audio.gcom2.ntxnow==5: tx5.configure(bg=bgcolor)
-        else: tx6.configure(bg=bgcolor)
+        elif Audio.gcom2.ntxnow==6: tx6.configure(bg=bgcolor)
     else:
         bgcolor='green'
         t='Receiving'

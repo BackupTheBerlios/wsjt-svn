@@ -1,6 +1,6 @@
 subroutine echogen(mode_echo,dither,iwave,nwave,f1)
 
-  parameter (NMAX=24050)            !Length of wave file, 2.0 seconds
+  parameter (NMAX=44100)            !Length of wave file, 4.0 seconds
   real dither                       !Amount to dither f1
   integer*2 iwave(NMAX)             !Wave file to be generated
   integer nwave                     !Length of wave file
@@ -11,8 +11,8 @@ subroutine echogen(mode_echo,dither,iwave,nwave,f1)
        16,4,9,19,10,21,14/
 
   twopi=8*atan(1.d0)
-  dt=1.d0/12000.d0
-  df=12000.d0/890.d0
+  dt=1.d0/11025.d0
+  df=11025.d0/890.d0
 
   if(mode_echo.ne.0) then
      pha=0.d0
@@ -43,7 +43,6 @@ subroutine echogen(mode_echo,dither,iwave,nwave,f1)
         pha=pha+dpha
         iwave(i)=nint(32767.0*sin(pha))
      enddo
-     iwave(24001:)=0
   endif
   nwave=NMAX
 

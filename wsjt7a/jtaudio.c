@@ -156,8 +156,14 @@ SoundOut( void *inputBuffer, void *outputBuffer,
     n=nsec/(*data->trperiod);
     //    ic = (int)(stime - *data->trperiod*n) * data->nfs/framesPerBuffer;
     //    ic = framesPerBuffer*ic;
-    ic = (int)(stime - *data->trperiod*n) * data->nfs;
-    ic = ic % *data->nwave;
+
+    if(*data->nmode == 3)  {
+      ic = 0;
+    }
+    else  {
+      ic = (int)(stime - *data->trperiod*n) * data->nfs;
+      ic = ic % *data->nwave;
+    }
   }
 
   TxOKz=*data->TxOK;

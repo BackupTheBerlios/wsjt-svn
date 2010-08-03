@@ -162,14 +162,6 @@ subroutine wsjtgen
      goto 900
   endif
 
-  if(mode(1:4).eq.'Echo') then
-!  We're in Echo mode.
-!     dither=AmpA
-!     call echogen(dither,wavefile,nbytes,f1)
-!     AmpB=f1
-     goto 900
-  endif
-
   if(mode(1:2).eq.'CW') then
 !  We're in CW mode
 !     wpm=15.
