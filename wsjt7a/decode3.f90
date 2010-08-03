@@ -11,7 +11,6 @@ subroutine decode3(d2,jz,istart,filename)
   FileID=filename
   decodedfile=filename
   lumsg=11
-  nqrn=nclip+5
   nmode=1
   if(mode(1:4).eq.'JT65') then
      nmode=2
@@ -35,8 +34,6 @@ subroutine decode3(d2,jz,istart,filename)
      d2d(i)=d2(i)
   enddo
 
-  if(nblank.ne.0) call blanker(d2d,jz)
-
   nseg=1
   if(mode(1:4).eq.'JT65' .or. nmode.ge.6) then
      i=index(FileID,'.')-3
@@ -57,7 +54,7 @@ subroutine decode3(d2,jz,istart,filename)
      jz=min(60*11025,jz+nzero)
   endif
   call wsjt1(d2d,jz,istart,samfacin,FileID,ndepth,                     &
-       MinSigdB,NQRN,DFTolerance,MouseButton,NClearAve,nforce,         &
+       MinSigdB,DFTolerance,MouseButton,NClearAve,nforce,         &
        nMode,NFreeze,NAFC,NZap,mode65,mode4,idf,ntdecode,              &
        MyCall,HisCall,HisGrid,neme,ntx2,s2,                            &
        ps0,npkept,lumsg,basevb,rmspower,nslim2,psavg,ccf,Nseg,         &

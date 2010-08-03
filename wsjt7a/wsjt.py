@@ -61,7 +61,6 @@ isync6m=-10
 isync_iscat=-20
 isync65=1
 isync_save=0
-iclip=0
 itol=5                                       #Default tol=400 Hz
 ntol=(10,25,50,100,200,400,600)              #List of available tolerances
 idsec=0
@@ -86,7 +85,6 @@ nafc=IntVar()
 naz=0
 ndepth=IntVar()
 nel=0
-nblank=IntVar()
 ncall=0
 ncwtrperiod=120
 ndmiles=0
@@ -571,15 +569,15 @@ def ModeFSK441(event=NONE):
         bclravg.configure(state=DISABLED)
         binclude.configure(state=DISABLED)
         bexclude.configure(state=DISABLED)
-        cbnb.configure(state=NORMAL)
         cbzap.configure(state=NORMAL)
         cbfreeze.configure(state=NORMAL)
-        cbafc.configure(state=DISABLED)
+        cbafc.grid_forget()
         if ltxdf: toggletxdf()
         btxdf.configure(state=DISABLED)
         report.configure(state=NORMAL)
         shmsg.configure(state=NORMAL)
         graph2.configure(bg='black')
+        btxdf.grid_forget()
         report.delete(0,END)
         report.insert(0,'26')
         itol=4
@@ -605,10 +603,10 @@ def ModeJT65():
     bclravg.configure(state=NORMAL)
     binclude.configure(state=NORMAL)
     bexclude.configure(state=NORMAL)
-    cbnb.configure(state=NORMAL)
+    btxdf.grid(column=0,row=3,sticky='EW',padx=4)
     cbzap.configure(state=NORMAL)
     cbfreeze.configure(state=NORMAL)
-    cbafc.configure(state=NORMAL)
+    cbafc.grid(column=1,row=4,padx=2,sticky='W')
     if ltxdf: toggletxdf()
     btxdf.configure(state=NORMAL)
     report.configure(state=DISABLED)
@@ -679,7 +677,6 @@ def ModeJT6M(event=NONE):
         isync=isync6m
         lsync.configure(text=slabel+str(isync))
         shmsg.configure(state=DISABLED)
-        cbnb.configure(state=NORMAL)
         cbzap.configure(state=NORMAL)
         cbfreeze.configure(state=NORMAL)
         itol=3
@@ -705,7 +702,7 @@ def ModeCW(event=NONE):
         binclude.configure(state=DISABLED)
         bexclude.configure(state=DISABLED)
         cbfreeze.configure(state=DISABLED)
-        cbafc.configure(state=DISABLED)
+        cbafc.grid(column=1,row=4,padx=2,sticky='W')
         if ltxdf: toggletxdf()
         btxdf.configure(state=DISABLED)
         report.configure(state=NORMAL)
@@ -884,7 +881,7 @@ graphics area    JT65: Click to set DF for Freeze
 Main screen,     Double-click puts callsign in Tx messages
 text area           Right-double-click also sets Auto ON
 
-Sync, Clip,      Left/Right click to increase/decrease
+Sync, S,         Left/Right click to increase/decrease
 Tol, ...
 """
     Label(scwid,text=t,justify=LEFT).pack(padx=20)
@@ -1030,22 +1027,6 @@ def decsync(event):
         isync=isync-1
         lsync.configure(text=slabel+str(isync))
 
-#------------------------------------------------------ incclip
-def incclip(event):
-    global iclip
-    if iclip<5:
-        iclip=iclip+1
-        if iclip==5: iclip=99
-        lclip.configure(text='Clip   '+str(iclip))
-
-#------------------------------------------------------ decclip
-def decclip(event):
-    global iclip
-    if iclip>-5:
-        iclip=iclip-1
-        if iclip==98: iclip=4
-        lclip.configure(text='Clip   '+str(iclip))
-
 #------------------------------------------------------ inctol
 def inctol(event=NONE):
     global itol
@@ -1129,20 +1110,18 @@ def clear_avg(event=NONE):
     Audio.gcom2.nclearave=1
 
 #------------------------------------------------------ defaults
-def defaults():
-    global slabel,isync,iclip,itol,idsec
-    isync=1
-    if g.mode=="FSK441" or g.mode=="JTMS": isync=2
-    iclip=0
-    lclip.configure(text='Clip   '+str(iclip))
-    itol=5
-    ltol.configure(text='Tol    '+str(ntol[itol]))
-    if g.mode=="JT6M" or g.mode=="ISCAT":
-        isync=-10
-        if g.mode=="ISCAT": isync=-20
-        itol=4
-        ltol.configure(text='Tol    '+str(ntol[itol]))
-    lsync.configure(text=slabel+str(isync))
+##def defaults():
+##    global slabel,isync,itol,idsec
+##    isync=1
+##    if g.mode=="FSK441" or g.mode=="JTMS": isync=2
+##    itol=5
+##    ltol.configure(text='Tol    '+str(ntol[itol]))
+##    if g.mode=="JT6M" or g.mode=="ISCAT":
+##        isync=-10
+##        if g.mode=="ISCAT": isync=-20
+##        itol=4
+##        ltol.configure(text='Tol    '+str(ntol[itol]))
+##    lsync.configure(text=slabel+str(isync))
 
 #------------------------------------------------------ delwav
 def delwav():
@@ -1825,8 +1804,6 @@ def update():
     Audio.gcom2.nzap=nzap.get()
     Audio.gcom2.ndebug=ndebug.get()
     Audio.gcom2.minsigdb=isync
-    Audio.gcom2.nclip=iclip
-    Audio.gcom2.nblank=nblank.get()
     Audio.gcom2.nafc=nafc.get()
     Audio.gcom2.nfreeze=nfreeze.get()
     Audio.gcom2.dftolerance=ntol[itol]
@@ -2309,26 +2286,20 @@ Widget.bind(lsync,'<Button-3>',decsync)
 nzap=IntVar()
 cbzap=Checkbutton(f5b,text='Zap',underline=0,variable=nzap)
 cbzap.grid(column=1,row=0,padx=2,sticky='W')
-cbnb=Checkbutton(f5b,text='NB',variable=nblank)
-cbnb.grid(column=1,row=1,padx=2,sticky='W')
-shrx=Checkbutton(f5b,text='Rx ST',variable=nshrx,command=restart2)
-shrx.grid(column=1,row=2,sticky='W',padx=2)
 cbfreeze=Checkbutton(f5b,text='Freeze',underline=0,variable=nfreeze)
-cbfreeze.grid(column=1,row=3,padx=2,sticky='W')
+cbfreeze.grid(column=1,row=2,padx=2,sticky='W')
+shrx=Checkbutton(f5b,text='Rx ST',variable=nshrx,command=restart2)
+shrx.grid(column=1,row=3,sticky='W',padx=2)
 cbafc=Checkbutton(f5b,text='AFC',variable=nafc)
 cbafc.grid(column=1,row=4,padx=2,sticky='W')
 lspace=Label(f5b, text='')
 lspace.grid(column=0,row=5,padx=2,pady=5,sticky='W')
-lclip=Label(f5b, bg='white', fg='black', text='Clip   0', width=8, relief=RIDGE)
-lclip.grid(column=0,row=1,padx=2,sticky='EW')
-Widget.bind(lclip,'<Button-1>',incclip)
-Widget.bind(lclip,'<Button-3>',decclip)
 ltol=Label(f5b, bg='white', fg='black', text='Tol    400', width=8, relief=RIDGE)
 ltol.grid(column=0,row=2,padx=2,sticky='EW')
 Widget.bind(ltol,'<Button-1>',inctol)
 Widget.bind(ltol,'<Button-3>',dectol)
-Button(f5b,text='Defaults',command=defaults,padx=1).grid(column=0,
-                              row=3,sticky='EW')
+##Button(f5b,text='Defaults',command=defaults,padx=1).grid(column=0,
+##                              row=3,sticky='EW')
 ##ldsec=Label(f5b, bg='white', fg='black', text='Dsec  0.0', width=8, relief=RIDGE)
 ##ldsec.grid(column=0,row=4,ipadx=3,padx=2,pady=5,sticky='EW')
 ##lshift=Label(f5b, bg='white', fg='black', text='Shift 0.0', width=8, relief=RIDGE)
@@ -2575,9 +2546,7 @@ try:
         elif key == 'S6m': isync6m=int(value)
         elif key == 'Siscat': isync_iscat=int(value)
         elif key == 'Sync': isync65=int(value)
-        elif key == 'Clip': iclip=int(value)
         elif key == 'Zap': nzap.set(value)
-        elif key == 'NB': nblank.set(value)
         elif key == 'NAFC': nafc.set(value)
         elif key == 'nshrx': nshrx.set(value)
         elif key == 'NoShJT65all': noshjt65all.set(value)
@@ -2616,7 +2585,6 @@ elif mode.get()[:3]=='JT4':
     if mode.get()[3:4]=='G': Audio.gcom2.mode4=72
 
 lsync.configure(text=slabel+str(isync))
-lclip.configure(text='Clip   '+str(iclip))
 Audio.gcom2.azeldir=(options.azeldir.get()+' '*80)[:80]
 Audio.gcom2.ndepth=ndepth.get()
 Audio.gcom2.nhighpri=options.HighPri.get()
@@ -2686,9 +2654,7 @@ f.write("S441 " + str(isync441) + "\n")
 f.write("S6m " + str(isync6m) + "\n")
 f.write("Siscat " + str(isync_iscat) + "\n")
 f.write("Sync " + str(isync65) + "\n")
-f.write("Clip " + str(iclip) + "\n")
 f.write("Zap " + str(nzap.get()) + "\n")
-f.write("NB " + str(nblank.get()) + "\n")
 f.write("NAFC " + str(nafc.get()) + "\n")
 f.write("nshrx " + str(nshrx.get()) + "\n")
 f.write("NoShJT65all " + str(noshjt65all.get()) + "\n")

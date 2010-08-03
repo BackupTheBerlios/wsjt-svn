@@ -1,4 +1,4 @@
-      subroutine mtdecode(dat,jz,nz,MinSigdB,MinWidth,NQRN,NFreeze,
+      subroutine mtdecode(dat,jz,nz,MinSigdB,MinWidth,NFreeze,
      +   DFTolerance,MouseDF,istart,pick,cfile6,mycall,hiscall,
      +   mode,ps0)
 

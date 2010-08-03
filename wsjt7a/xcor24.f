@@ -14,7 +14,6 @@ C  the "OOO" message.
       integer npr2(207)
       real pr2(207)
       logical first
-      common/clipcom/ nclip
       data lagmin/0/                    !Silence g77 warning
       data first/.true./
       data npr2/
