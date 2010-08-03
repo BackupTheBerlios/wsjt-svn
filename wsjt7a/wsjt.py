@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#------------------------------------------------------------------- WSJT
+#-------------------------------------------------------------------- WSJT
 # $Date$ $Revision$
 #
 from Tkinter import *
@@ -56,7 +56,7 @@ addpfx0=""
 first=1
 g.appdir=appdir
 isync=0
-isync441=2
+isync441=1
 isync_iscat=-20
 isync65=1
 isync_save=0

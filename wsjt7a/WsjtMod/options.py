@@ -58,7 +58,6 @@ wxlist=("CLEAR","CLOUDY")
 ntc.set(1)
 
 def defaults():
-#    if g.mode=="FSK441" or g.mode=="JT6M":
     if (ireport.get()==0 and iregion.get()==0):
         tx1.delete(0,END)
         tx1.insert(0,'%T %M')
@@ -168,7 +167,7 @@ rb5.pack(anchor=W,side=LEFT,padx=2,pady=2)
 rb6.pack(anchor=W,side=LEFT,padx=2,pady=2)
 f1.pack()
 
-g2=Pmw.Group(root,tag_text="FSK441/JT6M message templates")
+g2=Pmw.Group(root,tag_text="FSK441/JTMS/ISCAT message templates")
 f2=Frame(g2.interior(),width=100,height=20)
 f2a=Frame(f2,width=50,height=20,bd=2,relief=GROOVE)
 f2a.pack(side=LEFT,padx=6,pady=6)
