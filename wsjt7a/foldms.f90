@@ -40,11 +40,9 @@ subroutine foldms(s2,msglen,nchar,mycall,msg,msg29)
   msg29=msg(1:msglen)
 
   call alignmsg('  ',2,msg29,msglen,idone)
-  if(idone.eq.0) call alignmsg(mycall,4,msg29,msglen,idone)
   if(idone.eq.0) call alignmsg('CQ',  3,msg29,msglen,idone)
   if(idone.eq.0) call alignmsg('QRZ', 3,msg29,msglen,idone)
-  if(idone.eq.0) call alignmsg('RRR', 3,msg29,msglen,idone)
-  if(idone.eq.0) call alignmsg('73',  3,msg29,msglen,idone)
+  if(idone.eq.0) call alignmsg(mycall,4,msg29,msglen,idone)
   if(idone.eq.0) call alignmsg(' ',   1,msg29,msglen,idone)
   msg29=adjustl(msg29)
 
