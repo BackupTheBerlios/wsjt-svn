@@ -379,9 +379,9 @@ def update():
     if g.mode!=mode0:
         if (g.mode[:4]=="JT65" or g.mode[:3]=="JT4") \
            and nspeed0.get()>5: nspeed0.set(3)
-        if g.mode=="FSK441" and nspeed0.get()<6: nspeed0.set(6)
-        if g.mode=="JTMS" and nspeed0.get()<6: nspeed0.set(6)
-        if g.mode=="ISCAT" and nspeed0.get()<6: nspeed0.set(6)
+        if g.mode=="FSK441" and nspeed0.get()<6: nspeed0.set(7)
+        if g.mode=="JTMS" and nspeed0.get()<6: nspeed0.set(7)
+        if g.mode=="ISCAT" and nspeed0.get()<6: nspeed0.set(7)
         if g.mode=="Echo" and nspeed0.get()>5: nspeed0.set(3)
         draw_axis()
         mode0=g.mode

@@ -73,6 +73,7 @@ font1='Helvetica'
 hiscall=""
 hisgrid=""
 isec0=-99
+jtol=IntVar()
 k2txb=IntVar()
 kb8rq=IntVar()
 loopall=0
@@ -98,6 +99,7 @@ nopen=0
 nshrx=IntVar()
 noshjt65=IntVar()
 noshjt65all=IntVar()
+nsync=IntVar()
 qdecode=IntVar()
 setseq=IntVar()
 ShOK=IntVar()
@@ -2191,8 +2193,8 @@ bstop=Button(iframe4c, text='Stop',underline=0,command=stopmon,
                 padx=1,pady=1)
 bmonitor=Button(iframe4c, text='Monitor',underline=0,command=monitor,
                 padx=1,pady=1)
-bsavelast=Button(iframe4c, text='Save',underline=2,command=savelast,
-                padx=1,pady=1)
+##bsavelast=Button(iframe4c, text='Save',underline=2,command=savelast,
+##                padx=1,pady=1)
 bdecode=Button(iframe4c, text='Decode',underline=0,command=decode,
                 padx=1,pady=1)
 berase=Button(iframe4c, text='Erase',underline=0,command=erase,
@@ -2207,10 +2209,9 @@ btxstop=Button(iframe4c,text='TxStop',underline=4,command=txstop,
                 padx=1,pady=1)
 
 blogqso.pack(side=LEFT,expand=1,fill=X)
-#bplay.pack(side=LEFT,expand=1,fill=X)
 bstop.pack(side=LEFT,expand=1,fill=X)
 bmonitor.pack(side=LEFT,expand=1,fill=X)
-bsavelast.pack(side=LEFT,expand=1,fill=X)
+##bsavelast.pack(side=LEFT,expand=1,fill=X)
 bdecode.pack(side=LEFT,expand=1,fill=X)
 berase.pack(side=LEFT,expand=1,fill=X)
 bclravg.pack(side=LEFT,expand=1,fill=X)
@@ -2226,7 +2227,7 @@ iframe5 = Frame(frame, bd=1, relief=FLAT,height=180)
 f5a=Frame(iframe5,height=170,bd=2,relief=GROOVE)
 labToRadio=Label(f5a,text='To radio:', width=9, relief=FLAT)
 labToRadio.grid(column=0,row=0)
-ToRadio=Entry(f5a,width=9)
+ToRadio=Entry(f5a,width=12)
 ToRadio.insert(0,'W8WN')
 ToRadio.grid(column=1,row=0,pady=3)
 ToRadio.bind('<Return>',lookup)
@@ -2234,7 +2235,7 @@ bLookup=Button(f5a, text='Lookup',underline=0,command=lookup,padx=1,pady=1)
 bLookup.grid(column=2,row=0,sticky='EW',padx=4)
 labGrid=Label(f5a,text='Grid:', width=9, relief=FLAT)
 labGrid.grid(column=0,row=1)
-HisGrid=Entry(f5a,width=9)
+HisGrid=Entry(f5a,width=12)
 HisGrid.grid(column=1,row=1,pady=1)
 bAdd=Button(f5a, text='Add',command=addtodb,padx=1,pady=1)
 bAdd.grid(column=2,row=1,sticky='EW',padx=4)
@@ -2249,10 +2250,10 @@ labDist.grid(column=2,row=2)
 ldate=Label(f5a, bg='black', fg='yellow', width=11, bd=4,
         text='2005 Apr 22\n01:23:45', relief=RIDGE,
         justify=CENTER, font=(font1,16))
-ldate.grid(column=0,columnspan=2,row=3,rowspan=2,padx=4,pady=2)
+ldate.grid(column=0,columnspan=2,row=3,rowspan=2,padx=2,pady=2)
 
 ldsec=Label(f5a, bg='white', fg='black', text='Dsec  0.0', width=8, relief=RIDGE)
-ldsec.grid(column=2,row=3,ipadx=3,padx=10,pady=20)
+ldsec.grid(column=2,row=4,ipadx=3,padx=2,pady=0)
 
 f5a.pack(side=LEFT,expand=1,fill=BOTH)
 
@@ -2275,6 +2276,13 @@ lspace=Label(f5b, text='')
 lspace.grid(column=0,row=5,padx=2,pady=5,sticky='W')
 ltol=Label(f5b, bg='white', fg='black', text='Tol    400', width=8, relief=RIDGE)
 ltol.grid(column=0,row=3,padx=2,sticky='EW')
+##sbsync=Spinbox(f5b,from_=-20,to=10,bg='white',width=4,textvariable=nsync)
+##sbsync.grid(column=0,row=4)
+##nsync.set(1)
+##sbtol=Spinbox(f5b,values=(10,20,50,100,200,500,1000),bg='white', \
+##    width=4,textvariable=jtol)
+##sbtol.grid(column=0,row=5)
+##jtol.set(200)
 Widget.bind(ltol,'<Button-1>',inctol)
 Widget.bind(ltol,'<Button-3>',dectol)
 Widget.bind(ldsec,'<Button-1>',incdsec)
@@ -2309,42 +2317,42 @@ auto.grid(column=0,row=5,sticky='EW',padx=4)
 #txstop.grid(column=0,row=6,sticky='EW',padx=4)
 
 ntx=IntVar()
-tx1=Entry(f5c,width=24)
+tx1=Entry(f5c,width=32)
 rb1=Radiobutton(f5c,value=1,variable=ntx)
 b1=Button(f5c, text='Tx1',underline=2,command=btx1,padx=1,pady=1)
 tx1.grid(column=1,row=0)
 rb1.grid(column=2,row=0)
 b1.grid(column=3,row=0)
 
-tx2=Entry(f5c,width=24)
+tx2=Entry(f5c,width=32)
 rb2=Radiobutton(f5c,value=2,variable=ntx)
 b2=Button(f5c, text='Tx2',underline=2,command=btx2,padx=1,pady=1)
 tx2.grid(column=1,row=1)
 rb2.grid(column=2,row=1)
 b2.grid(column=3,row=1)
 
-tx3=Entry(f5c,width=24)
+tx3=Entry(f5c,width=32)
 rb3=Radiobutton(f5c,value=3,variable=ntx)
 b3=Button(f5c, text='Tx3',underline=2,command=btx3,padx=1,pady=1)
 tx3.grid(column=1,row=2)
 rb3.grid(column=2,row=2)
 b3.grid(column=3,row=2)
 
-tx4=Entry(f5c,width=24)
+tx4=Entry(f5c,width=32)
 rb4=Radiobutton(f5c,value=4,variable=ntx)
 b4=Button(f5c, text='Tx4',underline=2,command=btx4,padx=1,pady=1)
 tx4.grid(column=1,row=3)
 rb4.grid(column=2,row=3)
 b4.grid(column=3,row=3)
 
-tx5=Entry(f5c,width=24)
+tx5=Entry(f5c,width=32)
 rb5=Radiobutton(f5c,value=5,variable=ntx)
 b5=Button(f5c, text='Tx5',underline=2,command=btx5,padx=1,pady=1)
 tx5.grid(column=1,row=4)
 rb5.grid(column=2,row=4)
 b5.grid(column=3,row=4)
 
-tx6=Entry(f5c,width=24)
+tx6=Entry(f5c,width=32)
 rb6=Radiobutton(f5c,value=6,variable=ntx)
 b6=Button(f5c, text='Tx6',underline=2,command=btx6,padx=1,pady=1)
 tx6.grid(column=1,row=5)
