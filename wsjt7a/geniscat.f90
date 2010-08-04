@@ -26,15 +26,17 @@ subroutine geniscat(msg,nmsg,samfac,shok,iwave,nwave,sendingsh,msgsent)
   nsym=NMAX/NSPS
   sendingsh=0
 
-  if(shok.eq.1 .and. nmsg.le.4 .and.                                   &
+  if(shok.eq.1 .and.                                                   &
        (msg(1:1).eq.'R' .or. msg(1:1).eq.'7')) then        !Check for shorthand
      n=0
      m=0
-     if(nmsg.eq.2 .and. msg(1:3).eq.'RO') n=5
-     if(nmsg.eq.3 .and. msg(1:3).eq.'R26') n=10
-     if(nmsg.eq.3 .and. msg(1:3).eq.'R27') n=20
-     if(nmsg.eq.3 .and. msg(1:3).eq.'RRR') n=30
-     if(nmsg.eq.2 .and. msg(1:2).eq.'73') n=40
+     if(msg(1:3).eq.'RO ') n=5
+     if(msg(1:4).eq.'R26 ') n=10
+     if(msg(1:4).eq.'R27 ') n=20
+     if(msg(1:4).eq.'RRR ') n=30
+     if(msg(1:3).eq.'73 ') n=40
+     i1=index(msg,' ')
+     msgsent=msg(:i1)
      if(n.eq.0 .and. msg(1:1).eq.'R') then
         read(msg(2:4),*,err=10) m
         if(m.lt.-20) m=-20

@@ -1162,11 +1162,12 @@ def toggletxdf(event=NONE):
     ltxdf=1-ltxdf
     if ltxdf:
         Audio.gcom2.ntxdf=Audio.gcom2.mousedf
-        t="  TxDF = %3d" % (int(Audio.gcom2.mousedf),)
+        t="  TxDF =%4d" % (int(Audio.gcom2.mousedf),)
         btxdf.configure(text=t,bg='red',relief=SOLID)
     else:
         Audio.gcom2.ntxdf=0
-        btxdf.configure(text='  TxDF = 0  ',bg='gray85',relief=RAISED)
+        t="  TxDF =%4d" % 0
+        btxdf.configure(text=t,bg='gray85',relief=RAISED)
     if Audio.gcom1.transmitting:
         txstop()
 

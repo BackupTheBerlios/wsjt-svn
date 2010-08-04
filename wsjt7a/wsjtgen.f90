@@ -127,7 +127,7 @@ subroutine wsjtgen
         call geniscat(msg,nmsg,samfacout,shok,iwave,nwave,sendingsh,msgsent)
         if(txsnrdb.gt.0.d0 .and. txsnrdb.lt.40.d0) call makepings(iwave,nwave)
      else if(mode(1:4).eq.'JTMS') then
-        if(shok.eq.1 .and. nmsg.le.4 .and.                                &
+        if(shok.eq.1 .and.                                                &
            (msg(1:4).eq.'R26 ' .or. msg(1:4).eq.'R27 ' .or.               &
                 msg(1:4).eq.'RRR ' .or. msg(1:3).eq.'73 ')) go to 100
         call genms(msg,samfacout,iwave,cwave,0,nwave)
@@ -176,23 +176,27 @@ subroutine wsjtgen
 
 !  Check for shorthand messages
 100 sendingsh = 0
-  if(shok.eq.1 .and. nmsg.le.4) then
-     if (msg(1:3).eq.'R26') then
+  if(shok.eq.1) then
+     if (msg(1:4).eq.'R26 ') then
         msg='++'
         nmsg=2
         sendingsh = 1
-     else if (msg(1:3).eq.'R27') then
+     else if (msg(1:4).eq.'R27 ') then
         msg='**'
         nmsg=2
         sendingsh = 1
-     else if (msg(1:3).eq.'RRR') then
+     else if (msg(1:4).eq.'RRR ') then
         msg='%%'
         nmsg=2
         sendingsh = 1
-     else if (msg(1:2).eq.'73') then
+     else if (msg(1:3).eq.'73 ') then
         msg='@@'
         nmsg=2
         sendingsh = 1
+     endif
+     if(sendingsh.eq.1) then
+        i1=index(txmsg,' ')
+        txmsg=txmsg(1:i1)
      endif
   endif
 
