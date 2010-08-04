@@ -100,6 +100,7 @@ nshrx=IntVar()
 noshjt65=IntVar()
 noshjt65all=IntVar()
 nsync=IntVar()
+nzap=IntVar()
 qdecode=IntVar()
 setseq=IntVar()
 ShOK=IntVar()
@@ -581,17 +582,14 @@ def ModeFSK441(event=NONE):
         bclravg.configure(state=DISABLED)
         binclude.configure(state=DISABLED)
         bexclude.configure(state=DISABLED)
-        cbzap.configure(state=NORMAL)
         cbfreeze.grid_forget()
-        nfreeze.set(0)
-        shrx.grid(column=1,row=2,sticky='W',padx=2)
-        shmsg.grid(column=0,row=2,sticky='W',padx=2)
-        f5c2.grid(column=0,row=1,sticky='W',padx=2)
         cbafc.grid_forget()
+        nfreeze.set(0)
+        shrx.grid(column=1,row=1,sticky='W',padx=2)
+        shmsg.grid(column=1,row=0,sticky='W',padx=2)
+        report.grid(column=1,row=1,sticky='W',padx=7)
+        labreport.grid(column=0,row=1,sticky='E',padx=0)
         if ltxdf: toggletxdf()
-        btxdf.configure(state=DISABLED)
-        report.configure(state=NORMAL)
-        shmsg.configure(state=NORMAL)
         graph2.configure(bg='black')
         btxdf.grid_forget()
         report.delete(0,END)
@@ -619,16 +617,15 @@ def ModeJT65():
     bclravg.configure(state=NORMAL)
     binclude.configure(state=NORMAL)
     bexclude.configure(state=NORMAL)
-    btxdf.grid(column=0,row=3,sticky='EW',padx=4)
-    cbzap.configure(state=NORMAL)
-    cbfreeze.grid(column=1,row=3,padx=2,sticky='W')
-    cbfreeze.configure(state=NORMAL)    
-    cbafc.grid(column=1,row=4,padx=2,sticky='W')
+    btxdf.grid(column=0,row=1,sticky='EW',padx=4)
+    cbfreeze.grid(column=0,row=2,padx=2,sticky='W')
+    cbafc.grid(column=1,row=1,padx=2,sticky='W')
     if ltxdf: toggletxdf()
     btxdf.configure(state=NORMAL)
-    f5c2.grid_forget()
     shmsg.grid_forget()
     shrx.grid_forget()
+    report.grid_forget()
+    labreport.grid_forget()
     graph2.configure(bg='#66FFFF')
     itol=4
     inctol()
@@ -664,8 +661,7 @@ def ModeJTMS(event=NONE):
     if g.mode != "JTMS":
         if lauto: toggleauto()
     ModeFSK441()
-    cbfreeze.grid(column=1,row=3,padx=2,sticky='W')
-    cbfreeze.configure(state=NORMAL)
+    cbfreeze.grid(column=0,row=2,padx=2,sticky='W')
     mode.set("JTMS")
     
 #------------------------------------------------------ ModeISCAT
@@ -680,14 +676,11 @@ def ModeISCAT(event=NONE):
         lab2.configure(text='FileID      Avg dB        DF')
         isync=isync_iscat
         lsync.configure(text=slabel+str(isync))
-        shmsg.configure(state=NORMAL)
-        cbfreeze.grid(column=1,row=3,padx=2,sticky='W')
-        cbfreeze.configure(state=NORMAL)
+        cbfreeze.grid(column=0,row=2,padx=2,sticky='W')
         itol=3
         ltol.configure(text='Tol    '+str(ntol[itol]))
         inctol()
         nfreeze.set(0)
-        report.configure(state=NORMAL)
         report.delete(0,END)
         report.insert(0,'-15')
         ntx.set(1)
@@ -708,7 +701,7 @@ def ModeCW(event=NONE):
         binclude.configure(state=DISABLED)
         bexclude.configure(state=DISABLED)
         cbfreeze.grid_forget()
-        cbafc.grid(column=1,row=4,padx=2,sticky='W')
+        cbafc.grid_forget()
         if ltxdf: toggletxdf()
         btxdf.configure(state=DISABLED)
         report.configure(state=NORMAL)
@@ -776,6 +769,7 @@ def ModeEcho(event=NONE):
     mode.set("Echo")
     if lauto: toggleauto()
     lab2.configure(text='     N      Level         Sig              DF         Width      Q')
+    Audio.gcom1.trperiod=6
 #    tx1.delete(0,99)
 #    tx1.insert(0,"ECHO")
     
@@ -1075,10 +1069,12 @@ def decdsec(event):
 #------------------------------------------------------ inctrperiod
 def inctrperiod(event):
     global ncwtrperiod
-    if mode.get()[:2]=="CW":
+    if mode.get()=="CW":
         if ncwtrperiod==120: ncwtrperiod=150
         if ncwtrperiod==60:  ncwtrperiod=120
         Audio.gcom1.trperiod=ncwtrperiod
+    elif mode.get()=="FSK441" or mode.get()=="JTMS" or mode.get()=="ISCAT":
+        if Audio.gcom1.trperiod==15: Audio.gcom1.trperiod=30
 
 #------------------------------------------------------ dectrperiod
 def dectrperiod(event):
@@ -1087,6 +1083,8 @@ def dectrperiod(event):
         if ncwtrperiod==120: ncwtrperiod=60
         if ncwtrperiod==150: ncwtrperiod=120
         Audio.gcom1.trperiod=ncwtrperiod
+    elif mode.get()=="FSK441" or mode.get()=="JTMS" or mode.get()=="ISCAT":
+        if Audio.gcom1.trperiod==30: Audio.gcom1.trperiod=15
 
 #------------------------------------------------------ erase
 def erase(event=NONE):
@@ -1663,14 +1661,15 @@ def update():
         bdecode.configure(bg='#66FFFF',activebackground='#66FFFF')
         if (sys.platform == 'darwin'):
            bdecode.configure(text='*Decode*')
-    if mode.get()[:2]=="CW":
+    if mode.get()=="CW" or mode.get()=='FSK441' or mode.get()=='JTMS' or \
+           mode.get()=='ISCAT':
         msg5.configure(text="TR Period: %d s" % (Audio.gcom1.trperiod,), \
                        bg='white')
     else:
         msg5.configure(text="TR Period: %d s" % (Audio.gcom1.trperiod,), \
                        bg='gray85')
-    t="%d" % (int(Audio.mtxcom.mtxstate),)
-    msg6.configure(text=t)
+##    t="%d" % (int(Audio.mtxcom.mtxstate),)
+##    msg6.configure(text=t)
 
     tx1.configure(bg='white')
     tx2.configure(bg='white')
@@ -2258,24 +2257,26 @@ ldsec.grid(column=2,row=4,ipadx=3,padx=2,pady=0)
 f5a.pack(side=LEFT,expand=1,fill=BOTH)
 
 #------------------------------------------------------ Receiving parameters
-f5b=Frame(iframe5,bd=2,relief=GROOVE)
-lsync=Label(f5b, bg='white', fg='black', text='Sync   1', width=8, relief=RIDGE)
+f5b=Frame(iframe5,bd=0)
+f5b1=Frame(f5b,bd=2,relief=GROOVE)
+f5b1.grid(column=0,row=0,sticky='W',padx=2,sticky='EW')
+
+lsync=Label(f5b1, bg='white', fg='black', text='Sync   1', width=8, relief=RIDGE)
 lsync.grid(column=0,row=0,padx=2,sticky='EW')
 Widget.bind(lsync,'<Button-1>',incsync)
 Widget.bind(lsync,'<Button-3>',decsync)
-nzap=IntVar()
-cbzap=Checkbutton(f5b,text='Zap',underline=0,variable=nzap)
+cbzap=Checkbutton(f5b1,text='Zap',underline=0,variable=nzap)
 cbzap.grid(column=1,row=0,padx=2,sticky='W')
-shrx=Checkbutton(f5b,text='Rx ST',variable=nshrx,command=restart2)
+shrx=Checkbutton(f5b1,text='Rx ST',variable=nshrx,command=restart2)
 shrx.grid(column=1,row=2,sticky='W',padx=2)
-cbfreeze=Checkbutton(f5b,text='Freeze',underline=0,variable=nfreeze)
-cbfreeze.grid(column=1,row=3,padx=2,sticky='W')
-cbafc=Checkbutton(f5b,text='AFC',variable=nafc)
-cbafc.grid(column=1,row=4,padx=2,sticky='W')
-lspace=Label(f5b, text='')
-lspace.grid(column=0,row=5,padx=2,pady=5,sticky='W')
-ltol=Label(f5b, bg='white', fg='black', text='Tol    400', width=8, relief=RIDGE)
-ltol.grid(column=0,row=3,padx=2,sticky='EW')
+cbfreeze=Checkbutton(f5b1,text='Freeze',underline=0,variable=nfreeze)
+cbfreeze.grid(column=0,row=2,padx=2,sticky='W')
+cbafc=Checkbutton(f5b1,text='AFC',variable=nafc)
+cbafc.grid(column=1,row=1,padx=2,sticky='W')
+##lspace=Label(f5b1, text='')
+##lspace.grid(column=0,row=5,padx=2,pady=5,sticky='W')
+ltol=Label(f5b1, bg='white', fg='black', text='Tol    400', width=8, relief=RIDGE)
+ltol.grid(column=0,row=1,padx=2,sticky='EW')
 ##sbsync=Spinbox(f5b,from_=-20,to=10,bg='white',width=4,textvariable=nsync)
 ##sbsync.grid(column=0,row=4)
 ##nsync.set(1)
@@ -2288,33 +2289,39 @@ Widget.bind(ltol,'<Button-3>',dectol)
 Widget.bind(ldsec,'<Button-1>',incdsec)
 Widget.bind(ldsec,'<Button-3>',decdsec)
 
+f5b2=Frame(f5b,bd=2,relief=GROOVE)
+f5b2.grid(column=0,row=1,padx=2,sticky='EW')
+txfirst=Checkbutton(f5b2,text='Tx First',justify=RIGHT,variable=TxFirst)
+txfirst.grid(column=0,row=0,sticky='W',padx=2)
+shmsg=Checkbutton(f5b2,text='Tx ST',justify=RIGHT,variable=ShOK,
+            command=restart2)
+shmsg.grid(column=1,row=0,sticky='W',padx=2)
+
+report=Entry(f5b2, width=4)
+report.insert(0,'26')
+report.grid(column=1,row=1,sticky='W',padx=7)
+labreport=Label(f5b2,text='Rpt:',width=4,underline=0)
+labreport.grid(column=0,row=1,sticky='E',padx=0)
+
+btxdf=Button(f5b2,text='TxDF = 0',command=toggletxdf,padx=1,pady=1)
+btxdf.grid(column=0,row=1,sticky='EW',padx=2)
+
+f5b3=Frame(f5b,bd=2,relief=GROOVE)
+f5b3.grid(column=0,row=2,padx=2,sticky='EW')
+genmsg=Button(f5b3,text=' Gen Msgs ',underline=1,command=GenStdMsgs,
+            padx=1,pady=2)
+genmsg.grid(column=0,row=0,sticky='W',padx=2)
+auto=Button(f5b3,text='Auto is Off',underline=0,command=toggleauto,
+            padx=2,pady=2)
+auto.focus_set()
+auto.grid(column=1,row=0,sticky='EW',padx=2)
+
 f5b.pack(side=LEFT,expand=0,fill=BOTH)
 
 #------------------------------------------------------ Tx params and msgs
 f5c=Frame(iframe5,bd=2,relief=GROOVE)
-txfirst=Checkbutton(f5c,text='Tx First',justify=RIGHT,variable=TxFirst)
-f5c2=Frame(f5c,bd=0)
-labreport=Label(f5c2,text='Rpt',width=4)
-report=Entry(f5c2, width=4)
-report.insert(0,'26')
-labreport.pack(side=RIGHT,expand=1,fill=BOTH)
-report.pack(side=RIGHT,expand=1,fill=BOTH)
-shmsg=Checkbutton(f5c,text='Tx ST',justify=RIGHT,variable=ShOK,
-            command=restart2)
-btxdf=Button(f5c,text='TxDF = 0',command=toggletxdf,padx=1,pady=1)
-genmsg=Button(f5c,text='GenStdMsgs',underline=0,command=GenStdMsgs,
-            padx=1,pady=1)
-auto=Button(f5c,text='Auto is Off',underline=0,command=toggleauto,
-            padx=1,pady=1)
-auto.focus_set()
-
-txfirst.grid(column=0,row=0,sticky='W',padx=4)
-f5c2.grid(column=0,row=1,sticky='W',padx=8)
-shmsg.grid(column=0,row=2,sticky='W',padx=4)
-btxdf.grid(column=0,row=3,sticky='EW',padx=4)
-genmsg.grid(column=0,row=4,sticky='W',padx=4)
-auto.grid(column=0,row=5,sticky='EW',padx=4)
-#txstop.grid(column=0,row=6,sticky='EW',padx=4)
+##f5c2=Frame(f5c,bd=0)
+##f5c2.grid(column=0,row=1,sticky='W',padx=8)
 
 ntx=IntVar()
 tx1=Entry(f5c,width=32)
@@ -2374,8 +2381,8 @@ msg4=Message(iframe6, text='Message #4', width=300,relief=SUNKEN)
 msg4.pack(side=LEFT, fill=X, padx=1)
 msg5=Message(iframe6, text='Message #5', width=300,relief=SUNKEN)
 msg5.pack(side=LEFT, fill=X, padx=1)
-msg6=Message(iframe6, text='', width=300,relief=SUNKEN)
-msg6.pack(side=LEFT, fill=X, padx=1)
+##msg6=Message(iframe6, text='', width=300,relief=SUNKEN)
+##msg6.pack(side=LEFT, fill=X, padx=1)
 Widget.bind(msg5,'<Button-1>',inctrperiod)
 Widget.bind(msg5,'<Button-3>',dectrperiod)
 msg7=Message(iframe6, text='                        ', width=300,relief=SUNKEN)
