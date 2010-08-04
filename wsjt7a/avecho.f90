@@ -71,8 +71,8 @@ subroutine avecho(fname,ntime,y1,ibuf0,ntc,necho,nfrit,ndither,      &
      if(nsave.ne.0) write(25,3001) (i-300)*df,s1(i),s2(i)
 3001 format(f10.3,2f12.3)
   enddo
-  close(25)
   call flush(25)
+  close(25)
   call cs_unlock
 
   call pctile(s2,tmp,600,50,x0)
