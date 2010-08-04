@@ -1,12 +1,10 @@
-subroutine geniscat(msg,nmsg,samfac,shok,iwave,nwave,sendingsh,msgsent)
+subroutine geniscat(msg,nmsg,samfac,iwave,nwave,msgsent)
 
 ! Generate an ISCAT_2 waveform.
 
   parameter (NMAX=30*11025,NSZ=1291,NSPS=256)
   character msg*28,msgsent*22
   integer*2 iwave(NMAX)
-  integer sendingsh
-  integer shok
   integer imsg(30)
   integer itone(NSZ)
   character c*42
@@ -24,70 +22,37 @@ subroutine geniscat(msg,nmsg,samfac,shok,iwave,nwave,sendingsh,msgsent)
   dt=1.0/(samfac*11025.0)
   f0=13*df
   nsym=NMAX/NSPS
-  sendingsh=0
 
-  if(shok.eq.1 .and.                                                   &
-       (msg(1:1).eq.'R' .or. msg(1:1).eq.'7')) then        !Check for shorthand
-     n=0
-     m=0
-     if(msg(1:3).eq.'RO ') n=5
-     if(msg(1:4).eq.'R26 ') n=10
-     if(msg(1:4).eq.'R27 ') n=20
-     if(msg(1:4).eq.'RRR ') n=30
-     if(msg(1:3).eq.'73 ') n=40
-     i1=index(msg,' ')
-     msgsent=msg(:i1)
-     if(n.eq.0 .and. msg(1:1).eq.'R') then
-        read(msg(2:4),*,err=10) m
-        if(m.lt.-20) m=-20
-        if(m.gt.10) m=10
-        write(msgsent,1002) m
-1002    format('R',i3)
-        if(msgsent(2:2).eq.' ') msgsent=msgsent(1:1)//msgsent(3:)
-        if(msgsent(2:2).eq.' ') msgsent=msgsent(1:1)//msgsent(3:)
-        n=irpt(m+21)
-     endif
-
-     if(n.ne.0) then
-        do i=1,nsym-1,2
-           itone(i)=0
-           itone(i+1)=n
-        enddo
-        sendingsh=1
-     endif
-
-  else
-10   nblk=nsync+nlen+ndat           !Normal message (NOT shorthand)
-     msglen=nmsg+1
-     k=0
-     kk=1
-     imsg(1)=40
-     do i=1,nmsg                                 !Define the tone sequence
-        imsg(i+1)=36
-        do j=1,42
-           if(msg(i:i).eq.c(j:j)) imsg(i+1)=j-1
-        enddo
+  nblk=nsync+nlen+ndat
+  msglen=nmsg+1
+  k=0
+  kk=1
+  imsg(1)=40
+  do i=1,nmsg                                 !Define the tone sequence
+     imsg(i+1)=36
+     do j=1,42
+        if(msg(i:i).eq.c(j:j)) imsg(i+1)=j-1
      enddo
+  enddo
 
-     do i=1,nsym                                 !Total symbols in 30 s 
-        j=mod(i-1,nblk)+1
-        if(j.le.nsync) then
-           itone(i)=icos(j)
-        else if(j.gt.nsync .and. j.le.nsync+nlen) then
-           itone(i)=msglen
-           if(j.ge.nsync+2) then
-              n=msglen + 5*(j-nsync-1)
-              if(n.gt.41) n=n-42
-              itone(i)=n
-           endif
-        else
-           k=k+1
-           kk=mod(k-1,msglen)+1
-           itone(i)=imsg(kk)
+  do i=1,nsym                                 !Total symbols in 30 s 
+     j=mod(i-1,nblk)+1
+     if(j.le.nsync) then
+        itone(i)=icos(j)
+     else if(j.gt.nsync .and. j.le.nsync+nlen) then
+        itone(i)=msglen
+        if(j.ge.nsync+2) then
+           n=msglen + 5*(j-nsync-1)
+           if(n.gt.41) n=n-42
+           itone(i)=n
         endif
-     enddo
-     msgsent=msg
-  endif
+     else
+        k=k+1
+        kk=mod(k-1,msglen)+1
+        itone(i)=imsg(kk)
+     endif
+  enddo
+  msgsent=msg
 
   k=0
   pha=0.

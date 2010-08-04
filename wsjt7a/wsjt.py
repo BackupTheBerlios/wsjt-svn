@@ -677,13 +677,15 @@ def ModeISCAT(event=NONE):
         lab2.configure(text='FileID      Avg dB        DF')
         isync=isync_iscat
         lsync.configure(text=slabel+str(isync))
-        cbfreeze.grid(column=0,row=2,padx=2,sticky='W')
+        cbfreeze.grid(column=1,row=1,padx=2,sticky='W')
         itol=3
         ltol.configure(text='Tol    '+str(ntol[itol]))
         inctol()
         nfreeze.set(0)
         report.delete(0,END)
         report.insert(0,'-15')
+        shrx.grid_forget()
+        shmsg.grid_forget()
         ntx.set(1)
         Audio.gcom2.mousedf=0
         GenStdMsgs()
@@ -2259,7 +2261,7 @@ f5a.pack(side=LEFT,expand=1,fill=BOTH)
 #------------------------------------------------------ Receiving parameters
 f5b=Frame(iframe5,bd=0)
 f5b1=Frame(f5b,bd=2,relief=GROOVE)
-f5b1.grid(column=0,row=0,sticky='W',padx=2,sticky='EW')
+f5b1.grid(column=0,row=0,padx=2,sticky='EW')
 
 lsync=Label(f5b1, bg='white', fg='black', text='Sync   1', width=8, relief=RIDGE)
 lsync.grid(column=0,row=0,padx=2,sticky='EW')
