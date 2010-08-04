@@ -617,11 +617,10 @@ def ModeJT65():
     bclravg.configure(state=NORMAL)
     binclude.configure(state=NORMAL)
     bexclude.configure(state=NORMAL)
-    btxdf.grid(column=0,row=1,sticky='EW',padx=4)
     cbfreeze.grid(column=0,row=2,padx=2,sticky='W')
     cbafc.grid(column=1,row=1,padx=2,sticky='W')
     if ltxdf: toggletxdf()
-    btxdf.configure(state=NORMAL)
+    btxdf.grid_forget()
     shmsg.grid_forget()
     shrx.grid_forget()
     report.grid_forget()
@@ -639,8 +638,10 @@ def ModeJT65():
 def ModeJT65A(event=NONE):
     if g.mode != "JT65A":
         if lauto: toggleauto()
-        mode.set("JT65A")
         ModeJT65()
+        mode.set("JT65A")
+        btxdf.grid(column=1,row=0,sticky='EW',padx=4)
+
 
 #------------------------------------------------------ ModeJT65B
 def ModeJT65B(event=NONE):
@@ -703,8 +704,6 @@ def ModeCW(event=NONE):
         cbfreeze.grid_forget()
         cbafc.grid_forget()
         if ltxdf: toggletxdf()
-        btxdf.configure(state=DISABLED)
-        report.configure(state=NORMAL)
         ntx.set(1)
         GenStdMsgs()
         erase()
@@ -1155,7 +1154,7 @@ def toggleauto(event=NONE):
         Audio.gcom1.txok=0
         Audio.gcom2.mantx=0
     if lauto==0: auto.configure(text='Auto is OFF',bg='gray85',relief=RAISED)
-    if lauto==1: auto.configure(text='Auto is ON',bg='red',relief=SOLID)
+    if lauto==1: auto.configure(text='Auto is  ON',bg='red',relief=SOLID)
     
 #------------------------------------------------------ toggletxdf
 def toggletxdf(event=NONE):
@@ -1163,11 +1162,11 @@ def toggletxdf(event=NONE):
     ltxdf=1-ltxdf
     if ltxdf:
         Audio.gcom2.ntxdf=Audio.gcom2.mousedf
-        t="TxDF = %d" % (int(Audio.gcom2.mousedf),)
+        t="  TxDF = %3d" % (int(Audio.gcom2.mousedf),)
         btxdf.configure(text=t,bg='red',relief=SOLID)
     else:
         Audio.gcom2.ntxdf=0
-        btxdf.configure(text='TxDF = 0',bg='gray85',relief=RAISED)
+        btxdf.configure(text='  TxDF = 0  ',bg='gray85',relief=RAISED)
     if Audio.gcom1.transmitting:
         txstop()
 
@@ -2303,8 +2302,8 @@ report.grid(column=1,row=1,sticky='W',padx=7)
 labreport=Label(f5b2,text='Rpt:',width=4,underline=0)
 labreport.grid(column=0,row=1,sticky='E',padx=0)
 
-btxdf=Button(f5b2,text='TxDF = 0',command=toggletxdf,padx=1,pady=1)
-btxdf.grid(column=0,row=1,sticky='EW',padx=2)
+btxdf=Button(f5b2,text='  TxDF = 0  ',command=toggletxdf,padx=1,pady=1)
+btxdf.grid(column=1,row=0,sticky='EW',padx=2)
 
 f5b3=Frame(f5b,bd=2,relief=GROOVE)
 f5b3.grid(column=0,row=2,padx=2,sticky='EW')
