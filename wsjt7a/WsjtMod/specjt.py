@@ -554,7 +554,7 @@ for i in (7, 6, 5, 4, 3, 2, 1):
     if i==6: t="H1"
     if i==7: t="H2"
     Radiobutton(sbar,text=t,value=i,variable=nspeed0).pack(side=RIGHT)
-nspeed0.set(6)
+nspeed0.set(7)
 lab2=Label(sbar,text='Speed: ',bd=0)
 lab2.pack(side=RIGHT)
 #------------------------------------------------- Graphics frame
