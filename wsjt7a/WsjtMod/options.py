@@ -48,27 +48,35 @@ ntc=IntVar()
 necho=IntVar()
 fRIT=IntVar()
 dither=IntVar()
-wx=StringVar()
 temp=StringVar()
 wind=StringVar()
 pwr=StringVar()
 ant=StringVar()
-wxlist=("CLEAR","CLOUDY")
+mytag=IntVar()
+histag=IntVar()
+genmsg=IntVar()
 
 ntc.set(1)
 
+def resetgen():
+    defaults()
+    genmsg.set(1)
+
 def defaults():
+    t=''
+    if mytag.get()==1: t=' %S'
+    if histag.get()==1: t=' %H'
     if (ireport.get()==0 and iregion.get()==0):
         tx1.delete(0,END)
         tx1.insert(0,'%T %M')
         tx2.delete(0,END)
         tx2.insert(0,'%T %M %R')
         tx3.delete(0,END)
-        tx3.insert(0,'%T %M R%R')
+        tx3.insert(0,'R%R'+t)
         tx4.delete(0,END)
-        tx4.insert(0,'RRR %S')
+        tx4.insert(0,'RRR'+t)
         tx5.delete(0,END)
-        tx5.insert(0,'73 %S')
+        tx5.insert(0,'73'+t)
         tx6.delete(0,END)
         tx6.insert(0,'CQ %M')
     elif (ireport.get()==1 and iregion.get()==0):
@@ -77,14 +85,14 @@ def defaults():
         tx2.delete(0,END)
         tx2.insert(0,'%T %M %G')
         tx3.delete(0,END)
-        tx3.insert(0,'RR %G')
+        tx3.insert(0,'RR %G'+t)
         tx4.delete(0,END)
-        tx4.insert(0,'RRR')
+        tx4.insert(0,'RRR'+t)
         tx5.delete(0,END)
-        tx5.insert(0,'73')
+        tx5.insert(0,'73'+t)
         tx6.delete(0,END)
         tx6.insert(0,'CQ %M')
-        
+
     elif (ireport.get()==0 and iregion.get()==1):
         tx1.delete(0,END)
         tx1.insert(0,'%T %M')
@@ -113,22 +121,13 @@ def defaults():
         tx6.delete(0,END)
         tx6.insert(0,'CQ %M')
 
-#------------------------------------------------------ set_wx
-def set_wx(event=NONE):
-    print 'hello'
-    wxdialog=Pmw.ComboBoxDialog(root, title="Wx options",
-        buttons=('OK','cancel'),defaultbutton='OK',
-        scrolledlist_items=tx6list,listbox_width=9)
-    wxdialog.geometry(msgpos())
-    if g.Win32: wxdialog.iconbitmap("wsjt.ico")
-    wxdialog.tkraise()
-    t=wxdialog.activate()
-    if t=='OK':
-        t=wxdialog.get()
-        wx_entry.delete(0,END)
-        wx_entry.insert(0,t)
+#------------------------------------------------------ setMyTag
+def setMyTag(event=NONE):
+    if(mytag.get()==1): histag.set(0)
 
-
+#------------------------------------------------------ setHisTag
+def setHisTag(event=NONE):
+    if(histag.get()==1): mytag.set(0)
 
 mycall=Pmw.EntryField(g1.interior(),labelpos=W,label_text='My Call:',
         value='K1JT',entry_textvariable=MyCall,entry_width=12)
@@ -170,24 +169,31 @@ f1.pack()
 g2=Pmw.Group(root,tag_text="FSK441/JTMS/ISCAT message templates")
 f2=Frame(g2.interior(),width=100,height=20)
 f2a=Frame(f2,width=50,height=20,bd=2,relief=GROOVE)
-f2a.pack(side=LEFT,padx=6,pady=6)
+f2a.pack(side=LEFT,padx=6,pady=6,fill=Y)
 f2b=Frame(f2,width=50,height=20,bd=2,relief=GROOVE)
 f2b.pack(side=LEFT,padx=6,pady=6)
+iregion=IntVar()
+rb4=Radiobutton(f2a,text='EU',value=1,variable=iregion)
+rb4.pack(anchor=W,side=LEFT,padx=2,pady=2)
+rb3=Radiobutton(f2a,text='NA',value=0,variable=iregion)
+rb3.pack(anchor=W,side=LEFT,padx=2,pady=2)
 
 ireport=IntVar()
-rb1=Radiobutton(f2a,text='Report',value=0,variable=ireport)
-rb2=Radiobutton(f2a,text='Grid',value=1,variable=ireport)
-rb1.pack(anchor=W,side=LEFT,padx=2,pady=2)
-rb2.pack(anchor=W,side=LEFT,padx=2,pady=2)
+rb1=Radiobutton(f2b,text='Report',value=0,variable=ireport)
+rb2=Radiobutton(f2b,text='Grid',value=1,variable=ireport)
+rb1.grid(column=0,row=0)
+rb2.grid(column=1,row=0)
+cb1=Checkbutton(f2b,text='My tag',variable=mytag,command=setMyTag)
+cb1.grid(column=0,row=2)
+cb2=Checkbutton(f2b,text='His tag',variable=histag,command=setHisTag)
+cb2.grid(column=1,row=2)
 
-iregion=IntVar()
-rb3=Radiobutton(f2b,text='NA',value=0,variable=iregion)
-rb4=Radiobutton(f2b,text='EU',value=1,variable=iregion)
-rb3.pack(anchor=W,side=LEFT,padx=2,pady=2)
-rb4.pack(anchor=W,side=LEFT,padx=2,pady=2)
 f2.pack()
 
-Button(g2.interior(),text="Reset defaults",command=defaults).pack(padx=6,pady=6)
+f3=Frame(g2.interior(),width=100,height=20)
+Button(f3,text="Reset",command=defaults).pack(side=LEFT,padx=6,pady=6)
+Button(f3,text="Reset and Gen Msgs",command=resetgen).pack(side=LEFT,padx=6,pady=6)
+f3.pack()
 
 tx1=Pmw.EntryField(g2.interior(),labelpos=W,label_text='Tx 1:',
                    entry_textvariable=Template1)

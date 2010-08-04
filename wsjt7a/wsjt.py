@@ -1632,6 +1632,10 @@ def update():
         if first and mode.get()!='Echo': GenStdMsgs()
         first=0
 
+    if options.genmsg.get():
+        GenStdMsgs()
+        options.genmsg.set(0)
+
     samfac_in=Audio.gcom1.mfsample/110250.0
     samfac_out=Audio.gcom1.mfsample2/110250.0
     xin=1
