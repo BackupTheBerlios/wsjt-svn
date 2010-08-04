@@ -191,7 +191,7 @@ cb2.grid(column=1,row=2)
 f2.pack()
 
 f3=Frame(g2.interior(),width=100,height=20)
-Button(f3,text="Reset",command=defaults).pack(side=LEFT,padx=6,pady=6)
+Button(f3,text="Reset Templates",command=defaults).pack(side=LEFT,padx=6,pady=6)
 Button(f3,text="Reset and Gen Msgs",command=resetgen).pack(side=LEFT,padx=6,pady=6)
 f3.pack()
 
