@@ -972,7 +972,7 @@ VK7ABC K1JT RRR
 
 #------------------------------------------------------ usersguide
 def usersguide(event=NONE):
-    url='http://physics.princeton.edu/pulsar/K1JT/wsjt7a.txt'
+    url='http://physics.princeton.edu/pulsar/K1JT/WSJT_9_Supplement.pdf'
     thread.start_new_thread(browser,(url,))
 
 #------------------------------------------------------- browser
@@ -1787,8 +1787,8 @@ def update():
             im.putpalette(g.palette)
             cmap0=g.cmap
 
-        if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4' \
-               or mode.get()=='Echo': plot_large()
+        if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4':
+            plot_large()
         else:
             im.putdata(Audio.gcom2.b)
             pim=ImageTk.PhotoImage(im)          #Convert Image to PhotoImage
