@@ -1,5 +1,5 @@
 subroutine avecho(fname,ntime,y1,ibuf0,ntc,necho,nfrit,ndither,      &
-     dlatency,nsave,f1,nsum)
+     dlatency,nsave,f1,nsum,ss1,ss2)
 
   parameter (NBSIZE=1024*2048)
   character*24 fname
@@ -7,6 +7,8 @@ subroutine avecho(fname,ntime,y1,ibuf0,ntc,necho,nfrit,ndither,      &
   real d(28672)                          !Real audio data
   real s1(600)      !Avg spectrum relative to initial Doppler echo freq
   real s2(600)      !Avg spectrum with Dither and changing Doppler removed
+  real ss1(-224:224)
+  real ss2(-224:224)
   real tmp(600)
   integer nsum      !Number of integrations
   real dop0         !Doppler shift for initial integration (Hz)
@@ -63,17 +65,26 @@ subroutine avecho(fname,ntime,y1,ibuf0,ntc,necho,nfrit,ndither,      &
   u=1.0/nsum
   if(ntc.lt.1) ntc=1
   if(nsum.gt.10*ntc) u=1.0/(10*ntc)
-  call cs_lock('avecho')
-  if(nsave.ne.0) open(25,file=fname,status='unknown')
   do i=1,600
      s1(i)=(1.0-u)*s1(i) + u*s(ia+i-300)  !Center at initial doppler freq
      s2(i)=(1.0-u)*s2(i) + u*s(ib+i-300)  !Center at expected echo freq
-     if(nsave.ne.0) write(25,3001) (i-300)*df,s1(i),s2(i)
-3001 format(f10.3,2f12.3)
+     j=i-300
+     if(abs(j).le.224) then
+        ss1(j)=s1(i)
+        ss2(j)=s2(i)
+     endif
   enddo
-  call flush(25)
-  close(25)
-  call cs_unlock
+  if(nsave.ne.0) then
+     call cs_lock('avecho')
+     open(25,file=fname,status='unknown')
+     do i=1,600
+        write(25,3001) (i-300)*df,s1(i),s2(i)
+3001    format(f10.3,2f12.3)
+     enddo
+     call flush(25)
+     close(25)
+     call cs_unlock
+  endif
 
   call pctile(s2,tmp,600,50,x0)
   call pctile(s2,tmp,600,84,x1)
@@ -121,10 +132,8 @@ subroutine avecho(fname,ntime,y1,ibuf0,ntc,necho,nfrit,ndither,      &
   write(11,1010) nsum,sigdB,echosig,echodop,width,NQual
 1010 format(i4,f6.1,f7.1,f8.1,f6.1,i4)
   write(21,1010) nsum,sigdB,echosig,echodop,width,NQual
-
   call flush(11)
   call flush(21)
-  call flush(25)
   call cs_unlock
 
 900 return

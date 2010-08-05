@@ -863,8 +863,8 @@ Ctrl+D	Force Decode
 Shift+Ctrl+D  Force Decode, no JT65 shorthands 
 Alt+E	Erase
 Alt+F	Toggle Freeze
-Alt+G	Generate Standard Messages
-Ctrl+G	Generate Alternate JT65 Messages
+Alt+G	Generate standard messages
+Ctrl+G	Generate alternate JT65/JT4 Messages
 Alt+I	Include
 Alt+L	Lookup
 Ctrl+L	Lookup, then Generate Standard Messages
@@ -949,7 +949,7 @@ def minimal_qso(event=NONE):
     if g.Win32: screenf5s.iconbitmap("wsjt.ico")
     t="""
 The following are recommended sequences for  minimal QSOs
-using the standard JT65 messages:
+using the standard JT65/JT4 messages:
 
 Station #1                            Station #2
 ----------------------------------------------------------
@@ -1787,8 +1787,8 @@ def update():
             im.putpalette(g.palette)
             cmap0=g.cmap
 
-        if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4':
-            plot_large()
+        if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4' \
+               or mode.get()=='Echo': plot_large()
         else:
             im.putdata(Audio.gcom2.b)
             pim=ImageTk.PhotoImage(im)          #Convert Image to PhotoImage
@@ -1930,7 +1930,7 @@ setupmenu.add_separator()
 setupmenu.add_checkbutton(label = 'F4 sets Tx6',variable=kb8rq)
 setupmenu.add_checkbutton(label = 'Double-click on callsign sets TxFirst',
                           variable=setseq)
-setupmenu.add_checkbutton(label = 'GenStdMsgs sets Tx1',variable=k2txb)
+setupmenu.add_checkbutton(label = 'Gen Msgs sets Tx1',variable=k2txb)
 setupmenu.add_separator()
 setupmenu.add_checkbutton(label = 'Monitor ON at startup',variable=nmonitor)
 setupmenu.add_separator()
@@ -2055,6 +2055,7 @@ bandmenu.add_radiobutton(label = '21', variable=nfreq,value=21)
 bandmenu.add_radiobutton(label = '24', variable=nfreq,value=24)
 bandmenu.add_radiobutton(label = '28', variable=nfreq,value=28)
 bandmenu.add_radiobutton(label = '50', variable=nfreq,value=50)
+bandmenu.add_radiobutton(label = '70', variable=nfreq,value=70)
 bandmenu.add_radiobutton(label = '144', variable=nfreq,value=144)
 bandmenu.add_radiobutton(label = '222', variable=nfreq,value=222)
 bandmenu.add_radiobutton(label = '432', variable=nfreq,value=432)
