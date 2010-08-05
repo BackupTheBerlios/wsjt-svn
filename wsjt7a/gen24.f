@@ -1,5 +1,5 @@
-      subroutine gen24(message,mode4,samfac,ntxdf,ndebug,
-     +    iwave,nwave,sendingsh,msgsent,nmsg)
+      subroutine gen24(message,mode4,samfac,ntxdf,iwave,nwave,
+     +  sendingsh,msgsent,nmsg)
 
 C  Encode a JT4 message into a wavefile.
 
@@ -38,14 +38,6 @@ C  Encode a JT4 message into a wavefile.
       sendingsh=0
       if(iand(dgen(10),8).ne.0) sendingsh=-1 !Plain text flag
       call interleave24(symbol(2),1)         !Apply JT4 interleaving
-
-      if(ndebug.ne.0) then
-         rewind 51
-         do i=1,nsym
-            write(51,3001) i,symbol(i),npr2(i),npr2(i)+2*symbol(i)
- 3001       format(4i5)
-         enddo
-      endif
 
 C  Set up necessary constants
       tsymbol=2520.d0/11025.d0

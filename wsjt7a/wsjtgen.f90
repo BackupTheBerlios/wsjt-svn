@@ -121,7 +121,7 @@ subroutine wsjtgen
         if(mode(5:5).eq.'A') mode65=1
         if(mode(5:5).eq.'B') mode65=2
         if(mode(5:5).eq.'C') mode65=4
-        call gen65(msg,mode65,samfacout,ntxdf,ndebug,iwave,nwave,sendingsh,   &
+        call gen65(msg,mode65,samfacout,ntxdf,iwave,nwave,sendingsh,   &
              msgsent,nmsg0)
      else if(mode(1:5).eq.'ISCAT') then
         call geniscat(msg,nmsg,samfacout,iwave,nwave,msgsent)
@@ -136,7 +136,7 @@ subroutine wsjtgen
         sendingsh=0
         msgsent=msg
      else if(mode(1:3).eq.'JT4' ) then
-        call gen24(msg,mode4,samfacout,ntxdf,ndebug,iwave,nwave,      &
+        call gen24(msg,mode4,samfacout,ntxdf,iwave,nwave,                 &
              sendingsh,msgsent,nmsg0)
      else
         stop 'Unknown Tx mode requested.'

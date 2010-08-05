@@ -1,17 +1,18 @@
 subroutine astro0(nyear,month,nday,uth8,nfreq,grid,cauxra,cauxdec,       &
      AzSun8,ElSun8,AzMoon8,ElMoon8,AzMoonB8,ElMoonB8,ntsky,ndop,ndop00,  &
      dbMoon8,RAMoon8,DecMoon8,HA8,Dgrd8,sd8,poloffset8,xnr8,dfdt,dfdt0,  &
-     RaAux8,DecAux8,AzAux8,ElAux8)
+     RaAux8,DecAux8,AzAux8,ElAux8,width1,width2)
 
 !f2py threadsafe
 !f2py intent(in) nyear,month,nday,uth8,nfreq,grid,cauxra,cauxdec
-!f2py intent(out) AzSun8,ElSun8,AzMoon8,ElMoon8,AzMoonB8,ElMoonB8,ntsky,ndop,ndop00,dbMoon8,RAMoon8,DecMoon8,HA8,Dgrd8,sd8,poloffset8,xnr8,dfdt,dfdt0,RaAux8,DecAux8,AzAux8,ElAux8
+!f2py intent(out) AzSun8,ElSun8,AzMoon8,ElMoon8,AzMoonB8,ElMoonB8,ntsky,ndop,ndop00,dbMoon8,RAMoon8,DecMoon8,HA8,Dgrd8,sd8,poloffset8,xnr8,dfdt,dfdt0,RaAux8,DecAux8,AzAux8,ElAux8,width1,width2
 
+  parameter (DEGS=57.2957795130823d0)
   character grid*6
   character*9 cauxra,cauxdec
   real*8 AzSun8,ElSun8,AzMoon8,ElMoon8,AzMoonB8,ElMoonB8,AzAux8,ElAux8
   real*8 dbMoon8,RAMoon8,DecMoon8,HA8,Dgrd8,xnr8,dfdt,dfdt0,dt
-  real*8 sd8,poloffset8
+  real*8 sd8,poloffset8,day8,width1,width2
   include 'gcom2.f90'
   data uth8z/0.d0/,imin0/-99/
   save
@@ -57,13 +58,28 @@ subroutine astro0(nyear,month,nday,uth8,nfreq,grid,cauxra,cauxdec,       &
   call astro(nyear,month,nday,uth,nfreq,hisgrid,2,nmode,1,    &
        AzSun,ElSun,AzMoon,ElMoon,ntsky,doppler00,doppler,            &
        dbMoon,RAMoon,DecMoon,HA,Dgrd,sd,poloffset,xnr,auxra,auxdec,  &
-       AzAux,ElAux)
+       AzAux,ElAux,day,xlon2,xlat2)
   AzMoonB8=AzMoon
   ElMoonB8=ElMoon
   call astro(nyear,month,nday,uth,nfreq,grid,1,nmode,1,       &
        AzSun,ElSun,AzMoon,ElMoon,ntsky,doppler00,doppler,            &
        dbMoon,RAMoon,DecMoon,HA,Dgrd,sd,poloffset,xnr,auxra,auxdec,  &
-       AzAux,ElAux)
+       AzAux,ElAux,day,xlon1,xlat1)
+
+  day8=day
+  call tm2(day8,xlat1,xlon1,xl1,b1)
+  call tm2(day8,xlat2,xlon2,xl2,b2)
+  call tm2(day8+1.d0/1440.0,xlat1,xlon1,xl1a,b1a)
+  call tm2(day8+1.d0/1440.0,xlat2,xlon2,xl2a,b2a)
+  fghz=0.001*nfreq
+  dldt1=DEGS*(xl1a-xl1)
+  dbdt1=DEGS*(b1a-b1)
+  dldt2=DEGS*(xl2a-xl2)
+  dbdt2=DEGS*(b2a-b2)
+  rate1=2.0*sqrt(dldt1**2 + dbdt1**2)
+  width1=0.5*6741*fghz*rate1
+  rate2=sqrt((dldt1+dldt2)**2 + (dbdt1+dbdt2)**2)
+  width2=0.5*6741*fghz*rate2
 
   RaAux8=auxra
   DecAux8=auxdec

@@ -75,7 +75,7 @@ SRCS2F90 = abc441.f90 astro0.f90 audio_init.f90 azdist0.f90 \
 	thnix.f90 tweak1.f90 smo.f90 analytic.f90 \
 	geniscat.f90 iscat.f90 four2a.f90 hipass.f90 \
 	msdf.f90 syncms.f90 lenms.f90 jtms.f90 foldms.f90 avecho.f90 \
-	echogen.f90 alignmsg.f90 chk441.f90 gen441.f90 
+	echogen.f90 alignmsg.f90 chk441.f90 gen441.f90 tm2.f90
 
 OBJS2F90 = ${SRCS2F90:.f90=.o}
 
@@ -102,7 +102,7 @@ SRCS2F77 = wsjt1.f astro.f azdist.f coord.f dcoord.f deg2grid.f \
 OBJS2F77 = ${SRCS2F77:.f=.o} deep65.o
 
 SRCS2C	= init_rs.c encode_rs.c decode_rs.c fano.c tab.c nhash.c \
-	cutil.c fthread.c
+	cutil.c fthread.c tmoonsub.c
 OBJS2C  = ${SRCS2C:.c=.o}
 
 SRCS3C	= ptt_unix.c igray.c wrapkarn.c

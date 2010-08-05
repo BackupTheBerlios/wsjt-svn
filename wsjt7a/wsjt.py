@@ -575,15 +575,19 @@ def ModeFSK441(event=NONE):
         lab6.configure(bg="green")
         isync=isync441
         slabel="S      "
+        f5b1.grid(column=0,row=0,padx=2,sticky='EW')
         lsync.configure(text=slabel+str(isync))
         iframe4b.pack_forget()
         textheight=9
         text.configure(height=textheight)
-        bclravg.configure(state=DISABLED)
-        binclude.configure(state=DISABLED)
-        bexclude.configure(state=DISABLED)
+        bclravg.pack_forget()
+        binclude.pack_forget()
+        bexclude.pack_forget()
         cbfreeze.grid_forget()
         cbafc.grid_forget()
+        lsync.grid(column=0,row=0,padx=8,sticky='EW')
+        ltol.grid(column=0,row=1,padx=8,sticky='EW')
+        cbzap.grid(column=1,row=0,padx=2,sticky='W')
         nfreeze.set(0)
         shrx.grid(column=1,row=1,sticky='W',padx=2)
         shmsg.grid(column=1,row=0,sticky='W',padx=2)
@@ -613,10 +617,17 @@ def ModeJT65():
     text.configure(height=textheight)
     isync=isync65
     slabel="Sync   "
+    f5b1.grid(column=0,row=0,padx=2,sticky='EW')
     lsync.configure(text=slabel+str(isync))
-    bclravg.configure(state=NORMAL)
-    binclude.configure(state=NORMAL)
-    bexclude.configure(state=NORMAL)
+    lsync.grid(column=0,row=0,padx=2,sticky='EW')
+    ltol.grid(column=0,row=1,padx=2,sticky='EW')
+    cbzap.grid(column=1,row=0,padx=2,sticky='W')
+    btxstop.pack_forget()
+    bclravg.pack(side=LEFT,expand=1,fill=X)
+    binclude.pack(side=LEFT,expand=1,fill=X)
+    bexclude.pack(side=LEFT,expand=1,fill=X)
+    btxstop.pack(side=LEFT,expand=1,fill=X)
+
     cbfreeze.grid(column=0,row=2,padx=2,sticky='W')
     cbafc.grid(column=1,row=1,padx=2,sticky='W')
     if ltxdf: toggletxdf()
@@ -662,7 +673,7 @@ def ModeJTMS(event=NONE):
     if g.mode != "JTMS":
         if lauto: toggleauto()
     ModeFSK441()
-    cbfreeze.grid(column=0,row=2,padx=2,sticky='W')
+    cbfreeze.grid(column=0,row=2,padx=4,sticky='W')
     mode.set("JTMS")
     
 #------------------------------------------------------ ModeISCAT
@@ -696,15 +707,17 @@ def ModeCW(event=NONE):
     if g.mode != "CW":
         if lauto: toggleauto()
         cleartext()
+        ModeJT65B()
         mode.set("CW")
         Audio.gcom1.trperiod=ncwtrperiod
         iframe4b.pack_forget()
         text.configure(height=9)
-        bclravg.configure(state=DISABLED)
-        binclude.configure(state=DISABLED)
-        bexclude.configure(state=DISABLED)
         cbfreeze.grid_forget()
         cbafc.grid_forget()
+        lsync.grid_forget()
+        ltol.grid_forget()
+        cbzap.grid_forget()
+        f5b1.grid_forget()
         if ltxdf: toggletxdf()
         ntx.set(1)
         GenStdMsgs()
@@ -714,6 +727,10 @@ def ModeCW(event=NONE):
 def ModeJT4():
     global slabel,isync,isync65,textheight,itol
     ModeJT65()
+    bclravg.pack_forget()
+    binclude.pack_forget()
+    bexclude.pack_forget()
+
 
 #------------------------------------------------------ ModeJT4A
 def ModeJT4A():
@@ -721,6 +738,7 @@ def ModeJT4A():
     ModeJT4()
     mode.set("JT4A")
     Audio.gcom2.mode4=1
+    btxdf.grid(column=1,row=0,sticky='EW',padx=4)
 
 #------------------------------------------------------ ModeJT4B
 def ModeJT4B():
@@ -794,13 +812,14 @@ def about(event=NONE):
 WSJT is a weak signal communications program.  It supports
 these operating modes:
 
-  1. FSK441 - fast mode for meteor scatter
-  2. JTMS   - fast mode for meteor scatter
-  3. ISCAT  - for meteor and ionospheric scatter on 50 MHz
-  4. JT65   - for HF, EME, and troposcatter
-  5. JT4    - for HF and EME
-  6. CW     - 15 WPM Morse code, messages structured for EME
-  7. Echo   - EME Echo testing
+  1. FSK441 -  meteor scatter
+  2. JTMS     -  meteor scatter (experimental)
+  3. ISCAT    -  for tropo- and iono-scatter, weak Es/F2 on 50 MHz
+                       (replaces JT6M)
+  4. JT65      -  for HF, EME, and troposcatter
+  5. JT4        -  HF, microwave beacons, 10 GHz EME and rainscatter
+  6. CW        -  15 WPM Morse code, messages structured for EME
+  7. Echo      -  EME Echo testing
 
 Copy (c) 2001-2010 by Joseph H. Taylor, Jr., K1JT, with
 contributions from additional authors.  WSJT is Open Source 
@@ -831,6 +850,7 @@ F5	What message to send?
 Shift+F5	Examples of minimal JT65 QSOs
 F6	Open next file in directory
 Shift+F6	Decode all wave files in directory
+F9	Online Supplement to User's Guide
 F10	Show SpecJT
 Shift+F10  Show astronomical data
 F11	Decrement Freeze DF
@@ -1559,11 +1579,11 @@ def update():
             g.AzSun,g.ElSun,g.AzMoon,g.ElMoon,g.AzMoonB,g.ElMoonB,g.ntsky, \
                 g.ndop,g.ndop00,g.dbMoon,g.RAMoon,g.DecMoon,g.HA8,g.Dgrd,  \
                 g.sd,g.poloffset,g.MaxNR,g.dfdt,g.dfdt0,g.RaAux,g.DecAux, \
-                g.AzAux,g.ElAux = Audio.astro0(utc[0],utc[1],utc[2],  \
+                g.AzAux,g.ElAux,g.w1,g.w2 = Audio.astro0(utc[0],utc[1],utc[2],  \
                 utchours,nfreq.get(),options.MyGrid.get().upper(), \
                     options.auxra.get()+(' '*9)[:9],     \
                     options.auxdec.get()+(' '*9)[:9])
-
+            
             if len(HisGrid.get().strip())<4:
                 g.ndop=g.ndop00
                 g.dfdt=g.dfdt0
@@ -1667,22 +1687,25 @@ def update():
         bdecode.configure(bg='#66FFFF',activebackground='#66FFFF')
         if (sys.platform == 'darwin'):
            bdecode.configure(text='*Decode*')
-    if mode.get()=="CW" or mode.get()=='FSK441' or mode.get()=='JTMS' or \
-           mode.get()=='ISCAT':
-        msg5.configure(text="TR Period: %d s" % (Audio.gcom1.trperiod,), \
-                       bg='white')
+    msg5.configure(text="T/R Period: %d s" % (Audio.gcom1.trperiod,))
+    if mode.get()=="CW": color='white'
+    elif mode.get()=='FSK441' or mode.get()=='JTMS' or mode.get()=='ISCAT':
+        if(Audio.gcom1.trperiod==15): color='yellow'
+        else: color='white'
     else:
-        msg5.configure(text="TR Period: %d s" % (Audio.gcom1.trperiod,), \
-                       bg='gray85')
-##    t="%d" % (int(Audio.mtxcom.mtxstate),)
-##    msg6.configure(text=t)
+        color='gray85'
+    msg5.configure(bg=color)
 
     tx1.configure(bg='white')
     tx2.configure(bg='white')
     tx3.configure(bg='white')
     tx4.configure(bg='white')
     tx5.configure(bg='white')
-    if len(tx5.get())>13: tx5.configure(bg='pink')
+    if len(tx5.get())>13 and \
+            (mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4'):
+        Audio.gcom2.t0msg=(tx5.get()+' '*22)[:22]
+        nplain,naddon,ndiff=Audio.chkt0()
+        if nplain==1: tx5.configure(bg='pink')
     tx6.configure(bg='white')
     if tx6.get()[:1]=='#':
         try:
@@ -2055,7 +2078,8 @@ else:
    helpmenu = Menu(mbar, tearoff=0)
 helpmenu.add('command', label = 'Keyboard shortcuts', command = shortcuts, \
              accelerator='F1')
-helpmenu.add('command',label="Online User's Guide",command=usersguide)
+helpmenu.add('command',label="Online Supplement to User's Guide", \
+             command=usersguide, accelerator='F9')
 helpmenu.add('command', label = 'Special mouse commands', \
              command = mouse_commands, accelerator='Shift+F1')
 helpmenu.add('command', label = 'What message to send?', \
@@ -2125,6 +2149,7 @@ root.bind_all('<F5>', what2send)
 root.bind_all('<Shift-F5>', minimal_qso)
 root.bind_all('<F6>', opennext)
 root.bind_all('<Shift-F6>', decodeall)
+root.bind_all('<F9>', usersguide)
 root.bind_all('<F10>', showspecjt)
 root.bind_all('<Shift-F10>', astro1)
 root.bind_all('<F11>', left_arrow)

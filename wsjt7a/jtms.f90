@@ -73,8 +73,8 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
      if(nline.le.99) nline=nline+1
      tping(nline)=t2
      call cs_lock('decodems')
-     write(line(nline),1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg29,msglen
-1120 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a29,8x,i3,'*',i3)
+     write(line(nline),1120) cfile6,t2,mswidth,ndb,nrpt,ndf,msg29
+1120 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a29,11x,'*')
      call cs_unlock
    endif
 

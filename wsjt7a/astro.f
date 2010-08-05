@@ -1,7 +1,7 @@
       subroutine astro(nyear,month,nday,uth,nfreq,Mygrid,
      +     NStation,mode,MoonDX,AzSun,ElSun,AzMoon,ElMoon0,
      +     ntsky,doppler00,doppler,dbMoon,RAMoon,DecMoon,HA,Dgrd,sd,
-     +     poloffset,xnr,auxra,auxdec,azaux,elaux)
+     +     poloffset,xnr,auxra,auxdec,azaux,elaux,day,lon,lat)
 
 C  Computes astronomical quantities for display in JT65, CW, and EME Echo mode.
 C  NB: may want to smooth the Tsky map to 10 degrees or so.
@@ -22,7 +22,7 @@ C  NB: may want to smooth the Tsky map to 10 degrees or so.
       call grid2deg(MyGrid,elon,lat)
       lon=-elon
       call sun(nyear,month,nday,uth,lon,lat,RASun,DecSun,LST,
-     +    AzSun,ElSun,mjd)
+     +    AzSun,ElSun,mjd,day)
 
       freq=nfreq*1.e6
       if(nfreq.eq.2) freq=1.8e6
