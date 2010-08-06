@@ -784,7 +784,7 @@ def ModeJT4G():
 
 #------------------------------------------------------ ModeEcho
 def ModeEcho(event=NONE):
-    ModeJT65B()
+    ModeCW()
     mode.set("Echo")
     if lauto: toggleauto()
     lab2.configure(text='     N      Level         Sig              DF         Width      Q')
@@ -1375,7 +1375,37 @@ def setmsg(template,r):
             else:
                 msg=msg+template[i]            
     return msg.upper()
-    
+
+#------------------------------------------------------ plot_echo
+def plot_echo():
+    "Plot red and blue curves for Echo mode."
+    graph1.delete(ALL)
+    y1=[]
+    y2=[]
+    for i in range(446):        #Find ymax for magenta/orange curves
+        ss1=Audio.gcom2.ss1[i+1]
+        y1.append(ss1)
+        ss2=Audio.gcom2.ss2[i+1]
+        y2.append(ss2)
+    ymax=max(y1+y2)
+    yfac=30.0
+    if ymax>85.0/yfac: yfac=85.0/ymax
+    xy1=[]
+    xy2=[]
+    fac=500.0/446.0
+    for i in range(446):        #Make xy list for magenta/orange curves
+        x=i*fac
+        ss1=Audio.gcom2.ss1[i+1]
+        n=int(90.0-yfac*ss1)
+        xy1.append(x)
+        xy1.append(n)
+        ss2=Audio.gcom2.ss2[i+1]
+        n=int(90.0-yfac*ss2) - 20
+        xy2.append(x)
+        xy2.append(n)
+    graph1.create_line(xy1,fill='#33FFFF')            #Light blue
+    graph1.create_line(xy2,fill="red")
+
 #------------------------------------------------------ plot_large
 def plot_large():
     "Plot the green, red, and blue curves."
@@ -1787,7 +1817,9 @@ def update():
             im.putpalette(g.palette)
             cmap0=g.cmap
 
-        if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4':
+        if mode.get()=='Echo':
+            plot_echo()
+        elif mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4':
             plot_large()
         else:
             im.putdata(Audio.gcom2.b)

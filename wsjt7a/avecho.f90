@@ -50,7 +50,7 @@ subroutine avecho(fname,ntime,y1,ibuf0,ntc,necho,nfrit,ndither,      &
   x(28673:)=0.0
   call xfft(x,32768)
 
-  fac=(1.0/32768.0)**2
+  fac=1.e-6
   do i=1,8192
      s(i)=fac * (real(c(i))**2 + aimag(c(i))**2)
   enddo
