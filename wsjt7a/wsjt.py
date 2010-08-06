@@ -1870,6 +1870,13 @@ def update():
     except:
         pass
 
+    if options.iregion.get():
+        options.cb1.configure(state=DISABLED)
+        options.cb2.configure(state=DISABLED)
+    else:
+        options.cb1.configure(state=NORMAL)
+        options.cb2.configure(state=NORMAL)
+
     if altmsg: tx6alt=tx6.get()    
 # Queue up the next update
     ldate.after(100,update)
