@@ -2008,7 +2008,6 @@ else:
 # state=modemenu.entrycget(0,"state")
 
 modemenu.add_radiobutton(label = 'FSK441', variable=mode,command = ModeFSK441, state=NORMAL)
-modemenu.add_radiobutton(label = 'JTMS', variable=mode, command = ModeJTMS)
 modemenu.add_radiobutton(label = 'ISCAT', variable=mode, command = ModeISCAT)
 modemenu.add_radiobutton(label = 'JT65A', variable=mode, command = ModeJT65A)
 modemenu.add_radiobutton(label = 'JT65B', variable=mode, command = ModeJT65B)
@@ -2021,6 +2020,7 @@ modemenu.add_radiobutton(label = 'JT4E', variable=mode, command = ModeJT4E)
 modemenu.add_radiobutton(label = 'JT4F', variable=mode, command = ModeJT4F)
 modemenu.add_radiobutton(label = 'JT4G', variable=mode, command = ModeJT4G)
 modemenu.add_radiobutton(label = 'CW', variable=mode, command = ModeCW)
+modemenu.add_radiobutton(label = 'JTMS', variable=mode, command = ModeJTMS)
 modemenu.add_radiobutton(label = 'Echo', variable=mode, command = ModeEcho)
 
 if (sys.platform == 'darwin'):
