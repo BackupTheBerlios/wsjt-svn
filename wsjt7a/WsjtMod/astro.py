@@ -29,7 +29,7 @@ def update():
     t5= "           Self     DX\n"
     t6= "Dop:    %7d %7d\n" % (g.ndop,g.ndop00)
     t7= "df/dt:  %7.2f %7.2f\n" % (g.dfdt,g.dfdt0)
-    t7aa="Width:  %7.1f %7.1f\n\n" % (g.w1,g.w2)
+    t7aa="Spread: %7.1f %7.1f\n\n" % (g.w1,g.w2)
     t7a="            RA      DEC\n"
     irah=int(g.RAMoon)
     iram=int(60.0*(g.RAMoon-irah))

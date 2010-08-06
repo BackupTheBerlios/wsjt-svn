@@ -2693,7 +2693,8 @@ f.write("Monitor " + str(nmonitor.get()) + "\n")
 #f.write("TRPeriod " + str(Audio.gcom1.trperiod) + "\n")
 mrudir2=mrudir.replace(" ","#")
 f.write("MRUDir " + mrudir2 + "\n")
-if g.astro_geom[:7]=="200x200": g.astro_geom="316x373" + g.astro_geom[7:]
+if g.astro_geom[:7]=="200x200":
+    g.astro_geom="316x393" + g.astro_geom[7:]
 f.write("AstroGeometry " + g.astro_geom + "\n")
 f.write("CWTRPeriod " + str(ncwtrperiod) + "\n")
 f.close()
