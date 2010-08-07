@@ -68,9 +68,10 @@ subroutine fivehz
   endif
 
 ! Echo mode
+  if(mode(1:4).ne.'Echo') n3=0
   if(mode(1:4).eq.'Echo') then
      s6=mod(tsec,6.d0)
-     if(lauto.eq.0) go to 10
+     if(lauto.eq.0 .and. (n3.le.0 .or. n3.ge.6)) go to 10
 
 ! When s6 has wrapped back to zero, start a new cycle
      if(s6.lt.s6z) then

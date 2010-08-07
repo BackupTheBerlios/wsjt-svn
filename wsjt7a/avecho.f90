@@ -1,5 +1,5 @@
 subroutine avecho(fname,ntime,y1,ibuf0,ntc,necho,nfrit,ndither,      &
-     dlatency,nsave,f1,nsum,ss1,ss2)
+     dlatency,nsave,f1,nsum,nclearave,ss1,ss2)
 
   parameter (NBSIZE=1024*2048)
   character*24 fname
@@ -33,6 +33,8 @@ subroutine avecho(fname,ntime,y1,ibuf0,ntc,necho,nfrit,ndither,      &
   sigdB=db(sq/(14*2048)) - 58.5
   if(sigdB.lt.-99.0) sigdB=-99.0
 
+  if(nclearave.ne.0) nsum=0
+  nclearave=0
   if(nsum.eq.0) then
      dop0=2.0*xdop(1)       !Remember the initial Doppler
      s1=0.
@@ -50,7 +52,7 @@ subroutine avecho(fname,ntime,y1,ibuf0,ntc,necho,nfrit,ndither,      &
   x(28673:)=0.0
   call xfft(x,32768)
 
-  fac=1.e-6
+  fac=1.e-9
   do i=1,8192
      s(i)=fac * (real(c(i))**2 + aimag(c(i))**2)
   enddo

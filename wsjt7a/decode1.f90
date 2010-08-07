@@ -30,7 +30,7 @@ subroutine decode1(iarg)
      i1=index(fnamex,'.WAV')
      fnamex=fnamex(1:i1-3)//'.eco'
      call avecho(fnamex,ntime,y1,ibuf0,ntc,necho,nfrit,ndither,dlatency,   &
-          nsave,fecho,nsumecho,ss1,ss2)
+          nsave,fecho,nsumecho,nclearave,ss1,ss2)
      ndecoding=0
      ndecdone=1
   endif

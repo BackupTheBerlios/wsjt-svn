@@ -1388,19 +1388,19 @@ def plot_echo():
         ss2=Audio.gcom2.ss2[i+1]
         y2.append(ss2)
     ymax=max(y1+y2)
-    yfac=30.0
-    if ymax>85.0/yfac: yfac=85.0/ymax
+    yfac=0.5
+    if ymax>80.0/yfac: yfac=80.0/ymax
     xy1=[]
     xy2=[]
     fac=500.0/446.0
     for i in range(446):        #Make xy list for magenta/orange curves
         x=i*fac
         ss1=Audio.gcom2.ss1[i+1]
-        n=int(90.0-yfac*ss1)
+        n=int(90.0-yfac*ss1) + 20
         xy1.append(x)
         xy1.append(n)
         ss2=Audio.gcom2.ss2[i+1]
-        n=int(90.0-yfac*ss2) - 20
+        n=int(90.0-yfac*ss2)
         xy2.append(x)
         xy2.append(n)
     graph1.create_line(xy1,fill='#33FFFF')            #Light blue
