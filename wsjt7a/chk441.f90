@@ -1,10 +1,12 @@
-subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,dftolerance,nok)
+subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,             &
+     dftolerance,pick,nok)
 
 ! Experimental FSK441 decoder
 
   parameter (NMAX=512*1024)
   parameter (MAXFFT=8192)
   real dat(NMAX)                          !Raw signal, 30 s at 11025 sps
+  logical pick
   complex cdat(NMAX)                      !Analytic form of signal
   character frag*28,frag0*29              !Message fragment to be matched
   complex cfrag(2100)                     !Complex waveform of message fragment
@@ -29,6 +31,14 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,dftolerance,nok)
      frag0=frag
   endif
 
+  ccf0=3.0
+  sb0=0.75
+  if(pick) then
+     ccf0=2.5
+     sb0=0.65
+  endif
+
+
   nsps=25                                  !Initialize variables
   nsam=nsps*ndits
   mswidth=10*nint(100.0*width)
@@ -44,6 +54,8 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,dftolerance,nok)
   nfft1=2**n
   df1=11025.0/nfft1
   nok=0
+  ibest=1
+  sbest=0.
 
   call analytic(dat(i0),npts,nfft1,s,cdat)    !Convert to analytic signal
 
@@ -73,15 +85,12 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,dftolerance,nok)
   ic=min(nint(220/df1),ia)                    !Baseline range +/- 220 Hz
   call pctile(ccf(ipk-ic),work,2*ic+1,50,base)
   ccfmax=ccfmax/base
-
-  if(ccfmax.lt.4.0) go to 800                 !Reject non-FSK441 signals
+  if(ccfmax.lt.ccf0) go to 800                !Reject non-FSK441 signals
 
 ! We seem to have an FSK441 ping, and we know DF; now find DT.
   call tweak1(cdat,npts,-dfx,cdat)            !Mix to standard frequency
 
-  ibest=1
 ! Look for best match to "frag", find its DT
-  sbest=0.
   fac=1.e-6/base
   do i=1,npts-nsam
      z=0.
@@ -100,7 +109,7 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,dftolerance,nok)
      endif
   enddo
   rr(npts-nsam+1:)=0
-  if(sbest.lt.0.75) go to 800     !Skip if not decodable FSK441 data
+  if(sbest.lt.sb0) go to 800            !Skip if not decodable FSK441 data
   nok=1
 
 800 continue

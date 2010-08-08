@@ -122,10 +122,9 @@ C  Assemble a signal report:
          endif
 
          call chk441(dat,jz,tstart,width,nfreeze,mousedf,
-     +               dftolerance,nok)
+     +               dftolerance,pick,nok)
 !         call new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,
 !     +              nfreeze,mousedf,dftolerance,mycall,0,nok)
-
          if(msglen.eq.0 .or. nok.eq.0) go to 100
 
 C  Discard this ping if DF outside tolerance limits or bauderr too big.
