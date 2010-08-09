@@ -1,11 +1,12 @@
       subroutine decode24(dat,npts,dtx,dfx,flip,mode,mode4,
-     +  decoded,ncount,deepmsg,qual)
+     +  decoded,ncount,deepmsg,qual,submode)
 
 C  Decodes JT65 data, assuming that DT and DF have already been determined.
 
       real dat(npts)                        !Raw data
       character decoded*22,deepmsg*22
       character*72 c72
+      character submode*1
       real*8 dt,df,phi,f0,dphi,twopi,phi1,dphi1
       complex*16 cz,cz1,c0,c1
       integer*1 symbol(207)
@@ -128,7 +129,11 @@ C  Compute soft symbols using differential BPSK demodulation
       call cs_unlock
 
       decoded='                      '
-      if(ncount.ge.0) call unpackmsg(data4,decoded)
+      submode=' '
+      if(ncount.ge.0) then
+         call unpackmsg(data4,decoded)
+         submode=char(ichar('A')+ich-1)
+      endif
       if(decoded(1:6).eq.'000AAA') then
          decoded='***WRONG MODE?***'
          ncount=-1
