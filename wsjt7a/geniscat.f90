@@ -3,7 +3,7 @@ subroutine geniscat(msg,nmsg,samfac,iwave,nwave,msgsent)
 ! Generate an ISCAT_2 waveform.
 
   parameter (NMAX=30*11025,NSZ=1291,NSPS=256)
-  character msg*28,msgsent*22
+  character msg*28,msgsent*28
   integer*2 iwave(NMAX)
   integer imsg(30)
   integer itone(NSZ)

@@ -16,7 +16,7 @@ subroutine wsjtgen
   parameter (NTONES=4)               !Number of FSK tones
 
   integer   itone(84)
-  character msg*28,msgsent*22,idmsg*22
+  character msg*28,msgsent*28,idmsg*22,msg22*22
   real*8 freq,pha,dpha,twopi,dt
   character testfile*27,tfile2*80
   logical lcwid
@@ -122,7 +122,8 @@ subroutine wsjtgen
         if(mode(5:5).eq.'B') mode65=2
         if(mode(5:5).eq.'C') mode65=4
         call gen65(msg,mode65,samfacout,ntxdf,iwave,nwave,sendingsh,   &
-             msgsent,nmsg0)
+             msg22,nmsg0)
+        msgsent=msg22
      else if(mode(1:5).eq.'ISCAT') then
         call geniscat(msg,nmsg,samfacout,iwave,nwave,msgsent)
         sendingsh=0
@@ -137,7 +138,8 @@ subroutine wsjtgen
         msgsent=msg
      else if(mode(1:3).eq.'JT4' ) then
         call gen24(msg,mode4,samfacout,ntxdf,iwave,nwave,                 &
-             sendingsh,msgsent,nmsg0)
+             sendingsh,msg22,nmsg0)
+        msgsent=msg22
      else
         stop 'Unknown Tx mode requested.'
      endif
@@ -227,7 +229,7 @@ subroutine wsjtgen
   
 900 sending=txmsg
   if(mode(1:4).eq.'JT65' .and. sendingsh.ne.1) sending=msgsent
-  if(mode(1:5).eq.'ISCAT') sending=msgsent
+  if(mode(1:3).eq.'JT4' .or. mode(1:5).eq.'ISCAT') sending=msgsent
   do i=NMSGMAX,1,-1
      if(sending(i:i).ne.' '.and. ichar(sending(i:i)).ne.0) go to 910
   enddo
