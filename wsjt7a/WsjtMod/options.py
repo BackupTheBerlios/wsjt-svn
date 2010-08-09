@@ -43,9 +43,9 @@ addpfx=StringVar()
 auxra=StringVar()
 auxdec=StringVar()
 azeldir=StringVar()
-dlatency=DoubleVar()
+##necho=IntVar()
+##dlatency=DoubleVar()
 ntc=IntVar()
-necho=IntVar()
 fRIT=IntVar()
 dither=IntVar()
 temp=StringVar()
@@ -224,17 +224,17 @@ azeldir_entry=Pmw.EntryField(g3.interior(),labelpos=W,label_text='AzElDir:',
     entry_width=9,value=g.appdir,entry_textvariable=azeldir)
 ntc_entry=Pmw.EntryField(g3.interior(),labelpos=W,label_text='Echo Avg (m):',
     entry_width=9,entry_textvariable=ntc)
-necho_entry=Pmw.EntryField(g3.interior(),labelpos=W,label_text='Echo waveform:',
-    entry_width=9,entry_textvariable=necho)
+##necho_entry=Pmw.EntryField(g3.interior(),labelpos=W,label_text='Echo waveform:',
+##    entry_width=9,entry_textvariable=necho)
 fRIT_entry=Pmw.EntryField(g3.interior(),labelpos=W,label_text='RIT (Hz):',
     entry_width=9,entry_textvariable=fRIT)
 dither_entry=Pmw.EntryField(g3.interior(),labelpos=W,label_text='Dither (Hz):',
     entry_width=9,entry_textvariable=dither)
-dlatency_entry=Pmw.EntryField(g3.interior(),labelpos=W,label_text='Latency (s):',
-    entry_width=9,entry_textvariable=dlatency)
+##dlatency_entry=Pmw.EntryField(g3.interior(),labelpos=W,label_text='Latency (s):',
+##    entry_width=9,entry_textvariable=dlatency)
 
-widgets = (temp_prefix,aux_ra,aux_dec,azeldir_entry,ntc_entry,necho_entry, \
-           fRIT_entry,dither_entry,dlatency_entry)
+widgets = (temp_prefix,aux_ra,aux_dec,azeldir_entry,ntc_entry, \
+           fRIT_entry,dither_entry)
 for widget in widgets:
     widget.pack(padx=10,pady=2)
 Pmw.alignlabels(widgets)

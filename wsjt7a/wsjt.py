@@ -1895,10 +1895,10 @@ def update():
     try:
         Audio.gcom2.ntc=options.ntc.get()
         if int(options.ntc.get()<=0): Audio.gcom2.ntc=1
-        Audio.gcom2.necho=options.necho.get()
         Audio.gcom2.nfrit=options.fRIT.get()
         Audio.gcom2.ndither=options.dither.get()
-        Audio.gcom2.dlatency=options.dlatency.get()
+##        Audio.gcom2.necho=options.necho.get()
+##        Audio.gcom2.dlatency=options.dlatency.get()
     except:
         pass
 
@@ -2582,10 +2582,10 @@ try:
 	    except:
 		options.azeldir.set(os.getcwd())
         elif key == 'Ntc': options.ntc.set(value)
-        elif key == 'Necho': options.necho.set(value)
         elif key == 'fRIT': options.fRIT.set(value)
         elif key == 'Dither': options.dither.set(value)
-        elif key == 'Dlatency': options.dlatency.set(value)
+##        elif key == 'Necho': options.necho.set(value)
+##        elif key == 'Dlatency': options.dlatency.set(value)
         elif key == 'MyName': options.myname.set(value)
         elif key == 'HighPri': options.HighPri.set(value)
         elif key == 'TxFirst': TxFirst.set(value)
@@ -2696,10 +2696,10 @@ f.write("AuxRA " + options.auxra.get() + "\n")
 f.write("AuxDEC " + options.auxdec.get() + "\n")
 f.write("AzElDir " + str(options.azeldir.get()).replace(" ","#") + "\n")
 f.write("Ntc " + str(options.ntc.get()) + "\n")
-f.write("Necho " + str(options.necho.get()) + "\n")
 f.write("fRIT " + str(options.fRIT.get()) + "\n")
 f.write("Dither " + str(options.dither.get()) + "\n")
-f.write("Dlatency " + str(options.dlatency.get()) + "\n")
+##f.write("Necho " + str(options.necho.get()) + "\n")
+##f.write("Dlatency " + str(options.dlatency.get()) + "\n")
 f.write("HighPri " + str(options.HighPri.get()) + "\n")
 f.write("TxFirst " + str(TxFirst.get()) + "\n")
 f.write("KB8RQ " + str(kb8rq.get()) + "\n")
