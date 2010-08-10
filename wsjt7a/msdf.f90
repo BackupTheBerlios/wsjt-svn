@@ -8,12 +8,17 @@ subroutine msdf(cdat,npts,nfft1,f0,nfreeze,mousedf,dftolerance,dfx,ferr)
   complex cdat(npts)
   integer dftolerance
   real sq(NZ)
+  real tmp(NZ)
   complex c(NZ)
   data nsps/8/
   save c
 
+!  rewind 50
+
   df1=11025.0/nfft1
+  nh=nfft1/2
   fac=1.0/(nfft1**2)
+
   do i=1,npts
      c(i)=fac*cdat(i)**2
   enddo
@@ -31,8 +36,18 @@ subroutine msdf(cdat,npts,nfft1,f0,nfreeze,mousedf,dftolerance,dfx,ferr)
   jb=nint(fb/df1)
   jd=nfft1/nsps
 
-  do j=1,nfft1/2+1
+  do j=1,nh+1
      sq(j)=real(c(j))**2 + aimag(c(j))**2
+  enddo
+
+  call smo(sq,nh+1,tmp,9)
+  call smo(sq,nh+1,tmp,9)
+
+  do j=1,nh+1
+     sq2=0.
+     if(j+jd.le.nfft1/2+1) sq2=sq(j+jd)
+!     write(50,3001) (j-1)*df1,sq(j),sq2,j
+!3001 format(f10.2,2f12.3,i8)
   enddo
 
   smax=0.
@@ -62,6 +77,10 @@ subroutine msdf(cdat,npts,nfft1,f0,nfreeze,mousedf,dftolerance,dfx,ferr)
   fpk1=(jpk1-1)*df1
   fpk2=(jpk2-1)*df1
   ferr=(fpk2-fpk1)/1378.125 - 1.0
+  
+!  write(*,3501) t2,dfx,ferr,fpk1,fpk2
+!3501 format(2f8.1,f12.6,2f10.2)
+!  call flush(50)
 
   return
 end subroutine msdf

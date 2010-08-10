@@ -41,11 +41,14 @@ subroutine lenms(r,npts,msglen)
      amax2=0.
      do i=1,8
         k=56*np(i)                      !Check only the permitted lengths
+        if(k.gt.kz) go to 10
         if(acf(k).gt.3.5 .and. acf(k).gt.amax2) then  
            amax2=acf(k)                 !Save best value >3.5 sigma
            msglen=np(i)                 !Save message length
+           kpk2=k
         endif
      enddo
+10   continue
   endif
 
   return

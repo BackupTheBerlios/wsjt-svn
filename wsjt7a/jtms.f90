@@ -33,7 +33,7 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
 
   call msdf(cdat,npts,nfft1,f0,nfreeze,mousedf,dftolerance,dfx,ferr)  !Get DF
 
-  if(abs(ferr).gt.0.002) go to 900      !Reject non-JTMS signals
+  if(abs(ferr).gt.0.006) go to 900      !Reject non-JTMS signals
   call tweak1(cdat,npts,-dfx,cdat)      !Mix to standard frequency
 
 ! DF is known, now establish character sync.
