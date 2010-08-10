@@ -789,8 +789,12 @@ def ModeEcho(event=NONE):
     if lauto: toggleauto()
     lab2.configure(text='     N      Level         Sig              DF         Width      Q')
     Audio.gcom1.trperiod=6
-#    tx1.delete(0,99)
-#    tx1.insert(0,"ECHO")
+    tx1.delete(0,99)
+    tx2.delete(0,99)
+    tx3.delete(0,99)
+    tx4.delete(0,99)
+    tx5.delete(0,99)
+    tx6.delete(0,99)
     
 #------------------------------------------------------ msgpos
 def msgpos():
@@ -1201,10 +1205,7 @@ def toggletxdf(event=NONE):
 #----------------------------------------------------- dtdf_change
 # Readout of graphical cursor location
 def dtdf_change(event):
-    if mode.get()[:4]!='JT65' and mode.get()[:3]!='JT4':
-        t="%.1f" % (event.x*30.0/500.0,)
-        lab6.configure(text=t,bg='green')
-    else:
+    if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4':
         if event.y<40 and Audio.gcom2.nspecial==0:
             lab1.configure(text='Time (s)',bg="#33FFFF")   #light blue
             t="%.1f" % (12.0*event.x/500.0-2.0,)
@@ -1219,6 +1220,14 @@ def dtdf_change(event):
             lab1.configure(text='Time (s)',bg='green')
             t="%.1f" % (53.0*event.x/500.0,)
             lab6.configure(text=t,bg="green")
+    elif mode.get()=='Echo':
+        lab1.configure(text='DF (Hz)',bg='red')
+##        t="%d" % int((event.x-250),)
+        t="%d" % int(0.3365*(event.x-250),)
+        lab6.configure(text=t,bg="red")
+    else:
+        t="%.1f" % (event.x*30.0/500.0,)
+        lab6.configure(text=t,bg='green')
 
 #---------------------------------------------------- mouse_click_g1
 def mouse_click_g1(event):
