@@ -117,7 +117,7 @@ C  Assemble a signal report:
 !     +      (dat(jj+j),j=1,jjz)
             jjzz=min(jjz,2*11025)       !Max data size 2 s 
             call jtms(dat(jj),jjzz,cfile6,t2,mswidth,int(peak),
-     +           nrpt,nfreeze,DFTolerance,MouseDF,mycall,hiscall)
+     +           nrpt,nfreeze,DFTolerance,MouseDF,pick,mycall,hiscall)
             go to 100
          endif
 

@@ -1,5 +1,5 @@
 subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
-     DFTolerance,MouseDF,mycall,hiscall)
+     DFTolerance,MouseDF,pick,mycall,hiscall)
 
 ! Decode a JTMS ping
 
@@ -8,6 +8,7 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   complex cdat(NZ)                      !Analytic form of signal
   character*6 cfile6                    !FileID
   integer DFTolerance
+  logical pick
   character*12 mycall,hiscall
   real s(NZ)                            !Power spectrum
   real s2(0:63,400)
@@ -31,9 +32,15 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   nfft1=2**n                            !FFT length
   call analytic(dat,npts,nfft1,s,cdat)  !Convert to analytic signal
 
-  call msdf(cdat,npts,t2,nfft1,f0,nfreeze,mousedf,dftolerance,dfx,ferr)  !Get DF
+  call msdf(cdat,npts,t2,nfft1,f0,nfreeze,mousedf,dftolerance,     &
+       dfx,snrsq2)                      !Get DF
 
-  if(abs(ferr).gt.0.006) go to 900      !Reject non-JTMS signals
+  sq2lim=7.0
+  if(pick) sq2lim=5.0
+!  write(*,3001) t2,dfx,snrsq2,npts
+!3001 format(3f7.1,i8)
+  if(snrsq2.lt.sq2lim) go to 900           !Reject non-JTMS signals
+
   call tweak1(cdat,npts,-dfx,cdat)      !Mix to standard frequency
 
 ! DF is known, now establish character sync.
