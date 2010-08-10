@@ -31,7 +31,7 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   nfft1=2**n                            !FFT length
   call analytic(dat,npts,nfft1,s,cdat)  !Convert to analytic signal
 
-  call msdf(cdat,npts,nfft1,f0,nfreeze,mousedf,dftolerance,dfx,ferr)  !Get DF
+  call msdf(cdat,npts,t2,nfft1,f0,nfreeze,mousedf,dftolerance,dfx,ferr)  !Get DF
 
   if(abs(ferr).gt.0.006) go to 900      !Reject non-JTMS signals
   call tweak1(cdat,npts,-dfx,cdat)      !Mix to standard frequency
