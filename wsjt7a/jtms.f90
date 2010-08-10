@@ -35,7 +35,7 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   call msdf(cdat,npts,t2,nfft1,f0,nfreeze,mousedf,dftolerance,     &
        dfx,snrsq2)                      !Get DF
 
-  sq2lim=7.0
+  sq2lim=7.5
   if(pick) sq2lim=5.0
 !  write(*,3001) t2,dfx,snrsq2,npts
 !3001 format(3f7.1,i8)
