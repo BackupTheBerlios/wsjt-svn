@@ -1,18 +1,18 @@
 subroutine astro0(nyear,month,nday,uth8,nfreq,grid,cauxra,cauxdec,       &
      AzSun8,ElSun8,AzMoon8,ElMoon8,AzMoonB8,ElMoonB8,ntsky,ndop,ndop00,  &
      dbMoon8,RAMoon8,DecMoon8,HA8,Dgrd8,sd8,poloffset8,xnr8,dfdt,dfdt0,  &
-     RaAux8,DecAux8,AzAux8,ElAux8,width1,width2)
+     RaAux8,DecAux8,AzAux8,ElAux8,width1,width2,w501,w502)
 
 !f2py threadsafe
 !f2py intent(in) nyear,month,nday,uth8,nfreq,grid,cauxra,cauxdec
-!f2py intent(out) AzSun8,ElSun8,AzMoon8,ElMoon8,AzMoonB8,ElMoonB8,ntsky,ndop,ndop00,dbMoon8,RAMoon8,DecMoon8,HA8,Dgrd8,sd8,poloffset8,xnr8,dfdt,dfdt0,RaAux8,DecAux8,AzAux8,ElAux8,width1,width2
+!f2py intent(out) AzSun8,ElSun8,AzMoon8,ElMoon8,AzMoonB8,ElMoonB8,ntsky,ndop,ndop00,dbMoon8,RAMoon8,DecMoon8,HA8,Dgrd8,sd8,poloffset8,xnr8,dfdt,dfdt0,RaAux8,DecAux8,AzAux8,ElAux8,width1,width2,w501,w502
 
   parameter (DEGS=57.2957795130823d0)
   character grid*6
   character*9 cauxra,cauxdec
   real*8 AzSun8,ElSun8,AzMoon8,ElMoon8,AzMoonB8,ElMoonB8,AzAux8,ElAux8
   real*8 dbMoon8,RAMoon8,DecMoon8,HA8,Dgrd8,xnr8,dfdt,dfdt0,dt
-  real*8 sd8,poloffset8,day8,width1,width2
+  real*8 sd8,poloffset8,day8,width1,width2,w501,w502
   include 'gcom2.f90'
   data uth8z/0.d0/,imin0/-99/
   save
@@ -80,6 +80,14 @@ subroutine astro0(nyear,month,nday,uth8,nfreq,grid,cauxra,cauxdec,       &
   width1=0.5*6741*fghz*rate1
   rate2=sqrt((dldt1+dldt2)**2 + (dbdt1+dbdt2)**2)
   width2=0.5*6741*fghz*rate2
+
+  fbend=0.7
+  a2=0.0045*log(fghz/fbend)/log(1.05)
+  if(fghz.lt.fbend) a2=0.0
+  f50=0.19 * (fghz/fbend)**a2
+  if(f50.gt.1.0) f50=1.0
+  w501=f50*width1
+  w502=f50*width2
 
   RaAux8=auxra
   DecAux8=auxdec

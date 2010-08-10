@@ -48,7 +48,7 @@ subroutine avecho(fname,ntime,y1,ibuf0,ntc,necho,nfrit,ndither,      &
   df=11025.0/32768.0
   istart=1
   nz=14*2048 + 1 - istart
-  x(1:28672)=d(istart:istart+28672)
+  x(1:28672)=d(istart:istart+28671)
   x(28673:)=0.0
   call xfft(x,32768)
 

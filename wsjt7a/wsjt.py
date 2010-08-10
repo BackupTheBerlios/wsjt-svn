@@ -1614,9 +1614,10 @@ def update():
             g.AzSun,g.ElSun,g.AzMoon,g.ElMoon,g.AzMoonB,g.ElMoonB,g.ntsky, \
                 g.ndop,g.ndop00,g.dbMoon,g.RAMoon,g.DecMoon,g.HA8,g.Dgrd,  \
                 g.sd,g.poloffset,g.MaxNR,g.dfdt,g.dfdt0,g.RaAux,g.DecAux, \
-                g.AzAux,g.ElAux,g.w1,g.w2 = Audio.astro0(utc[0],utc[1],utc[2],  \
-                utchours,nfreq.get(),options.MyGrid.get().upper(), \
-                    options.auxra.get()+(' '*9)[:9],     \
+                g.AzAux,g.ElAux,g.w1,g.w2,g.w501,g.w502 = Audio.astro0(   \
+                    utc[0],utc[1],utc[2],utchours,nfreq.get(),            \
+                    options.MyGrid.get().upper(),       \
+                    options.auxra.get()+(' '*9)[:9],    \
                     options.auxdec.get()+(' '*9)[:9])
             
             if len(HisGrid.get().strip())<4:
@@ -2732,7 +2733,7 @@ f.write("Monitor " + str(nmonitor.get()) + "\n")
 mrudir2=mrudir.replace(" ","#")
 f.write("MRUDir " + mrudir2 + "\n")
 if g.astro_geom[:7]=="200x200":
-    g.astro_geom="316x393" + g.astro_geom[7:]
+    g.astro_geom="316x416" + g.astro_geom[7:]
 f.write("AstroGeometry " + g.astro_geom + "\n")
 f.write("CWTRPeriod " + str(ncwtrperiod) + "\n")
 f.close()
