@@ -972,7 +972,12 @@ VK7ABC K1JT RRR
 
 #------------------------------------------------------ usersguide
 def usersguide(event=NONE):
-    url='http://physics.princeton.edu/pulsar/K1JT/WSJT_9_Supplement.pdf'
+    url='http://physics.princeton.edu/pulsar/K1JT/WSJT_User_600.pdf'
+    thread.start_new_thread(browser,(url,))
+
+#------------------------------------------------------ wsjt9supp
+def wsjt9supp(event=NONE):
+    url='http://physics.princeton.edu/pulsar/K1JT/WSJT_9.0_Supplement.pdf'
     thread.start_new_thread(browser,(url,))
 
 #------------------------------------------------------- browser
@@ -2116,10 +2121,11 @@ if (sys.platform != 'darwin'):
    helpbutton['menu'] = helpmenu
 else:   
    helpmenu = Menu(mbar, tearoff=0)
+helpmenu.add('command',label="Online User's Guide",command=usersguide)
+helpmenu.add('command',label="Online WSJT9 Supplement", \
+             command=wsjt9supp,accelerator='F9')
 helpmenu.add('command', label = 'Keyboard shortcuts', command = shortcuts, \
              accelerator='F1')
-helpmenu.add('command',label="Online Supplement to User's Guide", \
-             command=usersguide, accelerator='F9')
 helpmenu.add('command', label = 'Special mouse commands', \
              command = mouse_commands, accelerator='Shift+F1')
 helpmenu.add('command', label = 'What message to send?', \
@@ -2189,7 +2195,7 @@ root.bind_all('<F5>', what2send)
 root.bind_all('<Shift-F5>', minimal_qso)
 root.bind_all('<F6>', opennext)
 root.bind_all('<Shift-F6>', decodeall)
-root.bind_all('<F9>', usersguide)
+root.bind_all('<F9>', wsjt9supp)
 root.bind_all('<F10>', showspecjt)
 root.bind_all('<Shift-F10>', astro1)
 root.bind_all('<F11>', left_arrow)
