@@ -8,7 +8,7 @@ subroutine msdf(cdat,npts,t2,nfft1,f0,nfreeze,mousedf,dftolerance,dfx,snrsq2)
   complex cdat(npts)
   integer dftolerance
   real sq(NZ)
-  real ccf(-1200:1200)
+  real ccf(-2600:2600)                  !Correct limits?
   real tmp(NZ)
   complex c(NZ)
   data nsps/8/
