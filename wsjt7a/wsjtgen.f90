@@ -140,6 +140,8 @@ subroutine wsjtgen
         call gen24(msg,mode4,samfacout,ntxdf,iwave,nwave,                 &
              sendingsh,msg22,nmsg0)
         msgsent=msg22
+     else if(mode(1:5).eq.'Diana') then
+        call gendiana(msg,nmsg,samfacout,iwave,nwave,msgsent,sendingsh)
      else
         stop 'Unknown Tx mode requested.'
      endif

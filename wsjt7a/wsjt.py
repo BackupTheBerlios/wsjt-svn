@@ -702,6 +702,19 @@ def ModeISCAT(event=NONE):
         GenStdMsgs()
         erase()        
 
+#------------------------------------------------------ ModeDiana
+def ModeDiana(event=NONE):
+    global isync,isync_iscat
+    if g.mode != "Diana":
+        if lauto: toggleauto()
+        ModeISCAT()
+        mode.set("Diana")
+#        lab2.configure(text='FileID      Avg dB        DF')
+        isync=1
+        lsync.configure(text=slabel+str(isync))
+        report.delete(0,END)
+        report.insert(0,'-20')
+
 #------------------------------------------------------ ModeCW
 def ModeCW(event=NONE):
     if g.mode != "CW":
@@ -1280,7 +1293,8 @@ def GenStdMsgs(event=NONE):
     Audio.gcom2.hiscall=(ToRadio.get()+(' '*12))[:12]
     for m in (tx1, tx2, tx3, tx4, tx5, tx6):
         m.delete(0,99)
-    if mode.get()=="FSK441" or mode.get()=="ISCAT" or mode.get()=='JTMS':
+    if mode.get()=="FSK441" or mode.get()=="ISCAT" or \
+       mode.get()=='JTMS' or mode.get()=='Diana':
         r=report.get()
         tx1.insert(0,setmsg(options.tx1.get(),r))
         tx2.insert(0,setmsg(options.tx2.get(),r))
@@ -1687,6 +1701,8 @@ def update():
             msg2.configure(bg='#00FF00')
         elif mode.get()[:5]=="ISCAT":
             msg2.configure(bg='#CCFFFF')
+        elif mode.get()[:5]=="Diana":
+            msg2.configure(bg='#CCFF00')
         elif mode.get()[:4]=="JTMS":
             msg2.configure(bg='#CC4444')
         elif mode.get()[:3]=="JT4":
@@ -2036,6 +2052,7 @@ modemenu.add_radiobutton(label = 'JT4F', variable=mode, command = ModeJT4F)
 modemenu.add_radiobutton(label = 'JT4G', variable=mode, command = ModeJT4G)
 modemenu.add_radiobutton(label = 'CW', variable=mode, command = ModeCW)
 modemenu.add_radiobutton(label = 'JTMS', variable=mode, command = ModeJTMS)
+modemenu.add_radiobutton(label = 'Diana', variable=mode, command = ModeDiana)
 modemenu.add_radiobutton(label = 'Echo', variable=mode, command = ModeEcho)
 
 if (sys.platform == 'darwin'):
