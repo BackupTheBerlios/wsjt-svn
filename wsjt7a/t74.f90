@@ -1,6 +1,6 @@
 program t74
 
-! Tests experimental ISCAT_2 decoder
+! Tests experimental Diana decoder
 
   parameter (NMAX=512*1024)
   real dat(NMAX)                          !Raw signal, 30 s at 11025 sps
@@ -8,8 +8,8 @@ program t74
   character cfile6*6                      !File time
   character msg*28
   character*40 infile
-  real ccf(-5:540)                        !blue line
-  real psavg(450)                         !Average spectrum of the whole file
+  real ccfblue(-5:540)                        !blue line
+  integer dftolerance
 
   nargs=iargc()
   if(nargs.ne.2) then
@@ -30,7 +30,8 @@ program t74
      read(74,end=999) jz,cfile6,(dat(j),j=1,jz)
      if(irec.ne.nrec .and. nrec.ne.999) go to 900
 
-     call iscat(dat,jz,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
+     call diana(dat,jz,cfile6,MinSigdB,DFTolerance,NFreeze,      &
+          MouseDF,ccfblue,ccfred)
 900  continue
   enddo
 
