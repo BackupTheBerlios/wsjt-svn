@@ -231,13 +231,20 @@ subroutine wsjt1(d,jz0,istart,samfacin,FileID,ndepth,              &
      goto 900
   endif
 
-  if(mode.eq.9) then                             !ISCAT_2 mode
+  if(mode.eq.9) then                             !ISCAT mode
 !     write(74) jz,cfile6,(dat(j),j=1,jz)
      call spec2d(dat,jz,nstep,s2,nchan,nz,psavg,sigma)
      call iscat(dat,jz,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
      psavg(65:)=0.
      go to 800
   endif
+
+  if(mode.eq.10) then
+     print*,'A ',cfile6,jz
+     write(74) jz,cfile6,(dat(j),j=1,jz)
+     go to 900
+  endif
+     
 
 ! We're in FSK441 or JTMS mode. Compute the 2D spectrum.
   df=11025.0/256.0            !FFT resolution ~43 Hz

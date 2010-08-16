@@ -23,6 +23,7 @@ subroutine decode3(d2,jz,istart,filename)
   if(mode(1:3).eq.'JT4') nmode=7
   if(mode(1:4).eq.'JTMS') nmode=8
   if(mode(1:5).eq.'ISCAT') nmode=9
+  if(mode(1:5).eq.'Diana') nmode=10
   sum=0.
   do i=1,jz
      sum=sum+d2(i)
