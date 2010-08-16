@@ -10,19 +10,16 @@ subroutine gendiana(msg,msglen,samfac,iwave,nwave,msgsent,sendingsh)
   character c*42
   real*8 twopi,dt,f0,f,df,pha,dpha,samfac
   integer isync(4)                              !Sync pattern
-  integer irpt(31)
   integer sendingsh
   data isync/8,16,32,24/
   data nsync/4/,nlen/2/,ndat/18/
   data c/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ /.?+-'/
-  data irpt/1,2,3,4,6,7,8,9,11,12,13,14,15,16,17,18,19,21,22,23,24,     &
-       25,26,27,28,29,31,32,33,34,35/
 
   twopi=8.d0*atan(1.d0)
   df=11025.d0/NSPS
   dt=1.0/(samfac*11025.0)
   f0=236*df
-  nsym=126
+  nsym=126                             !Total symbols in whole transmission
 
   nblk=nsync+nlen+ndat
   k=0
@@ -34,7 +31,7 @@ subroutine gendiana(msg,msglen,samfac,iwave,nwave,msgsent,sendingsh)
      enddo
   enddo
 
-  do i=1,nsym                          !Total symbols in whole transmission
+  do i=1,nsym
      j=mod(i-1,nblk)+1
      if(j.le.nsync) then
         itone(i)=isync(j)
@@ -48,7 +45,8 @@ subroutine gendiana(msg,msglen,samfac,iwave,nwave,msgsent,sendingsh)
      else
         k=k+1
         kk=mod(k-1,msglen)+1
-        itone(i)=imsg(kk)
+        irpt=(i-1)/nblk
+        itone(i)=mod(imsg(kk) + 7*irpt,42)
      endif
   enddo
   msgsent=msg
@@ -65,9 +63,6 @@ subroutine gendiana(msg,msglen,samfac,iwave,nwave,msgsent,sendingsh)
      enddo
   enddo
   nwave=k
-  print*,'Diana ',f0,nwave
-  write(*,3001) itone
-3001 format(24i3)
 
   return
 end subroutine gendiana

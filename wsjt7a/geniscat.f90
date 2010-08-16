@@ -10,12 +10,9 @@ subroutine geniscat(msg,nmsg,samfac,iwave,nwave,msgsent)
   character c*42
   real*8 twopi,dt,f0,f,df,pha,dpha,samfac
   integer icos(4)
-  integer irpt(31)
   data icos/0,1,3,2/
-  data nsync/4/,nlen/2/,ndat/18/,jz/645/
+  data nsync/4/,nlen/2/,ndat/18/
   data c/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ /.?@-'/
-  data irpt/1,2,3,4,6,7,8,9,11,12,13,14,15,16,17,18,19,21,22,23,24,     &
-       25,26,27,28,29,31,32,33,34,35/
 
   twopi=8.d0*atan(1.d0)
   df=11025.d0/NSPS

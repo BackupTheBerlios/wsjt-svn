@@ -707,9 +707,9 @@ def ModeDiana(event=NONE):
     global isync,isync_iscat
     if g.mode != "Diana":
         if lauto: toggleauto()
-        ModeISCAT()
+        ModeJT65()
+        Audio.gcom1.trperiod=30
         mode.set("Diana")
-#        lab2.configure(text='FileID      Avg dB        DF')
         isync=1
         lsync.configure(text=slabel+str(isync))
         report.delete(0,END)
@@ -2540,6 +2540,8 @@ try:
                 ModeCW()
             elif value=='ISCAT':
                 ModeISCAT()
+            elif value=='Diana':
+                ModeDiana()
             elif value=='JTMS':
                 ModeJTMS()
             elif value[:3]=='JT4':
