@@ -240,8 +240,8 @@ subroutine wsjt1(d,jz0,istart,samfacin,FileID,ndepth,              &
   endif
 
   if(mode.eq.10) then
-     print*,'A ',cfile6,jz
-     write(74) jz,cfile6,(dat(j),j=1,jz)
+!     write(74) jz,cfile6,(dat(j),j=1,jz)
+     call diana(dat,jz,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
      go to 900
   endif
      
