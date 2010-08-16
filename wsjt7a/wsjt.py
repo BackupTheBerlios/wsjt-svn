@@ -1133,7 +1133,7 @@ def dectrperiod(event):
 def erase(event=NONE):
     graph1.delete(ALL)
     if mode.get()[:4]!="JT65" and mode.get()[:2]!="CW" and \
-            mode.get()[:3]!='JT4':
+            mode.get()[:3]!='JT4' and mode.get()!='Diana':
         graph2.delete(ALL)
     text.configure(state=NORMAL)
     text.delete('1.0',END)
@@ -1652,8 +1652,9 @@ def update():
             else:
                 Audio.gcom2.ntx2=0
 
-        if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4' \
-               or mode.get()[:2]=='CW' or mode.get()=='Echo':
+        if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4'\
+               or mode.get()[:2]=='CW' or mode.get()=='Echo' \
+               or mode.get()=='Diana':
             graph2.delete(ALL)
             graph2.create_text(80,13,anchor=CENTER,text="Moon",font=g2font)
             graph2.create_text(13,37,anchor=W, text="Az: %6.2f" % g.AzMoon,font=g2font)
@@ -1661,7 +1662,8 @@ def update():
             graph2.create_text(13,85,anchor=W, text="Dop:%6d" % g.ndop,font=g2font)
             graph2.create_text(13,109,anchor=W,text="Dgrd:%5.1f" % g.Dgrd,font=g2font)
 
-    if (mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4') and g.freeze_decode:
+    if (mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4' \
+        or mode.get()=='Diana') and g.freeze_decode:
         itol=2
         ltol.configure(text='Tol    '+str(50))
         Audio.gcom2.dftolerance=50
