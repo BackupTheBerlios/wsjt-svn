@@ -115,7 +115,8 @@ subroutine wsjtgen
   LTone=2
 
   if(mode(1:4).eq.'JT65' .or. mode(1:3).eq.'JT4' .or.                &
-       mode(1:5).eq. 'ISCAT' .or. mode(1:4).eq.'JTMS') then
+       mode(1:5).eq. 'ISCAT' .or. mode(1:4).eq.'JTMS' .or.           &
+       mode(1:5).eq. 'Diana') then
      if(mode(1:4).eq.'JT65') then
 !  We're in JT65 mode.
         if(mode(5:5).eq.'A') mode65=1

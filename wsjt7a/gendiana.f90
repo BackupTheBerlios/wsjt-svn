@@ -65,6 +65,9 @@ subroutine gendiana(msg,msglen,samfac,iwave,nwave,msgsent,sendingsh)
      enddo
   enddo
   nwave=k
+  print*,'Diana ',f0,nwave
+  write(*,3001) itone
+3001 format(24i3)
 
   return
 end subroutine gendiana
