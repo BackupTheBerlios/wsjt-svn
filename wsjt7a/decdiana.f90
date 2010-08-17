@@ -5,7 +5,7 @@ subroutine decdiana(s0,jsym,ipk,jpk,msglen,msg,avg)
   real fs1(0:41,30)
   character msg*28
   character c42*42
-  data c42/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ /.?@-'/
+  data c42/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ /.?+-'/
 
   nblk=24
   fs1=0.
