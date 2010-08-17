@@ -35,10 +35,8 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   call msdf(cdat,npts,t2,nfft1,f0,nfreeze,mousedf,dftolerance,     &
        dfx,snrsq2)                      !Get DF
 
-  sq2lim=7.5
+  sq2lim=7.0
   if(pick) sq2lim=5.0
-!  write(*,3001) t2,dfx,snrsq2,npts
-!3001 format(3f7.1,i8)
   if(snrsq2.lt.sq2lim) go to 900           !Reject non-JTMS signals
 
   call tweak1(cdat,npts,-dfx,cdat)      !Mix to standard frequency
