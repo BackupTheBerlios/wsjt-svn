@@ -13,7 +13,7 @@ subroutine lenms(r,npts,msglen)
      r=r-sum(r(1:npts))/npts
      acfmax=0.
      acf0=dot_product(r(1:npts),r(1:npts))
-     kz=min(npts/2,29*56)
+     kz=min(nint(0.75*npts),29*56)
      do k=8,kz
         fac=float(npts)/(npts-k)
         acf(k)=fac*dot_product(r(1:npts),r(1+k:npts+k))/acf0
@@ -39,10 +39,11 @@ subroutine lenms(r,npts,msglen)
      acf=acf/rms                        !Normalize the acf
 
      amax2=0.
+     acflim=3.5
      do i=1,8
         k=56*np(i)                      !Check only the permitted lengths
         if(k.gt.kz) go to 10
-        if(acf(k).gt.3.5 .and. acf(k).gt.amax2) then  
+        if(acf(k).gt.acflim .and. acf(k).gt.amax2) then  
            amax2=acf(k)                 !Save best value >3.5 sigma
            msglen=np(i)                 !Save message length
            kpk2=k

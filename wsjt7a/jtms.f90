@@ -62,8 +62,9 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   msg=adjustl(msg)
   ib=min(nchar,45)
   ndf=nint(dfx)
+  nchk=max(20,nint(1.5*msglen))
 
-  if(msglen.eq.0 .or. nchar.lt.max(20,2*msglen)) then
+  if(msglen.eq.0 .or. nchar.lt.nchk) then
 
      if(nline.le.99) nline=nline+1
      tping(nline)=t2
