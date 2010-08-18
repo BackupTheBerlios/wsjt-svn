@@ -33,18 +33,13 @@ subroutine diana(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,       &
   call lendiana(fs0,ipk,jpk,msglen)
   
   msg=' '
-  if(msglen.gt.0) call decdiana(s0,jsym,ipk,jpk,msglen,msg,avg)
-
-  if(nsig.lt.MinSigdB) then
-     msglen=0
-     worst=1.
-     avg=1.
+  if(msglen.gt.0) call decdiana(s0,jsym,ipk,jpk,msglen,msg,snrx)
+  nsnr=nint(snrx)
+  if(nsnr.lt.-28) then
+     nsnr=-28
+     msg=' '
   endif
-  nsnr=10.0*(avg-1.0)
-  if(nsnr.gt.10) nsnr=10
-  xsync=xsync-0.3
   jsync=xsync
-  if(nsnr.le.-99) msg=' '
   jdf=nint(dfx)
   nwidth=0
 
