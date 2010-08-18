@@ -1,7 +1,7 @@
 subroutine syncdiana(fs0,kstep,nfreeze,mousedf,dftolerance,syncx,     &
      ipk,jpk,dfx,dtx,msglen,ccfblue)
 
-  real fs0(1024,108)                       !108 = 96 + 3*4
+  real fs0(1024,96)                       !Folded-for-sync spectra
   real ccfblue(-5:540)
   integer dftolerance
   integer isync(4)
@@ -13,9 +13,9 @@ subroutine syncdiana(fs0,kstep,nfreeze,mousedf,dftolerance,syncx,     &
   smax=0.
   ipk=9999
   jpk=9999
+
   ia=-10
   ib=10
-
   if(nfreeze.eq.1) then
      ia=(mousedf-dftolerance)/df
      ib=(mousedf+dftolerance)/df
