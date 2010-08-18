@@ -1,4 +1,4 @@
-subroutine decdiana(s0,jsym,ipk,jpk,msglen,msg,snrx)
+subroutine decdiana(s0,jsym,ipk,jpk,msglen,msg,nsnr)
 
   parameter (NSZ=646)
   real s0(1024,NSZ)
@@ -69,7 +69,12 @@ subroutine decdiana(s0,jsym,ipk,jpk,msglen,msg,snrx)
   ave2=sum2/msglen                        !Average second-best
   averel=sum1/sum2                        !Average reliability indicator
 
-  snrx=db(ave1) - 26.7
+  snrx=db(ave1) - 26.7 + 2.0              !Last number is empirical
+  nsnr=nint(snrx)
+  if(nsnr.le.-27) then
+     nsnr=-27
+     msg=' '
+  endif
 
   return
 end subroutine decdiana

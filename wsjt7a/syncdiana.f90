@@ -1,5 +1,5 @@
-subroutine syncdiana(fs0,kstep,nfreeze,mousedf,dftolerance,xsync,     &
-     ipk,jpk,dfx,dtx,ccfblue)
+subroutine syncdiana(fs0,kstep,nfreeze,mousedf,dftolerance,syncx,     &
+     ipk,jpk,dfx,dtx,msglen,ccfblue)
 
   real fs0(1024,108)                       !108 = 96 + 3*4
   real ccfblue(-5:540)
@@ -55,14 +55,22 @@ subroutine syncdiana(fs0,kstep,nfreeze,mousedf,dftolerance,xsync,     &
         ss=ss + fs0(ipk+2*isync(n),k)
      enddo
      ccfblue(j+1)=ss/ref
-!     write(52,3002) j+1,ccfblue(j+1)
-!3002 format(i8,f12.3)
   enddo
+  syncx=smax/ref - 1.0
 
-  xsync=smax/ref
-  nsig=nint(db(smax/ref - 1.0) -15.0)
-  if(nsig.lt.-20) nsig=-20
-  ndf0=nint((ipk-i0)/df)
+  smax=0.
+  ja=jpk+16
+  if(ja.gt.4*nblk) ja=ja-4*nblk
+  jb=jpk+20
+  if(jb.gt.4*nblk) jb=jb-4*nblk
+  do i=ipk,ipk+60,2                         !Find User's message length
+     ss=fs0(i,ja) + fs0(i+10,jb)
+     if(ss.gt.smax) then
+        smax=ss
+        ipk2=i
+     endif
+  enddo
+  msglen=(ipk2-ipk)/2
 
   return
 end subroutine syncdiana

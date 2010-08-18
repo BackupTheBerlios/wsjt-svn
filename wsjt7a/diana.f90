@@ -1,22 +1,20 @@
 subroutine diana(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,       &
      MouseDF,ccfblue,ccfred)
 
-! Decode an ISCAT_2 signal
+! Decode a Diana signal
 
   parameter (NMAX=512*1024)
-  parameter (NSZ=646)
+  parameter (NSZ=646)                     !Quarter-symbols in 30 s
   real dat(NMAX)                          !Raw signal, 30 s at 11025 sps
   character cfile6*6                      !File time
   character c42*42
   character msg*28
   real s0(1024,NSZ)
-  real fs0(1024,108)                       !108 = 96 + 3*4
+  real fs0(1024,96)                       !Folded-for-sync symbol spectra
   real ccfblue(-5:540)
-  real psavg(1024)         !Average spectrum of the whole file
   integer dftolerance
   data nsps/2048/,nsync/4/,nlen/2/,ndat/18/
 
-! Define some constants
   nsym=npts/nsps                      !Total symbol intervals in file
   nblk=nsync+nlen+ndat                !Frame size
   nfft=4096
@@ -24,22 +22,15 @@ subroutine diana(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,       &
   df=11025.0/nfft
   kstep=nsps/4
 
-! Compute spectra at 1/4-symbol steps, s0, and folded spectra, fs0
-  call specdiana(dat,npts,s0,jsym,fs0)
+  call specdiana(dat,npts,s0,jsym,fs0)   !Get symbol spectra, fold for sync
 
-  call syncdiana(fs0,kstep,nfreeze,mousedf,dftolerance,xsync,     &
-     ipk,jpk,dfx,dtx,ccfblue)
-
-  call lendiana(fs0,ipk,jpk,msglen)
+  call syncdiana(fs0,kstep,nfreeze,mousedf,dftolerance,syncx,     &
+     ipk,jpk,dfx,dtx,msglen,ccfblue)     !Establish sync; get DF, DT, msglen
   
   msg=' '
-  if(msglen.gt.0) call decdiana(s0,jsym,ipk,jpk,msglen,msg,snrx)
-  nsnr=nint(snrx)
-  if(nsnr.lt.-28) then
-     nsnr=-28
-     msg=' '
-  endif
-  jsync=xsync
+  nsnr=-27
+  if(msglen.gt.0) call decdiana(s0,jsym,ipk,jpk,msglen,msg,nsnr) !Decode message
+  jsync=syncx
   jdf=nint(dfx)
   nwidth=0
 

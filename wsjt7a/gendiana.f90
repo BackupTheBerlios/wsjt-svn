@@ -7,28 +7,26 @@ subroutine gendiana(msg,msglen,samfac,iwave,nwave,msgsent,sendingsh)
   integer*2 iwave(NMAX)
   integer imsg(28)
   integer itone(NSZ)
-  character c*42
+  character c42*42
   real*8 twopi,dt,f0,f,df,pha,dpha,samfac
   integer isync(4)                              !Sync pattern
   integer sendingsh
   data isync/8,16,32,24/
   data nsync/4/,nlen/2/,ndat/18/
-  data c/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ /.?+-'/
+  data c42/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ /.?+-'/
 
   twopi=8.d0*atan(1.d0)
-  df=11025.d0/NSPS
-  dt=1.0/(samfac*11025.0)
-  f0=236*df
+  df=11025.d0/NSPS                     !5.383 Hz
+  dt=1.d0/(samfac*11025.d0)
+  f0=236*df                            !1270.46 Hz
   nsym=126                             !Total symbols in whole transmission
 
   nblk=nsync+nlen+ndat
   k=0
   kk=1
   do i=1,msglen                        !Define tone sequence for user message
-     imsg(i)=36
-     do j=1,42
-        if(msg(i:i).eq.c(j:j)) imsg(i)=j-1
-     enddo
+     imsg(i)=index(c42,msg(i:i))-1     !Get character index from c42
+     if(imsg(i).lt.0) imsg(i)=36       !Default char is <space>
   enddo
 
   do i=1,nsym
