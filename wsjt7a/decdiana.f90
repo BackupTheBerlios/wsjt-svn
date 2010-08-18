@@ -22,7 +22,7 @@ subroutine decdiana(s0,jsym,ipk,jpk,msglen,msg,avg)
         ioffset=7*iblk
         do i=0,41
            ii=i+ioffset
-           if(ii.lt.0) ii=ii+42
+           if(ii.ge.42) ii=ii-42
            fs1(i,m)=fs1(i,m) + s0(ipk+2*ii,j)
         enddo
      endif

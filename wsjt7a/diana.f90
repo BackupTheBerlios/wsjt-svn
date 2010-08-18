@@ -32,7 +32,8 @@ subroutine diana(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,       &
 
   call lendiana(fs0,ipk,jpk,msglen)
   
-  call decdiana(s0,jsym,ipk,jpk,msglen,msg,avg)
+  msg=' '
+  if(msglen.gt.0) call decdiana(s0,jsym,ipk,jpk,msglen,msg,avg)
 
   if(nsig.lt.MinSigdB) then
      msglen=0
