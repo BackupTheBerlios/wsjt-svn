@@ -64,18 +64,17 @@ subroutine jtms(dat,npts,cfile6,t2,mswidth,ndb,nrpt,Nfreeze,       &
   ndf=nint(dfx)
   nchk=max(20,nint(1.5*msglen))
 
-  if(msglen.eq.0 .or. nchar.lt.nchk) then
-
+  if(msglen.eq.0 .or. nchar.lt.nchk .or. pick) then
      if(nline.le.99) nline=nline+1
      tping(nline)=t2
      call cs_lock('decodems')
      write(line(nline),1110) cfile6,t2,mswidth,ndb,nrpt,ndf,msg(1:45)
 1110 format(a6,f5.1,i5,i3,1x,i2.2,i5,5x,a45)
      call cs_unlock
-  else if(msglen.gt.0) then
+  endif
 
+  if(msglen.gt.0 .and. nchar.ge.nchk) then
      call foldms(s2,msglen,nchar,mycall,msg,msg29)   !Decode folded message
-
      if(nline.le.99) nline=nline+1
      tping(nline)=t2
      call cs_lock('decodems')

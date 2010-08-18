@@ -1860,7 +1860,8 @@ def update():
 
         if mode.get()=='Echo':
             plot_echo()
-        elif mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4':
+        elif mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4' or \
+                 mode.get()=='Diana':
             plot_large()
         else:
             im.putdata(Audio.gcom2.b)
