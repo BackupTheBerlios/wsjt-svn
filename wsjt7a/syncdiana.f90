@@ -63,7 +63,7 @@ subroutine syncdiana(fs0,kstep,nfreeze,mousedf,dftolerance,syncx,     &
   if(ja.gt.4*nblk) ja=ja-4*nblk
   jb=jpk+20
   if(jb.gt.4*nblk) jb=jb-4*nblk
-  do i=ipk,ipk+60,2                         !Find User's message length
+  do i=ipk+2,ipk+56,2                         !Find User's message length
      ss=fs0(i,ja) + fs0(i+10,jb)
      if(ss.gt.smax) then
         smax=ss
