@@ -233,6 +233,9 @@ def stopmon(event=NONE):
 def dbl_click_text(event):
     t=text.get('1.0',END)           #Entire contents of text box
     t1=text.get('1.0',CURRENT)      #Contents from start to mouse pointer
+    if mode.get()=='Diana':
+        report.delete(0,END)
+        report.insert(0,'OOO')
     dbl_click_call(t,t1,'OOO',event)
 
 #------------------------------------------------------ dbl_click3_text
@@ -246,11 +249,13 @@ def dbl_click3_text(event):
         if rpt[:1]=='-' and len(rpt)==2: rpt=rpt[0:1]+'0'+rpt[1:2]
         dbl_click_call(t,t1,rpt,event)
 
-    elif mode.get()[:5]=='ISCAT':
+    elif mode.get()[:5]=='ISCAT' or mode.get()=='Diana':
         t=text.get('1.0',END)           #Entire contents of text box
         t1=text.get('1.0',CURRENT)      #Contents from start to mouse pointer
         n=t1.rfind("\n")
         rpt=t1[n+9:n+15]
+        if mode.get()=='Diana':
+            rpt=t1[n+12:n+16]
         if rpt[0:1] == " ": rpt=rpt[1:]
         if rpt[:1]=='-' and len(rpt)==2: rpt=rpt[0:1]+'0'+rpt[1:2]
         report.delete(0,END)
@@ -293,7 +298,7 @@ def dbl_click_call(t,t1,rpt,event):
         lookup()
         GenStdMsgs()
         if (mode.get()[:4]=='JT65' or \
-           mode.get()[:3]=='JT4') and rpt <> "OOO":
+                mode.get()[:3]=='JT4') and rpt <> "OOO":
             n=tx1.get().rfind(" ")
             t2=tx1.get()[0:n+1]
             tx2.delete(0,END)
@@ -304,7 +309,7 @@ def dbl_click_call(t,t1,rpt,event):
             tx4.insert(0,t2+"RRR")
             tx5.delete(0,END)
             tx5.insert(0,t2+"73")
-        i4=t[:i1].strip().rfind(' ')+1
+
         if t[i3:i1].find(' CQ ')>=0:
             ntx.set(1)
         else:
@@ -1302,6 +1307,9 @@ def GenStdMsgs(event=NONE):
         tx4.insert(0,setmsg(options.tx4.get(),r))
         tx5.insert(0,setmsg(options.tx5.get(),r))
         tx6.insert(0,setmsg(options.tx6.get(),r))
+        if tx3.get()=='ROOO':
+            tx3.delete(0,END)
+            tx3.insert(0,'RO')
     elif mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4':
         if options.MyCall.get()!= MyCall0 or \
                options.addpfx.get()!= addpfx0 or ToRadio.get()!=ToRadio0:
@@ -1354,7 +1362,7 @@ def GenAltMsgs(event=NONE):
     ToRadio.insert(0,t)
     if k2txb.get()!=0: ntx.set(1)
     Audio.gcom2.hiscall=(ToRadio.get()+(' '*12))[:12]
-    if (mode.get()[:4]=='JT65' or \
+    if (mode.get()[:4]=='JT65' or mode.get()=='Diana' or \
         mode.get()[:3]=='JT4') and ToRadio.get().find("/") == -1 and \
                options.MyCall.get().find("/") == -1:
         for m in (tx1, tx2, tx3, tx4, tx5, tx6):
@@ -1908,6 +1916,8 @@ def update():
             Audio.gcom2.ntdecode=48
         else:
             Audio.gcom2.ntdecode=52
+##    if mode.get()=='Diana':
+##        Audio.gcom2.ntdecode=26
 
     try:
         Audio.gcom2.idinterval=options.IDinterval.get()
@@ -2630,7 +2640,7 @@ try:
         elif key == 'K2TXB': k2txb.set(value)
         elif key == 'SetSeq': setseq.set(value)
         elif key == 'Report':
-            report.delete(0,99)
+            report.delete(0,END)
             report.insert(0,value)
         elif key == 'ShOK': ShOK.set(value)
         elif key == 'Nsave': nsave.set(value)

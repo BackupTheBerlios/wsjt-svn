@@ -69,7 +69,7 @@ subroutine decdiana(s0,jsym,ipk,jpk,msglen,msg,nsnr)
   ave2=sum2/msglen                        !Average second-best
   averel=sum1/sum2                        !Average reliability indicator
 
-  snrx=db(ave1) - 26.7 + 2.0              !Last number is empirical
+  snrx=db(ave1) - 26.7 + 1.0              !Last number is empirical
   nsnr=nint(snrx)
   if(nsnr.le.-27) then
      nsnr=-27
