@@ -40,10 +40,16 @@ subroutine syncdiana(fs0,kstep,nfreeze,mousedf,dftolerance,syncx,     &
   dfx=(ipk-i0)*df
   dtx=jpk*kstep/11025.0
 
-  ref=fs0(ipk+2,jpk) + fs0(ipk+4,jpk) + fs0(ipk+6,jpk)  +        &
-      fs0(ipk,jpk+4) + fs0(ipk+4,jpk+4) + fs0(ipk+6,jpk+4) +     &
-      fs0(ipk,jpk+8) + fs0(ipk+2,jpk+8) + fs0(ipk+4,jpk+8) +     &
-      fs0(ipk,jpk+12) + fs0(ipk+2,jpk+12) + fs0(ipk+6,jpk+12)
+  ref=fs0(ipk+2,jpk) + fs0(ipk+4,jpk) + fs0(ipk+6,jpk)
+  j=jpk+4
+  if(j.gt.96) j=j-96
+  ref=ref + fs0(ipk,j) + fs0(ipk+4,j) + fs0(ipk+6,j)
+  j=jpk+8
+  if(j.gt.96) j=j-96
+  ref=ref + fs0(ipk,j) + fs0(ipk+2,j) + fs0(ipk+4,j)
+  j=jpk+12
+  if(j.gt.96) j=j-96
+  ref=ref + fs0(ipk,j) + fs0(ipk+2,j) + fs0(ipk+6,j)
   ref=ref/3.0                         !Reference level near (DF,DT)
 
   kk=0
