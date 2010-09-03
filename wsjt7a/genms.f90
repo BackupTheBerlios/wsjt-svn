@@ -10,8 +10,8 @@ subroutine genms(msg28,samfac,iwave,cwave,isrch,nwave)
   character cc*64
   integer sent(203)
   real*8 dt,phi,f,f0,dfgen,dphi,twopi,foffset,samfac
-  integer np(8)
-  data np/5,7,11,13,17,19,23,29/  !Permissible message lengths
+  integer np(9)
+  data np/5,7,9,11,13,17,19,23,29/  !Permissible message lengths
 !                   1         2         3         4         5         6
 !          0123456789012345678901234567890123456789012345678901234567890123
   data cc/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ./?-                 _     @'/
@@ -23,7 +23,7 @@ subroutine genms(msg28,samfac,iwave,cwave,isrch,nwave)
 1 iz=i+1                                       !Add one for space at EOM
   msglen=iz
   if(isrch.ne.0) go to 3
-  do i=1,8
+  do i=1,9
      if(np(i).ge.iz) go to 2
   enddo
   i=8

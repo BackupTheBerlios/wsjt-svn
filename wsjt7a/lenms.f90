@@ -4,8 +4,8 @@ subroutine lenms(r,npts,msglen)
 
   real r(60000)
   real acf(1624)
-  integer np(8)
-  data np/5,7,11,13,17,19,23,29/        !Permissible message lengths
+  integer np(9)
+  data np/5,7,9,11,13,17,19,23,29/      !Permissible message lengths
   save acf                              !Why necessary?  (But don't remove!)
 
   msglen=0                              !Use ACF to find msg length
@@ -40,7 +40,7 @@ subroutine lenms(r,npts,msglen)
 
      amax2=0.
      acflim=3.5
-     do i=1,8
+     do i=1,9
         k=56*np(i)                      !Check only the permitted lengths
         if(k.gt.kz) go to 10
         if(acf(k).gt.acflim .and. acf(k).gt.amax2) then  
