@@ -34,7 +34,7 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,             &
   ccf0=3.0
   sb0=0.75
   if(pick) then
-     ccf0=2.5
+     ccf0=2.1
      sb0=0.65
   endif
 
@@ -85,6 +85,7 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,             &
   ic=min(nint(220/df1),ia)                    !Baseline range +/- 220 Hz
   call pctile(ccf(ipk-ic),work,2*ic+1,50,base)
   ccfmax=ccfmax/base
+  print*,'A',ccf0,ccfmax
   if(ccfmax.lt.ccf0) go to 800                !Reject non-FSK441 signals
 
 ! We seem to have an FSK441 ping, and we know DF; now find DT.
