@@ -2064,9 +2064,15 @@ modemenu.add_radiobutton(label = 'JT4E', variable=mode, command = ModeJT4E)
 modemenu.add_radiobutton(label = 'JT4F', variable=mode, command = ModeJT4F)
 modemenu.add_radiobutton(label = 'JT4G', variable=mode, command = ModeJT4G)
 modemenu.add_radiobutton(label = 'CW', variable=mode, command = ModeCW)
-modemenu.add_radiobutton(label = 'JTMS', variable=mode, command = ModeJTMS)
-modemenu.add_radiobutton(label = 'Diana', variable=mode, command = ModeDiana)
 modemenu.add_radiobutton(label = 'Echo', variable=mode, command = ModeEcho)
+
+try:
+    f=open(appdir+'/experimental','r')
+    modemenu.add_separator()
+    modemenu.add_radiobutton(label = 'JTMS', variable=mode, command = ModeJTMS)
+    modemenu.add_radiobutton(label = 'Diana', variable=mode, command = ModeDiana)
+except:
+    pass
 
 if (sys.platform == 'darwin'):
     mbar.add_cascade(label="Mode", menu=modemenu)
