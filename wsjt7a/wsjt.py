@@ -835,13 +835,12 @@ WSJT is a weak signal communications program.  It supports
 these operating modes:
 
   1. FSK441 -  meteor scatter
-  2. JTMS     -  meteor scatter (experimental)
-  3. ISCAT    -  for tropo- and iono-scatter, weak Es/F2 on 50 MHz
+  2. ISCAT    -  for tropo- and iono-scatter, weak Es/F2 on 50 MHz
                        (replaces JT6M)
-  4. JT65      -  for HF, EME, and troposcatter
-  5. JT4        -  HF, microwave beacons, 10 GHz EME and rainscatter
-  6. CW        -  15 WPM Morse code, messages structured for EME
-  7. Echo      -  EME Echo testing
+  3. JT65      -  for HF, EME, and troposcatter
+  4. JT4        -  HF, microwave beacons, 10 GHz EME and rainscatter
+  5. CW        -  15 WPM Morse code, messages structured for EME
+  6. Echo      -  EME Echo testing
 
 Copy (c) 2001-2010 by Joseph H. Taylor, Jr., K1JT, with
 contributions from additional authors.  WSJT is Open Source 
