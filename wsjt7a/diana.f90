@@ -29,9 +29,10 @@ subroutine diana(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,       &
      ipk,jpk,dfx,dtx,msglen,ccfblue,ccfred)     !Get sync: DF, DT, msglen
   
   msg=' '
-  nsnr=-27
-  if(msglen.gt.0) call decdiana(s0,jsym,ipk,jpk,msglen,msg,nsnr) !Decode message
+  nsnr=-25
   jsync=syncx
+  if(jsync.ge.MinSigdB .and. msglen.gt.0) call decdiana(s0,jsym,ipk,jpk,  &
+       msglen,msg,nsnr)                               !Decode message
   jdf=nint(dfx)
   nwidth=0
 

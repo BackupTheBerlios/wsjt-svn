@@ -166,7 +166,7 @@ deb: wsjt.py WsjtMod/Audio.so WsjtMod/g.py WsjtMod/__init__.py \
 
 	cp wsjt.py wsjtrc CALL3.TXT dmet_10_-1_3.dat \
 	dmet_20_-2_2.dat kvasd.dat KVASD_g95 TSKY.DAT \
-	wsjt.ico WSJT_Quick_Reference.pdf WSJT_User_600.pdf DEB/WSJT9
+	wsjt.ico wsjt.jpg WSJT_Quick_Reference.pdf WSJT_User_600.pdf DEB/WSJT9
 
 	cp WsjtMod/Audio.so DEB/WSJT9/WsjtMod
 	cp WsjtMod/*.py DEB/WSJT9/WsjtMod

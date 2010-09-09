@@ -1222,10 +1222,13 @@ def toggletxdf(event=NONE):
 #----------------------------------------------------- dtdf_change
 # Readout of graphical cursor location
 def dtdf_change(event):
-    if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4':
+    if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4' or mode.get()=='Diana':
         if event.y<40 and Audio.gcom2.nspecial==0:
             lab1.configure(text='Time (s)',bg="#33FFFF")   #light blue
-            t="%.1f" % (12.0*event.x/500.0-2.0,)
+            if mode.get()=='Diana':
+                t="%.1f" % (4.458*event.x/500.0-0.6,)
+            else:
+                t="%.1f" % (12.0*event.x/500.0-2.0,)
             lab6.configure(text=t,bg="#33FFFF")
         elif (event.y>=40 and event.y<95) or \
                  (event.y<95 and Audio.gcom2.nspecial>0):
@@ -1235,7 +1238,10 @@ def dtdf_change(event):
             lab6.configure(text=t,bg="red")
         else:
             lab1.configure(text='Time (s)',bg='green')
-            t="%.1f" % (53.0*event.x/500.0,)
+            if mode.get()=='Diana':
+                t="%.1f" % (event.x*30.0/500.0,)
+            else:
+                t="%.1f" % (53.0*event.x/500.0,)
             lab6.configure(text=t,bg="green")
     elif mode.get()=='Echo':
         lab1.configure(text='DF (Hz)',bg='red')
@@ -1523,18 +1529,21 @@ def plot_large():
 
         if Audio.gcom2.ccf[0] != -9999.0:
             y=[]
-            for i in range(65):             #Find ymax for blue curve
+            iz=65
+            if mode.get()=='Diana':
+                iz=96
+            fac=500.0/iz
+            for i in range(iz):             #Find ymax for blue curve
                 ccf=Audio.gcom2.ccf[i]
                 y.append(ccf)
             ymax=max(y)
             yfac=40.0
             if ymax>55.0/yfac: yfac=55.0/ymax
             xy2=[]
-            fac=500.0/64.6
-            for i in range(65):             #Make xy list for blue curve
+            for i in range(iz):             #Make xy list for blue curve
                 x=(i+0.5)*fac
                 if mode.get()[:3]=='JT4':
-                    x=(i+0.5)*500.0/105.0 + 15     #15 is empirical
+                    x=(i+0.5)*500.0/105.0 + 15      #15 is empirical
                 ccf=Audio.gcom2.ccf[i]
                 n=int(60.0-yfac*ccf)
                 xy2.append(x)

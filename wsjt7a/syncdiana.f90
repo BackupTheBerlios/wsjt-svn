@@ -57,7 +57,10 @@ subroutine syncdiana(fs0,kstep,nfreeze,mousedf,dftolerance,syncx,     &
   j=jpk+12
   if(j.gt.96) j=j-96
   ref=ref + fs0(ipk,j) + fs0(ipk+2,j) + fs0(ipk+6,j)
+
   ref=ref/3.0                         !Reference level near (DF,DT)
+  ccfred=0.5*ccfred/ref - 1.0
+  syncx=smax/ref - 1.0
 
   kk=0
   do j=0,4*nblk-1                     !Compute ccfblue
@@ -67,9 +70,9 @@ subroutine syncdiana(fs0,kstep,nfreeze,mousedf,dftolerance,syncx,     &
         if(k.gt.4*nblk) k=k-4*nblk
         ss=ss + fs0(ipk+2*isync(n),k)
      enddo
-     ccfblue(j+1)=ss/ref
+     jj=mod(j+80,96) - 5
+     ccfblue(jj)=0.5*(ss/ref - 1.0)
   enddo
-  syncx=smax/ref - 1.0
 
   smax=0.
   ja=jpk+16
