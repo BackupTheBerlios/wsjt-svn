@@ -1,8 +1,9 @@
 subroutine syncdiana(fs0,kstep,nfreeze,mousedf,dftolerance,syncx,     &
-     ipk,jpk,dfx,dtx,msglen,ccfblue)
+     ipk,jpk,dfx,dtx,msglen,ccfblue,ccfred)
 
   real fs0(1024,96)                       !Folded-for-sync spectra
   real ccfblue(-5:540)
+  real ccfred(-224:224)
   integer dftolerance
   integer isync(4)
   data isync/8,16,32,24/
@@ -14,31 +15,37 @@ subroutine syncdiana(fs0,kstep,nfreeze,mousedf,dftolerance,syncx,     &
   ipk=9999
   jpk=9999
 
-  ia=-10
-  ib=10
+  ia=-600.0/df
+  ib=600.0/df
   if(nfreeze.eq.1) then
      ia=(mousedf-dftolerance)/df
      ib=(mousedf+dftolerance)/df
   endif
 
-  do j=0,4*nblk-1                     !Find sync pattern, lags 0-95
-     do i=ia,ib                       !Search over DF range
+  do i=ia,ib                          !Search over DF range
+     sm1=0.
+     do j=0,4*nblk-1                  !Find sync pattern, lags 0-95
         ss=0.
         do n=1,4                      !Sum the four sync tones
            k=j+4*n-3
            if(k.gt.4*nblk) k=k-4*nblk
            ss=ss + fs0(i0+i+2*isync(n),k)
         enddo
-        if(ss.gt.smax) then
-           smax=ss
-           ipk=i0+i                   !Frequency offset, DF
-           jpk=j+1                    !Time offset, DT
+        if(ss.gt.sm1) then
+           sm1=ss
+           jpk1=j+1
         endif
+        if(abs(i).le.224) ccfred(i)=sm1
      enddo
+     if(sm1.gt.smax) then
+        smax=sm1
+        ipk=i0+i                   !Frequency offset, DF
+        jpk=jpk1
+     endif
   enddo
 
   dfx=(ipk-i0)*df
-  dtx=jpk*kstep/11025.0
+  dtx=jpk*kstep/11025.0 - 1.4
 
   ref=fs0(ipk+2,jpk) + fs0(ipk+4,jpk) + fs0(ipk+6,jpk)
   j=jpk+4

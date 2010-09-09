@@ -76,7 +76,7 @@ subroutine decode3(d2,jz,istart,filename)
   
   nclearave=0
   nagain=0
-  if(mode(1:4).eq.'JT65') then
+  if(mode(1:4).eq.'JT65' .or. mode(1:5).eq.'Diana') then
      call pix2d65(d2d,jz)
   else if(mode.eq.'FSK441' .or. mode(1:5).eq.'ISCAT' .or.              &
        mode(1:4).eq.'JTMS') then

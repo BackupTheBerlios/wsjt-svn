@@ -12,6 +12,7 @@ subroutine diana(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,       &
   real s0(1024,NSZ)
   real fs0(1024,96)                       !Folded-for-sync symbol spectra
   real ccfblue(-5:540)
+  real ccfred(-224:224)
   integer dftolerance
   data nsps/2048/,nsync/4/,nlen/2/,ndat/18/
 
@@ -25,7 +26,7 @@ subroutine diana(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,       &
   call specdiana(dat,npts,s0,jsym,fs0)   !Get symbol spectra, fold for sync
 
   call syncdiana(fs0,kstep,nfreeze,mousedf,dftolerance,syncx,     &
-     ipk,jpk,dfx,dtx,msglen,ccfblue)     !Establish sync; get DF, DT, msglen
+     ipk,jpk,dfx,dtx,msglen,ccfblue,ccfred)     !Get sync: DF, DT, msglen
   
   msg=' '
   nsnr=-27

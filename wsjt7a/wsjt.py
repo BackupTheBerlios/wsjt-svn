@@ -1459,7 +1459,10 @@ def plot_large():
         for i in range(ngreen):             #Make xy list for green curve
             green=Audio.gcom2.green[i]
             n=int(105.0-yfac*green)
-            xy.append(i)
+            if mode.get()=='Diana':
+                xy.append(2*i)
+            else:
+                xy.append(i)
             xy.append(n)
         graph1.create_line(xy,fill="green")
 
