@@ -103,35 +103,42 @@ def pal_AFMHot():
 #--------------------------------------------------- Command button routines
 #--------------------------------------------------- rx_volume
 def rx_volume():
-    for path in string.split(os.environ["PATH"], os.pathsep):
-        file = os.path.join(path, "sndvol32") + ".exe"
-        try:
-            return os.spawnv(os.P_NOWAIT, file, (file,) + (" -r",))
-        except os.error:
-            pass
+##    for path in string.split(os.environ["PATH"], os.pathsep):
+##        file = os.path.join(path, "sndvol32") + ".exe"
+##        try:
+##            return os.spawnv(os.P_NOWAIT, file, (file,) + (" -r",))
+##        except os.error:
+##            pass
+##
+### Vista soundcontrol has no parameter to select the inputlevel !!   3LST
+### so we have no solution to call it
+##    raise os.error, "Cannot find "+file
 
-# Vista soundcontrol has no parameter to select the inputlevel !!   3LST
-# so we have no solution to call it
-    raise os.error, "Cannot find "+file
+    file=g.appdir+"\\vol132.exe"
+    return os.spawnv(os.P_NOWAIT, file, (file,) + (" -r",))
 
 #--------------------------------------------------- tx_volume  ..extended for Vista
 def tx_volume():
-    for path in string.split(os.environ["PATH"], os.pathsep):
-        file = os.path.join(path, "sndvol32") + ".exe"
-        try:
-            return os.spawnv(os.P_NOWAIT, file, (file,))
-        except os.error:
-            pass
+##    for path in string.split(os.environ["PATH"], os.pathsep):
+##        file = os.path.join(path, "sndvol32") + ".exe"
+##        try:
+##            return os.spawnv(os.P_NOWAIT, file, (file,))
+##        except os.error:
+##            pass
+##
+###Vista soundcontrol is now sndvol.exe and we try to open it           3LST
+##    for path in string.split(os.environ["PATH"], os.pathsep):
+##        file = os.path.join(path, "sndvol") + ".exe"
+##        try:
+##            return os.spawnv(os.P_NOWAIT, file, (file,))
+##        except os.error:
+##            pass
+##
+##    raise os.error, "Cannot find "+file
 
-#Vista soundcontrol is now sndvol.exe and we try to open it           3LST
-    for path in string.split(os.environ["PATH"], os.pathsep):
-        file = os.path.join(path, "sndvol") + ".exe"
-        try:
-            return os.spawnv(os.P_NOWAIT, file, (file,))
-        except os.error:
-            pass
-
-    raise os.error, "Cannot find "+file
+    file=g.appdir+"\\vol132.exe"
+    return os.spawnv(os.P_NOWAIT, file, (file,))
+    
 
 #---------------------------------------------------- fdf_change
 # Readout of graphical cursor location
