@@ -28,6 +28,7 @@ integer lauto          !Are we in Auto mode?                    GUI
 integer mantx          !Manual transmission requested?       GUI,SoundIn
 integer nrestart       !True if transmission should restart  GUI,SoundIn
 integer ntr            !Are we in 2nd sequence?                 SoundIn
+integer ntxboth        !Transmit both sequqnces?                GUI
 integer nmsg           !Length of Tx message                    SoundIn
 integer nsave          !Which files to save?                    GUI
 integer nadd5          !Prepend 5 sec of 0's before decoding?   GUI 
@@ -104,7 +105,8 @@ parameter (ND2MAX=120*11025)
 common/gcom2/ps0(431),psavg(450),s2(64,3100),ccf(-5:540),             &
      green(500),ngreen,dgain,dlatency,fecho,iter,iyr,imo,ida,         &
      ndecoding,ndecoding0,mousebutton,ntc,necho,nfrit,ndither,        &
-     nsumecho,ndecdone,npingtime,ierr,lauto,mantx,nrestart,ntr,nmsg,  &
+     nsumecho,ndecdone,npingtime,ierr,lauto,mantx,nrestart,ntr,       &
+     ntxboth,nmsg,                                                    &
      nsave,nadd5,dftolerance,LDecoded,rxdone,monitoring,nzap,         &
      nsavecum,minsigdb,nclearave,newdat2,nfreeze,nafc,nmode,mode65,   &
      mode4,ndebug,nport,mousedf,                                      &

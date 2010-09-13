@@ -143,13 +143,18 @@ subroutine fivehz
      if(tx2.gt.(trperiod-2.0)) tx2=trperiod-tlatency-1.0
   endif
 
-  if(TxFirst.eq.0) then
+  if(TxFirst.eq.0 .and. ntxboth.eq.0) then
      tx1=tx1+trperiod
      tx2=tx2+trperiod
   endif
 
   t=mod(Tsec,2.d0*trperiod)
-  txtime = t.ge.tx1 .and. t.lt.tx2
+  if(ntxboth.eq.0) then
+     txtime = t.ge.tx1 .and. t.lt.tx2
+  else
+     txtime = (t.ge.tx1 .and. t.lt.tx2) .or.                     &
+          (t.ge.tx1+trperiod .and. t.lt.tx2+trperiod)
+  endif
 
 ! If we're transmitting, freeze the input buffer pointers where they were.
   receiving=1

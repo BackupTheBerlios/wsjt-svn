@@ -2085,6 +2085,12 @@ try:
 except:
     pass
 
+try:
+    f=open(appdir+'/txboth','r')
+    Audio.gcom2.ntxboth=1
+except:
+    Audio.gcom2.ntxboth=0
+
 if (sys.platform == 'darwin'):
     mbar.add_cascade(label="Mode", menu=modemenu)
 
