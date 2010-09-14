@@ -254,19 +254,9 @@ def freq_range(event):
 def set_frange():
     nfr.set(3-nfr.get())
 
-#---------------------------------------------------- freq_center
-##def freq_center(event):
-### Move clicked location to center of frequency scale
-##    global fmid,frange
-##    n=100*int(0.01*df*(event.x-375))
-##    fmid = fmid + n
-##    if fmid<1000: fmid=1000
-##    if fmid>1700: fmid=1700
-
 #---------------------------------------------------- decode_request
 def decode_request(event):
-    if (g.mode=='FSK441' or g.mode=='JTMS' or \
-        g.mode=='ISCAT') and nspeed0.get()>5:
+    if (g.mode=='FSK441' or g.mode=='JTMS') and nspeed0.get()>5:
 # If decoder is busy or we are not monitoring, ignore request
         if Audio.gcom2.ndecoding==0 and Audio.gcom2.monitoring:
             Audio.gcom2.mousebutton=event.num       #Left=1, Right=3
@@ -275,6 +265,15 @@ def decode_request(event):
                 Audio.gcom2.ndecoding=2             #Mouse pick, top half
             else:
                 Audio.gcom2.ndecoding=3             #Mouse pick, bottom half
+
+    elif g.mode=='ISCAT' and nspeed0.get()>5 and \
+          Audio.gcom2.ndecoding==0 and Audio.gcom2.monitoring:
+        Audio.gcom2.mousebutton=event.num       #Left=1, Right=3
+        Audio.gcom2.npingtime=int(40*event.x)   #Time (ms) of selected ping
+        if event.y <= 150:
+            Audio.gcom2.ndecoding=2             #Mouse pick, top half
+        else:
+            Audio.gcom2.ndecoding=3             #Mouse pick, bottom half
 
 #---------------------------------------------------- freeze_decode
 def freeze_decode(event):
@@ -572,14 +571,11 @@ c.pack(side=TOP)
 Widget.bind(c,"<Shift-Button-1>",freq_range)
 Widget.bind(c,"<Shift-Button-2>",freq_range)
 Widget.bind(c,"<Shift-Button-3>",freq_range)
-#Widget.bind(c,"<Control-Button-1>",freq_center)
-
 graph1=Canvas(iframe1, bg='black', width=750, height=300,bd=0,cursor='crosshair')
 graph1.pack(side=TOP)
 Widget.bind(graph1,"<Motion>",fdf_change)
-#Widget.bind(graph1,"<Button-1>",decode_request)
-Widget.bind(graph1,"<Button-3>",decode_request)
 Widget.bind(graph1,"<Button-1>",set_freezedf)
+Widget.bind(graph1,"<Button-3>",decode_request)
 Widget.bind(graph1,"<Double-Button-1>",freeze_decode)
 iframe1.pack(expand=1, fill=X)
 

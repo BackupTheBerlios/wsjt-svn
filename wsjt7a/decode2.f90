@@ -28,6 +28,10 @@ subroutine decode2
   else if(ndecoding.eq.2) then
 
 ! Mouse pick, top half of waterfall
+     if(mode(1:5).eq.'ISCAT' .and. MouseButton.eq.3) then
+        lenpick=istart
+        istart=1
+     endif
 ! The following is empirical:
      k=2048*ibuf0 + istart - 11025*mod(tbuf(ibuf0),dble(trperiod)) -3850
      if(k.le.0)      k=k+NRxMax
@@ -45,6 +49,10 @@ subroutine decode2
   else if(ndecoding.eq.3) then
 
 !Mouse pick, bottom half of waterfall
+     if(mode(1:5).eq.'ISCAT' .and. MouseButton.eq.3) then
+        lenpick=istart
+        istart=1
+     endif
      ib0=ibuf0-161
      if(lauto.eq.1 .and. mute.eq.0 .and. transmitting.eq.1) ib0=ibuf0-323
      if(ib0.lt.1) ib0=ib0+1024
@@ -74,14 +82,26 @@ subroutine decode2
         if(istart.lt.2) istart=2
         if(istart+jzz.gt.jzc) istart=jzc-jzz
      endif
-     call decode3(d2c(istart),jzz,istart,filename)
+     if(mode(1:5).eq.'ISCAT' .and. MouseButton.eq.3) then
+        lenpick=istart
+        istart=1
+        call decode3(d2c,lenpick,istart,filename)
+     else
+        call decode3(d2c(istart),jzz,istart,filename)
+     endif
 
   else if(ndecoding.eq.5) then
 ! Mouse pick, main window (but not from recorded file)
      istart=istart - 1512
      if(istart.lt.2) istart=2
      if(istart+lenpick.gt.jza) istart=jza-lenpick
-     call decode3(d2a(istart),lenpick,istart,fnamea)
+     if(mode(1:5).eq.'ISCAT' .and. MouseButton.eq.3) then
+        lenpick=istart
+        istart=2
+        call decode3(d2a,lenpick,istart,fnamea)
+     else
+        call decode3(d2a(istart),lenpick,istart,fnamea)
+     endif
   endif
   fnameb=fnamea
 

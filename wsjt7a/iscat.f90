@@ -78,8 +78,8 @@ subroutine iscat(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
 
   i0=2*13
   smax=0.
-  ipk=9999
-  jpk=9999
+  ipk=1
+  jpk=1
   ia=-400/df
   ib=400/df
   if(nfreeze.eq.1) then

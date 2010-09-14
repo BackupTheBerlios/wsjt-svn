@@ -5,7 +5,7 @@ subroutine decode3(d2,jz,istart,filename)
   character FileID*40
   include 'gcom1.f90'
   include 'gcom2.f90'
-  
+
   if(ichar(filename(1:1)).eq.0) go to 999
     
   FileID=filename
