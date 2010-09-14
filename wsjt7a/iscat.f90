@@ -80,12 +80,14 @@ subroutine iscat(dat,npts,cfile6,MinSigdB,DFTolerance,NFreeze,MouseDF,ccf,psavg)
   smax=0.
   ipk=9999
   jpk=9999
-  ia=-10
-  ib=10
+  ia=-400/df
+  ib=400/df
   if(nfreeze.eq.1) then
      ia=(mousedf-dftolerance)/df
      ib=(mousedf+dftolerance)/df
   endif
+  if(i0+ia.lt.1) ia=1-i0
+  if(i0+ib+3.gt.128) ib=128-3-i0
 
   do j=0,4*nblk-1                            !Find sync pattern, lags 0-95
      do i=ia,ib
