@@ -1614,25 +1614,25 @@ def plot_small():
         if i%2: ytop=115
         graph2.create_line([x,120,x,ytop],fill="white")
 
-#------------------------------------------------------ plot_yellow
-def plot_yellow():
-    nz=int(Audio.gcom2.ps0[215])
-    if nz>10:
-        y=[]
-        for i in range(nz):             #Find ymax for yellow curve
-            n=Audio.gcom2.ps0[i]
-            y.append(n)
-        ymax=max(y)
-        fac=1.0
-        if ymax>60: fac=60.0/ymax
-        xy2=[]
-        for i in range(nz):
-            x=int(2.34*i)
-            y=fac*Audio.gcom2.ps0[i] + 8
-            n=int(85.0-y)
-            xy2.append(x)
-            xy2.append(n)
-        graph1.create_line(xy2,fill="yellow")
+###------------------------------------------------------ plot_yellow
+##def plot_yellow():
+##    nz=int(Audio.gcom2.ps0[215])
+##    if nz>10:
+##        y=[]
+##        for i in range(nz):             #Find ymax for yellow curve
+##            n=Audio.gcom2.ps0[i]
+##            y.append(n)
+##        ymax=max(y)
+##        fac=1.0
+##        if ymax>60: fac=60.0/ymax
+##        xy2=[]
+##        for i in range(nz):
+##            x=int(2.34*i)
+##            y=fac*Audio.gcom2.ps0[i] + 8
+##            n=int(85.0-y)
+##            xy2.append(x)
+##            xy2.append(n)
+##        graph1.create_line(xy2,fill="yellow")
 
 #------------------------------------------------------ update
 def update():
