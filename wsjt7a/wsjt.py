@@ -94,6 +94,7 @@ neme=IntVar()
 nfreeze=IntVar()
 nhotaz=0
 nhotabetter=0
+nmeas=0
 nmonitor=IntVar()
 nopen=0
 nshrx=IntVar()
@@ -110,6 +111,7 @@ ToRadio0=""
 tx6alt=""
 txsnrdb=99.
 TxFirst=IntVar()
+xypm=[]
 green=zeros(500,'f')
 im=Image.new('P',(500,120))
 im.putpalette(Colormap2Palette(colormapLinrad),"RGB")
@@ -813,7 +815,12 @@ def ModeEcho(event=NONE):
     tx4.delete(0,99)
     tx5.delete(0,99)
     tx6.delete(0,99)
-    
+
+#------------------------------------------------------ ModeMeasure
+def ModeMeasure(event=NONE):
+    ModeEcho()
+    mode.set("Measure")
+
 #------------------------------------------------------ msgpos
 def msgpos():
     g=root_geom[root_geom.index("+"):]
@@ -1447,6 +1454,19 @@ def plot_echo():
     graph1.create_line(xy1,fill='#33FFFF')            #Light blue
     graph1.create_line(xy2,fill="red")
 
+#------------------------------------------------------ plot_meas
+def plot_meas(nmeas,db):
+    global xypm
+    graph1.delete(ALL)
+    if nmeas>500: nmeas=0
+    if nmeas<2:
+        xypm=[]
+    xypm.append(nmeas)
+    n=int(60.0-3.0*db)
+    xypm.append(n)
+    if nmeas>=2:
+        graph1.create_line(xypm,fill="green")
+
 #------------------------------------------------------ plot_large
 def plot_large():
     "Plot the green, red, and blue curves."
@@ -1618,7 +1638,7 @@ def plot_yellow():
 def update():
     global root_geom,isec0,naz,nel,ndmiles,ndkm,nhotaz,nhotabetter,nopen, \
            im,pim,cmap0,isync,isync441,isync_iscat,isync65,       \
-           isync_save,idsec,first,itol,txsnrdb,tx6alt
+           isync_save,idsec,first,itol,txsnrdb,tx6alt,nmeas
     
     utc=time.gmtime(time.time()+0.1*idsec)
     isec=utc[5]
@@ -1673,13 +1693,24 @@ def update():
 
         if mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4'\
                or mode.get()[:2]=='CW' or mode.get()=='Echo' \
-               or mode.get()=='Diana':
+               or mode.get()=='Diana' or mode.get()=='Measure':
             graph2.delete(ALL)
             graph2.create_text(80,13,anchor=CENTER,text="Moon",font=g2font)
             graph2.create_text(13,37,anchor=W, text="Az: %6.2f" % g.AzMoon,font=g2font)
             graph2.create_text(13,61,anchor=W, text="El: %6.2f" % g.ElMoon,font=g2font)
             graph2.create_text(13,85,anchor=W, text="Dop:%6d" % g.ndop,font=g2font)
             graph2.create_text(13,109,anchor=W,text="Dgrd:%5.1f" % g.Dgrd,font=g2font)
+
+        if mode.get()=='Measure' and Audio.gcom2.monitoring:
+            nmeas=nmeas+1
+            db=20.0*log10(g.rms/770.0+0.01)
+            t="%5d  %6.1f\n" % (nmeas,db,)
+            text.configure(state=NORMAL)
+            text.insert(END,t)
+            text.see(END)
+            plot_meas(nmeas,db)
+        else:
+            nmeas=0
 
     if (mode.get()[:4]=='JT65' or mode.get()[:3]=='JT4' \
         or mode.get()=='Diana') and g.freeze_decode:
@@ -1730,6 +1761,8 @@ def update():
             msg2.configure(bg='#88FF88')
         elif mode.get()=="Echo":
             msg2.configure(bg='#FF0000')
+        elif mode.get()=="Measure":
+            msg2.configure(bg='#FF8800')
         g.mode=mode.get()
         if first and mode.get()!='Echo': GenStdMsgs()
         first=0
@@ -2076,6 +2109,7 @@ modemenu.add_radiobutton(label = 'JT4F', variable=mode, command = ModeJT4F)
 modemenu.add_radiobutton(label = 'JT4G', variable=mode, command = ModeJT4G)
 modemenu.add_radiobutton(label = 'CW', variable=mode, command = ModeCW)
 modemenu.add_radiobutton(label = 'Echo', variable=mode, command = ModeEcho)
+modemenu.add_radiobutton(label = 'Measure', variable=mode, command = ModeMeasure)
 
 try:
     f=open(appdir+'/experimental','r')
@@ -2582,8 +2616,10 @@ try:
                 ModeJTMS()
             elif value[:3]=='JT4':
                 ModeJT4()
-            elif value[:4]=='Echo':
+            elif value=='Echo':
                 ModeEcho()
+            elif value=='Measure':
+                ModeMeasure()
         elif key == 'MyCall': options.MyCall.set(value)
         elif key == 'MyGrid': options.MyGrid.set(value)
         elif key == 'HisCall':
