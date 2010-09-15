@@ -1458,7 +1458,6 @@ def plot_echo():
 def plot_meas(nmeas,db):
     global xypm
     graph1.delete(ALL)
-    if nmeas>500: nmeas=0
     if nmeas<2:
         xypm=[]
     xypm.append(nmeas)
@@ -1703,6 +1702,7 @@ def update():
 
         if mode.get()=='Measure' and Audio.gcom2.monitoring:
             nmeas=nmeas+1
+            if nmeas>500: nmeas=1
             db=20.0*log10(g.rms/770.0+0.01)
             t="%5d  %6.1f\n" % (nmeas,db,)
             text.configure(state=NORMAL)
