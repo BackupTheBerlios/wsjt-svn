@@ -11,7 +11,6 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,             &
   character frag*28,frag0*29              !Message fragment to be matched
   complex cfrag(2100)                     !Complex waveform of message fragment
   complex z
-  real rr(60000)
   integer itone(84)                       !Generated tones for msg fragment
   real s(NMAX)
   real ccf(-6000:6000)
@@ -35,13 +34,12 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,             &
   sb0=0.75
   if(pick) then
      ccf0=2.1
-     sb0=0.65
+     sb0=0.60
   endif
 
 
   nsps=25                                  !Initialize variables
   nsam=nsps*ndits
-  mswidth=10*nint(100.0*width)
   dt=1.0/11025.0
   i0=(tstart-0.02)/dt
   if(i0.lt.1) i0=1
@@ -54,7 +52,6 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,             &
   nfft1=2**n
   df1=11025.0/nfft1
   nok=0
-  ibest=1
   sbest=0.
 
   call analytic(dat(i0),npts,nfft1,s,cdat)    !Convert to analytic signal
@@ -91,7 +88,6 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,             &
   call tweak1(cdat,npts,-dfx,cdat)            !Mix to standard frequency
 
 ! Look for best match to "frag", find its DT
-  fac=1.e-6/base
   do i=1,npts-nsam
      z=0.
      a=0.
@@ -101,18 +97,13 @@ subroutine chk441(dat,jz,tstart,width,nfreeze,mousedf,             &
      enddo
      ss=abs(z)/a
 !     ss=abs(z)
-     rr(i)=ss
      if(ss.gt.sbest) then
         sbest=ss
-        ibest=i
-        tbest=(i+i0-1)*dt
      endif
   enddo
-  rr(npts-nsam+1:)=0
   if(sbest.lt.sb0) go to 800            !Skip if not decodable FSK441 data
   nok=1
 
 800 continue
-
   return
 end subroutine chk441

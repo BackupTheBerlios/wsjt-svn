@@ -22,11 +22,11 @@ C  Longest allowed data analysis is 1 second.
       data c/' 123456789.,?/# $ABCD FGHIJKLMNOPQRSTUVWXY 0EZ*!'/
       data wgt/1.0,4.0,6.0,4.0,1.0/
 
-      kpk=0 !shut up compiler warnings -db
+      kpk=0                                !Silence compiler warning
       do i=1,NDMAX
         dit(i)=0
       enddo
-      NSPD=25                                !Change if FSK110 is implemented
+      NSPD=25                              !Change if FSK110 is implemented
       LTone=2
       NBaud=11025/NSPD
       npts=min(NMAX,npts0)

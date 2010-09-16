@@ -59,7 +59,6 @@ C  Find signal power at suitable intervals to search for pings.
          enddo
       endif
 !##################################################################
-
       call smooth(sigdb,nz)
 
 C  Remove baseline and one dB for good measure.
@@ -72,12 +71,12 @@ C  Remove baseline and one dB for good measure.
 
 C  If this is a "mouse pick" and no ping was found, force a pseudo-ping 
 C  at center of data.
-        if(pick.and.nping.eq.0) then
-           if(nping.le.99) nping=nping+1
-           pingdat(1,nping)=0.5*jz*dt
-           pingdat(2,nping)=0.16
-           pingdat(3,nping)=1.0
-        endif
+      if(pick.and.nping.eq.0) then
+         if(nping.le.99) nping=nping+1
+         pingdat(1,nping)=0.5*jz*dt
+         pingdat(2,nping)=0.16
+         pingdat(3,nping)=1.0
+      endif
 
       bigpeak=0.
       do iping=1,nping
@@ -113,8 +112,6 @@ C  Assemble a signal report:
          t2=tstart + dt*(istart-1)
 
          if(mode.eq.8) then
-!            write(75) cfile6,t2,mswidth,int(peak),nrpt,jjz,
-!     +      (dat(jj+j),j=1,jjz)
             jjzz=min(jjz,2*11025)       !Max data size 2 s 
             call jtms(dat(jj),jjzz,cfile6,t2,mswidth,int(peak),
      +           nrpt,nfreeze,DFTolerance,MouseDF,pick,mycall,hiscall)
@@ -123,8 +120,6 @@ C  Assemble a signal report:
 
          call chk441(dat,jz,tstart,width,nfreeze,mousedf,
      +               dftolerance,pick,nok)
-!         call new441(dat,jz,cfile6,tstart,t2,width,npeak,nrpt,
-!     +              nfreeze,mousedf,dftolerance,mycall,0,nok)
          if(msglen.eq.0 .or. nok.eq.0) go to 100
 
 C  Discard this ping if DF outside tolerance limits or bauderr too big.
