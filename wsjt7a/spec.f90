@@ -194,7 +194,7 @@ subroutine spec(brightness,contrast,logmap,ngain,nspeed,a)
 
 !  Compute pixel values 
   iz=750
-  logmap=0
+!  logmap=0
   if(brightness.ne.b0 .or. contrast.ne.c0 .or. logmap.ne.logmap0 .or.    &
           nspeed.ne.nspeed0 .or. nlines.gt.1) then
      iz=225000

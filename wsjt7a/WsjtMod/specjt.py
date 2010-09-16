@@ -515,6 +515,7 @@ setupmenu.palettes.add_radiobutton(label='Hot',command=pal_Hot,
 setupmenu.palettes.add_radiobutton(label='AFMHot',command=pal_AFMHot,
             value=5,variable=npal)
 setupmenu.add_cascade(label = 'Palette',menu=setupmenu.palettes)
+setupmenu.add_checkbutton(label='Logarithmic scale',variable=logmap)
 
 if (sys.platform == 'darwin'):
    mbar.add_cascade(label="Options", menu=setupmenu)
