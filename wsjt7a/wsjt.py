@@ -255,7 +255,7 @@ def dbl_click3_text(event):
         t=text.get('1.0',END)           #Entire contents of text box
         t1=text.get('1.0',CURRENT)      #Contents from start to mouse pointer
         n=t1.rfind("\n")
-        rpt=t1[n+9:n+15]
+        rpt=t1[n+9:n+12]
         if mode.get()=='Diana':
             rpt=t1[n+12:n+16]
         if rpt[0:1] == " ": rpt=rpt[1:]
