@@ -86,7 +86,7 @@ subroutine spec(brightness,contrast,logmap,ngain,nspeed,a)
      kread=kread+istep                       !Update pointer
   else
 ! Real-time data
-     dgain=2.0*10.0**(0.005*ngain)
+     dgain=2.0*10.0**(0.015*ngain)
      k=iread
      do i=1,nfft
         k=k+1
