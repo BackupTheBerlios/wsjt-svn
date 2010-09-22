@@ -247,7 +247,7 @@ int jtaudio_(int *ndevin, int *ndevout, short y1[], short y2[],
   inputParameters.device = ndevice_in;
   inputParameters.channelCount = 2;
   inputParameters.sampleFormat = paInt16;
-  inputParameters.suggestedLatency = 1.0;
+  inputParameters.suggestedLatency = 0.2;
   inputParameters.hostApiSpecificStreamInfo = NULL;
 
 // Test if this configuration actually works, so we do not run into an ugly assertion
@@ -282,7 +282,7 @@ int jtaudio_(int *ndevin, int *ndevout, short y1[], short y2[],
   outputParameters.device = ndevice_out;
   outputParameters.channelCount = 2;
   outputParameters.sampleFormat = paInt16;
-  outputParameters.suggestedLatency = 1.0;
+  outputParameters.suggestedLatency = 0.2;
   outputParameters.hostApiSpecificStreamInfo = NULL;
 
 // Test if this configuration actually works, so we do not run into an ugly assertion

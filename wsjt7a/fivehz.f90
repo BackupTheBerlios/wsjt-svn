@@ -101,7 +101,8 @@ subroutine fivehz
         go to 10
      endif
 
-     if(n3.eq.3 .and. s6.gt.s6z) then
+!     if(n3.eq.3 .and. s6.gt.s6z) then
+     if(n3.eq.3 .and. s6.gt.3.2) then
         i1=ptt(nport,pttport,0,iptt)        !Lower PTT
         t4a=s6
         n3=4
