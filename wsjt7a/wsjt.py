@@ -26,7 +26,7 @@ import thread
 import webbrowser
 
 root = Tk()
-Version="9.01 r" + "$Rev$"[6:-1]
+Version="9.02 r" + "$Rev$"[6:-1]
 print "******************************************************************"
 print "WSJT Version " + Version + ", by K1JT"
 print "Revision date: " + \
@@ -2757,7 +2757,7 @@ if nmonitor.get():
 else:
     stopmon()
 if g.Win32: root.iconbitmap("wsjt.ico")
-root.title('  WSJT 9.01     by K1JT')
+root.title('  WSJT 9.02     by K1JT')
 from WsjtMod import astro
 from WsjtMod import specjt
 
