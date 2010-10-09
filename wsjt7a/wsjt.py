@@ -2434,7 +2434,7 @@ ldsec.grid(column=2,row=4,ipadx=3,padx=2,pady=0)
 
 f5a.pack(side=LEFT,expand=1,fill=BOTH)
 
-#------------------------------------------------------ Receiving parameters
+#------------------------------------------------------ Rx parameters
 f5b=Frame(iframe5,bd=0)
 f5b1=Frame(f5b,bd=2,relief=GROOVE)
 f5b1.grid(column=0,row=0,padx=2,sticky='EW')
@@ -2467,6 +2467,7 @@ Widget.bind(ltol,'<Button-3>',dectol)
 Widget.bind(ldsec,'<Button-1>',incdsec)
 Widget.bind(ldsec,'<Button-3>',decdsec)
 
+#------------------------------------------------------ Tx parameters
 f5b2=Frame(f5b,bd=2,relief=GROOVE)
 f5b2.grid(column=0,row=1,padx=2,sticky='EW')
 txfirst=Checkbutton(f5b2,text='Tx First',justify=RIGHT,variable=TxFirst)
@@ -2478,6 +2479,7 @@ shmsg.grid(column=1,row=0,sticky='W',padx=2)
 report=Entry(f5b2, width=4)
 report.insert(0,'26')
 report.grid(column=1,row=1,sticky='W',padx=7)
+report.bind('<Double-Button-1>',GenStdMsgs)
 labreport=Label(f5b2,text='Rpt:',width=4,underline=0)
 labreport.grid(column=0,row=1,sticky='E',padx=0)
 
