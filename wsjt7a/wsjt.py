@@ -1937,7 +1937,11 @@ def update():
 #    if Audio.gcom1.samfacin>1.01: Audio.gcom1.samfacin=1.01
 # ... etc.
     Audio.gcom2.mycall=(options.MyCall.get()+(' '*12))[:12]
-    Audio.gcom2.hiscall=(ToRadio.get()+(' '*12))[:12]
+    try:
+        Audio.gcom2.hiscall=(ToRadio.get()+(' '*12))[:12]
+    except:
+        MsgBox("Bad callsign: "+ToRadio.get()+".\nPlease re-enter.")
+        clrToRadio(None)
     Audio.gcom2.hisgrid=(HisGrid.get()+(' '*6))[:6]
     Audio.gcom4.addpfx=(options.addpfx.get().lstrip().upper()+(' '*8))[:8]
     Audio.gcom2.ntxreq=ntx.get()
