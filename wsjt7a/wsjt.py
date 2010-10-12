@@ -1675,12 +1675,12 @@ def update():
             g.AzSun,g.ElSun,g.AzMoon,g.ElMoon,g.AzMoonB,g.ElMoonB,g.ntsky, \
                 g.ndop,g.ndop00,g.dbMoon,g.RAMoon,g.DecMoon,g.HA8,g.Dgrd,  \
                 g.sd,g.poloffset,g.MaxNR,g.dfdt,g.dfdt0,g.RaAux,g.DecAux, \
-                g.AzAux,g.ElAux,g.w1,g.w2,g.w501,g.w502 = Audio.astro0(   \
+                g.AzAux,g.ElAux,g.w1,g.w2,g.w501,g.w502,g.xlst = Audio.astro0( \
                     utc[0],utc[1],utc[2],utchours,nfreq.get(),            \
                     options.MyGrid.get().upper(),       \
                     options.auxra.get()+(' '*9)[:9],    \
                     options.auxdec.get()+(' '*9)[:9])
-            
+
             if len(HisGrid.get().strip())<4:
                 g.ndop=g.ndop00
                 g.dfdt=g.dfdt0

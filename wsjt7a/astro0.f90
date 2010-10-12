@@ -1,18 +1,18 @@
 subroutine astro0(nyear,month,nday,uth8,nfreq,grid,cauxra,cauxdec,       &
      AzSun8,ElSun8,AzMoon8,ElMoon8,AzMoonB8,ElMoonB8,ntsky,ndop,ndop00,  &
      dbMoon8,RAMoon8,DecMoon8,HA8,Dgrd8,sd8,poloffset8,xnr8,dfdt,dfdt0,  &
-     RaAux8,DecAux8,AzAux8,ElAux8,width1,width2,w501,w502)
+     RaAux8,DecAux8,AzAux8,ElAux8,width1,width2,w501,w502,xlst8)
 
 !f2py threadsafe
 !f2py intent(in) nyear,month,nday,uth8,nfreq,grid,cauxra,cauxdec
-!f2py intent(out) AzSun8,ElSun8,AzMoon8,ElMoon8,AzMoonB8,ElMoonB8,ntsky,ndop,ndop00,dbMoon8,RAMoon8,DecMoon8,HA8,Dgrd8,sd8,poloffset8,xnr8,dfdt,dfdt0,RaAux8,DecAux8,AzAux8,ElAux8,width1,width2,w501,w502
+!f2py intent(out) AzSun8,ElSun8,AzMoon8,ElMoon8,AzMoonB8,ElMoonB8,ntsky,ndop,ndop00,dbMoon8,RAMoon8,DecMoon8,HA8,Dgrd8,sd8,poloffset8,xnr8,dfdt,dfdt0,RaAux8,DecAux8,AzAux8,ElAux8,width1,width2,w501,w502,xlst8
 
   parameter (DEGS=57.2957795130823d0)
   character grid*6
   character*9 cauxra,cauxdec
   real*8 AzSun8,ElSun8,AzMoon8,ElMoon8,AzMoonB8,ElMoonB8,AzAux8,ElAux8
   real*8 dbMoon8,RAMoon8,DecMoon8,HA8,Dgrd8,xnr8,dfdt,dfdt0,dt
-  real*8 sd8,poloffset8,day8,width1,width2,w501,w502
+  real*8 sd8,poloffset8,day8,width1,width2,w501,w502,xlst8
   include 'gcom2.f90'
   data uth8z/0.d0/,imin0/-99/
   save
@@ -59,15 +59,16 @@ subroutine astro0(nyear,month,nday,uth8,nfreq,grid,cauxra,cauxdec,       &
   call astro(nyear,month,nday,uth,nfreq,hisgrid,2,nmode,1,    &
        AzSun,ElSun,AzMoon,ElMoon,ntsky,doppler00,doppler,            &
        dbMoon,RAMoon,DecMoon,HA,Dgrd,sd,poloffset,xnr,auxra,auxdec,  &
-       AzAux,ElAux,day,xlon2,xlat2)
+       AzAux,ElAux,day,xlon2,xlat2,xlst)
   AzMoonB8=AzMoon
   ElMoonB8=ElMoon
   call astro(nyear,month,nday,uth,nfreq,grid,1,nmode,1,       &
        AzSun,ElSun,AzMoon,ElMoon,ntsky,doppler00,doppler,            &
        dbMoon,RAMoon,DecMoon,HA,Dgrd,sd,poloffset,xnr,auxra,auxdec,  &
-       AzAux,ElAux,day,xlon1,xlat1)
+       AzAux,ElAux,day,xlon1,xlat1,xlst)
 
   day8=day
+  xlst8=xlst
   call tm2(day8,xlat1,xlon1,xl1,b1)
   call tm2(day8,xlat2,xlon2,xl2,b2)
   call tm2(day8+1.d0/1440.0,xlat1,xlon1,xl1a,b1a)

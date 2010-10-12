@@ -1,7 +1,7 @@
       subroutine astro(nyear,month,nday,uth,nfreq,Mygrid,
      +     NStation,mode,MoonDX,AzSun,ElSun,AzMoon,ElMoon0,
      +     ntsky,doppler00,doppler,dbMoon,RAMoon,DecMoon,HA,Dgrd,sd,
-     +     poloffset,xnr,auxra,auxdec,azaux,elaux,day,lon,lat)
+     +     poloffset,xnr,auxra,auxdec,azaux,elaux,day,lon,lat,LST)
 
 C  Computes astronomical quantities for display in JT65, CW, and EME Echo mode.
 C  NB: may want to smooth the Tsky map to 10 degrees or so.

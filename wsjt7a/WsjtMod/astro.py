@@ -42,8 +42,10 @@ def update():
     if g.nfreq==2: t8="Freq:  1.8 Tsky:%6d\n" % (g.ntsky)
     if g.nfreq==4: t8="Freq:  3.5 Tsky:%6d\n" % (g.ntsky)
     t9= "MNR: %5.1f  Dgrd:%6.1f\n" % (g.MaxNR,g.Dgrd)
-    t10="DPol: %4d  SD:%8.2f\n" % (g.poloffset,g.sd)
-    t=t1+t2+t3+t4+t4a+t5+t6+t7+t7aa+t7ab+t7a+t7b+t7c+t8+t9+t10
+    t10="DPol: %4d  SD:%8.2f\n\n" % (g.poloffset,g.sd)
+    t11="LST (h):  %6.3f\n" % (g.xlst,)
+
+    t=t1+t2+t3+t4+t4a+t5+t6+t7+t7aa+t7ab+t7a+t7b+t7c+t8+t9+t10+t11
     lab1.configure(text=t)
     g.astro_geom=root.geometry()
     frame.after(1000,update)
