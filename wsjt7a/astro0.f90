@@ -132,8 +132,12 @@ subroutine astro0(nyear,month,nday,uth8,nfreq,grid,cauxra,cauxdec,       &
      ih=uth8
      im=mod(imin,60)
      is=mod(isec,60)
-     rewind 14
-     write(14,1010,err=800) ih,im,is,AzMoon,ElMoon,                          &
+     do i=80,1,-1
+        if(AzElDir(i:i).ne.' ') goto 700
+     enddo
+700  jz=i
+     open(14,file=AzElDir(:jz)//'/azel.dat',status='unknown',err=930)
+     write(14,1010,err=800) ih,im,is,AzMoon,ElMoon,                  &
         ih,im,is,AzSun,ElSun,                                        &
         ih,im,is,AzAux,ElAux,                                        &
         nfreq,doppler,dfdt,doppler00,dfdt0
@@ -141,10 +145,13 @@ subroutine astro0(nyear,month,nday,uth8,nfreq,grid,cauxra,cauxdec,       &
             i2.2,':',i2.2,':',i2.2,',',f5.1,',',f5.1,',Sun'/         &
             i2.2,':',i2.2,':',i2.2,',',f5.1,',',f5.1,',Source'/      &
             i5,',',f8.1,',',f8.2,',',f8.1,',',f8.2,',Doppler')
-     rewind 14
+     close(14)
 800  isec0=isec
      call cs_unlock
   endif
-
   return
+
+930 print*,'Error opening azel.dat'
+  stop
+
 end subroutine astro0

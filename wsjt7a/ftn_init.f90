@@ -52,9 +52,6 @@ subroutine ftn_init
        err=920)
   endfile 12
 
-  open(14,file=appdir(:iz)//'/azel.dat',status='unknown',                 &
-       err=930)
-
   open(15,file=appdir(:iz)//'/debug.txt',status='unknown',                 &
        err=940)
 
@@ -86,8 +83,6 @@ subroutine ftn_init
 910 print*,'Error opening DECODED.TXT'
   stop
 920 print*,'Error opening DECODED.AVE'
-  stop
-930 print*,'Error opening azel.dat'
   stop
 940 print*,'Error opening DEBUG.TXT'
   stop
