@@ -157,7 +157,17 @@ for widget in widgets:
 
 Pmw.alignlabels(widgets)
 mycall.component('entry').focus_set()
-f1=Frame(g1.interior(),width=100,height=20)
+
+f0=Frame(g1.interior(),width=100,height=15)
+ndtr=IntVar()
+Label(f0,text='PTT line:  ').pack(side=LEFT)
+rb7=Radiobutton(f0,text='DTR',value=1,variable=ndtr)
+rb8=Radiobutton(f0,text='RTS',value=0,variable=ndtr)
+rb7.pack(anchor=W,side=LEFT,padx=2,pady=2)
+rb8.pack(anchor=W,side=LEFT,padx=2,pady=2)
+f0.pack()
+
+f1=Frame(g1.interior(),width=100,height=15)
 mileskm=IntVar()
 Label(f1,text='Distance unit:').pack(side=LEFT)
 rb5=Radiobutton(f1,text='mi',value=0,variable=mileskm)
@@ -238,7 +248,6 @@ widgets = (temp_prefix,aux_ra,aux_dec,azeldir_entry,ntc_entry, \
 for widget in widgets:
     widget.pack(padx=10,pady=2)
 Pmw.alignlabels(widgets)
-
 
 g1.pack(side=LEFT,fill=BOTH,expand=1,padx=6,pady=6)
 g2.pack(side=LEFT,fill=BOTH,expand=1,padx=6,pady=6)

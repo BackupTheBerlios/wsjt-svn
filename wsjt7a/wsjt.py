@@ -1958,6 +1958,7 @@ def update():
     Audio.gcom2.dftolerance=ntol[itol]
     Audio.gcom2.neme=neme.get()
     Audio.gcom2.ndepth=ndepth.get()
+    Audio.gcom2.ndtr=options.ndtr.get()
     if mode.get()=='CW':
         Audio.gcom2.ntdecode=56
     else:
@@ -2657,6 +2658,7 @@ try:
                 Audio.gcom2.nport=0
             Audio.gcom2.pttport=(options.PttPort.get()+(' '*80))[:80]
         elif key == 'Mileskm': options.mileskm.set(value)
+        elif key == 'nDTR': options.ndtr.set(value)
         elif key == 'MsgStyle': options.ireport.set(value)
         elif key == 'Region': options.iregion.set(value)
         elif key == 'AudioIn':
@@ -2788,6 +2790,7 @@ f.write("HisGrid " + t + "\n")
 f.write("IDinterval " + str(options.IDinterval.get()) + "\n")
 f.write("PttPort " + str(options.PttPort.get()) + "\n")
 f.write("Mileskm " + str(options.mileskm.get()) + "\n")
+f.write("nDTR " + str(options.ndtr.get()) + "\n")
 f.write("MsgStyle " + str(options.ireport.get()) + "\n")
 f.write("Region " + str(options.iregion.get()) + "\n")
 f.write("AudioIn " + options.DevinName.get() + "\n")

@@ -76,7 +76,7 @@ subroutine fivehz
 ! When s6 has wrapped back to zero, start a new cycle
      if(s6.lt.s6z) then
         TxOK=0                              !Lower TxOK
-        i1=ptt(nport,pttport,1,iptt)        !Raise PTT
+        i1=ptt(nport,pttport,1,ndtr,iptt)   !Raise PTT
         call wsjtgen                        !Generate the waveform
         t1a=s6
         n3=1
@@ -103,7 +103,7 @@ subroutine fivehz
 
 !     if(n3.eq.3 .and. s6.gt.s6z) then
      if(n3.eq.3 .and. s6.gt.3.2) then
-        i1=ptt(nport,pttport,0,iptt)        !Lower PTT
+        i1=ptt(nport,pttport,0,ndtr,iptt)        !Lower PTT
         t4a=s6
         n3=4
 !        if(ndebug.gt.0) write(*,3001) n3,s6,s6-t3a,' Lower PTT'
@@ -186,12 +186,12 @@ subroutine fivehz
 ! Switch PTT line and TxOK appropriately
   if(lauto.eq.1) then
      if(txtime .and. iptt.eq.0 .and.          &
-          mute.eq.0) i1=ptt(nport,pttport,1,iptt)        !Raise PTT
-     if(.not.txtime .or. mute.eq.1) TxOK=0               !Lower TxOK
+          mute.eq.0) i1=ptt(nport,pttport,1,ndtr,iptt)        !Raise PTT
+     if(.not.txtime .or. mute.eq.1) TxOK=0                    !Lower TxOK
   else
      if(mantx.eq.1 .and. iptt.eq.0 .and.      &
-          mute.eq.0) i2=ptt(nport,pttport,1,iptt)        !Raise PTT
-     if(mantx.eq.0 .or. mute.eq.1) TxOK=0                !Lower TxOK
+          mute.eq.0) i2=ptt(nport,pttport,1,ndtr,iptt)        !Raise PTT
+     if(mantx.eq.0 .or. mute.eq.1) TxOK=0                     !Lower TxOK
   endif
 
 ! Calculate Tx waveform as needed
@@ -212,7 +212,7 @@ subroutine fivehz
   if(nc0a.lt.5) nc0a=5
   if(TxOK.eq.0 .and. TxOKz.eq.1 .and. iptt.eq.1) nc0=-nc0a-1
   if(nc0.le.0) nc0=nc0+1
-  if(nc0.eq.0) i3=ptt(nport,pttport,0,iptt)
+  if(nc0.eq.0) i3=ptt(nport,pttport,0,ndtr,iptt)
 
   if(iptt.eq.0 .and.TxOK.eq.0) then
      sending="                      "

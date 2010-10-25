@@ -34,7 +34,8 @@ subroutine ftn_init
 
   call cs_init
   call cs_lock('ftn_init')
-  i=ptt(nport,pttport,0,iptt)                       !Clear the PTT line
+  i=ptt(nport,pttport,0,1,iptt)                       !Clear DTR line
+  i=ptt(nport,pttport,0,0,iptt)                       !Clear RTS line
   addpfx='    '
 
   do i=80,1,-1
