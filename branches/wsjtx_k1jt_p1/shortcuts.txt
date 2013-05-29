@@ -1,0 +1,26 @@
+F1	Online User's Guide
+Ctrl+F1	About WSJT-X
+F2	Open configuration window
+F3	Display keyboard shortcuts
+F4	Clear Dx Call and Dx Grid entries
+Alt+F4	Exit program
+F5	Display special mouse commands
+F6	Open next in directory
+F11	Move Rx frequency down 1 Hz
+Ctrl+F11     	Move Rx and Tx frequencies down 1 Hz
+F12	Move Rx frequency up 1 Hz
+Ctrl+F12     	Move Rx and Tx frequencies up 1 Hz
+Shift+F6     	Decode remaining files in directory
+Alt+D	Decode again at QSO frequency
+Shift+D	Full-bandwidth decode (both windows)
+Alt+E	Erase()
+Ctrl+F	Edit the free text message box
+Alt+G	Generate standard messages
+Alt+H	Halt Tx()
+Ctrl+L	Lookup callsign in database, generate standard messages
+Alt M	Monitor()
+Alt+N	Enable Tx()
+Alt+Q	Log QSO()
+Alt+S	Stop()
+Alt+T	Tune
+Alt+V	Save the most recently completed *.wav file
